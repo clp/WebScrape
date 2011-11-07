@@ -1,0 +1,8 @@
+webscrape version 0.01
+=================================
+
+Go to a web site, grab HTML, and extract the data with a Perl regex.
+
+
+
+
