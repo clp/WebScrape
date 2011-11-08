@@ -25,21 +25,19 @@ unless ($url) {
 }
 
 
-
 my $mech = WWW::Mechanize->new();
-my $outfile = "out.html";
 $mech->agent_alias( 'Linux Mozilla' );
 $mech->get($url);
-
 my $output_page = $mech->content();
+
 my $out;
+my $outfile = "out.html";
+
 open($out, '>', $outfile);
 print {$out} "$output_page";
 close($out);
 
 exit 1;
-
-
 
 
 sub usage {
@@ -58,17 +56,15 @@ eousage
 }
 
 
-
 =begin notes
 
 Notes.
 
-1.  Use agent_alias() to get response from some sites that prohibit
+1.  Use agent_alias() to get a response from some sites that prohibit
 robots.
 
-2.  WWW::Mechanize might not be a good solution to use for pages 
+2.  WWW::Mechanize might not be a good solution to use for pages
 with Javascript.
-
 
 =end notes
 
