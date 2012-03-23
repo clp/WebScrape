@@ -50,14 +50,6 @@ eousage
 
 =begin notes
 
-Notes.
-
-1.  Use agent_alias() to get a response from some sites that prohibit
-robots.
-
-2.  WWW::Mechanize might not be a good solution to use for pages
-with Javascript.
-
 =end notes
 
 =cut
