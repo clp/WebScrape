@@ -1,44 +1,267 @@
 #! /usr/bin/env perl
 
+# scraper  clpoda  2012_0323
+# PC-batbug:/home/clpoda/p/WebScrape/bin
+  # Time-stamp: <Fri 2012 Mar 23 02:23:29 PMPM clpoda> 
+  # Scrape the wsj.com site for letters to the editor
+  #
+# Plan
+  # Build a release from this experimental code.
+  # Divide this code into a back-end web scraping module,
+  # and a program w/ site-specific code & data for wsj.com
+# Status
+  # Fri2012_0323_12:51  Scraper works; now parse the data.
+
 use strict;
 use warnings;
 
 use Getopt::Long;
+
+
+
+#TBD use Carp;
+#TBD use Data::Dumper;
+use File::Slurp;
+#TBD use HTML::Entities;
+use HTML::TreeBuilder;
+# TBD use JSON;
+use File::Path qw(remove_tree make_path);
+use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
+#TBD use DateTime;
+use Try::Tiny;
+use feature qw( switch say );
+#TBD use autodie qw( remove_tree );
+#TBD use Storable;
+#TBD use IO::Zlib;
+
+
 
 our $VERSION = '0.01';
 
-my $prog = $0;
-$prog =~ s{\A.*/}{};    # strip leading path, if any
+# Initialize
+my $source_name = "wsj";
+my $domain_name = "wsj.com";
+#TBR my $rootdir     = "/home/www";
+my $rootdir     = "/home/clpoda";
+#TBR my $tvshowdir   = "ddt_dev/scraper_done/cbs/tv";
+my $tvshowdir   = "ddt_dev/scraper_done/cbs/tv";
+my $msg;
 
-my $url;
-unless ( GetOptions( 'url=s' => \$url, ) ) {
+
+
+
+# Initialize
+  my $program = $0;
+  $program =~ s{\A.*/}{};    # strip leading path, if any
+  my $now = localtime;
+  #
+  # Raw data dir, eg, ./, /tmp, /var/tmp, ~/tmp/raw
+  my $raw_data_dir = "./";
+  my $log_file = $raw_data_dir . "$program.log";
+  #TBD # Name the $out_file later; it contains a time stamp.
+  #TBD my $out_file;
+  #
+  #TBD my $data_src = "__DATA__";
+  my $data_src = "web";
+
+
+# Set up logging.
+  Log::Log4perl->easy_init( {
+    #OK level => $INFO,
+    #OK level  => $WARN,
+    level  => $DEBUG,
+    file => ">>$program.log"
+    }
+  );
+  #
+  # Prepare to write o/p file.
+  my $h_log;
+  open $h_log, ">>$log_file";
+  # close $h_log;
+
+
+
+
+my $start_url;
+$start_url = qq{http://online.wsj.com/public/page/letters.html}; #CFG
+unless ( GetOptions( 'start_url=s' => \$start_url, ) ) {
     die usage();
 }
-unless ($url) {
-    die "$prog died: No url found on command line.\n\n", usage();
+unless ($start_url) {
+    die "$program died: No url found in file or on command line.\n\n", usage();
 }
 
 my $mech = WWW::Mechanize->new();
 $mech->agent_alias('Linux Mozilla');
-$mech->get($url);
-my $output_page = $mech->content();
+$mech->get($start_url);
+my $web_page = $mech->content();
 
 my $out;
 my $outfile = "out.html";
+$outfile = "wsj.lte.html"; #CFG
 
 open( $out, '>', $outfile );
-print {$out} "$output_page";
+print {$out} "$web_page";
 close($out);
+
+
+
+
+# Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
+__PACKAGE__->new->run unless caller;
+
+sub run {
+  my ($application) = @_;
+  my $start_time = localtime();
+  print "\n$0: Started run() at $start_time.\n";
+  DEBUG( "Started run() at $start_time" );
+
+  #
+  # Initialize --------------------------------------------------
+
+
+  #TBD.Fri2012_0323_13:14  Fix code below here for scraper.
+  #
+  my $total_distributions_count = 0;
+  my $total_test_modules_count = 0;
+  my $test_related_count = 0;
+  my @entries_about_test = ();
+  my $total_entries_about_test = 0;
+
+  #TMP1 # TBD init_tvshowdir();
+
+  #TMP1 print "   $0: See results at $rootdir/$tvshowdir when done.\n";
+  #TMP1 print "   $0: See log data at /home/www/ddt_dev/log/scraper/. \n\n";
+
+  #TMP1 write_file( $showlist_file, "" );
+
+  #OPT-DBG
+my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
+  if ( -d $raw_dir ) {
+    remove_tree($raw_dir);
+  }
+  make_path($raw_dir);
+
+  #
+  #---------------------------------------------------------------
+  # Get start page w/ data.
+  #
+  #TBR my $start_url = "http://www.cpan.org";
+
+  my $start_page = get_start_page( $mech, $start_url );
+
+  my $tree = HTML::TreeBuilder->new_from_content($start_page);
+
+  say "\n-----------------------------------------------------------";
+  say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
+  say "\n-----------------------------------------------------------";
+  say "DBG \$tree->as_text:\n", $tree->as_text;
+
+  my $in_file ;
+#
+### Added Sun2012_0318_16:42 
+
+
+=begin comment
+
+=end comment
+
+=cut
+
+
+  #---------------------------------------------------------------
+  #---------------------------------------------------------------
+  # Print summary stats at end of the program.
+  #TMP4 $tree->delete;
+
+  my $done_time = localtime();
+  my ($end_msg1);
+  $end_msg1 =
+      "$0\n"
+    . "  using data src ,$data_src,\n"
+    . "  ran from $start_time to $done_time.\n"
+    . "  Found ,$total_test_modules_count, entries with 'Test::'\n"
+    . "  and   ,$total_entries_about_test, entries with 'test'.\n";
+
+  DEBUG( $end_msg1 );
+  print { $application->{output_fh} } $end_msg1 . "\n";
+
+}  # End of run().
+
+close $h_log;
+
+
+sub new {
+  my ($class) = @_;
+  my $application = bless {}, $class;
+  $application->init;
+  $application;
+}
+
+sub init {
+  # TBD Add some or all init code here later.
+  my ($application) = @_;
+  $application->{output_fh} = \*STDOUT;
+}
+
+sub output_fh {
+  my ( $application, $fh ) = @_;
+  if ($fh) {
+    $application->{output_fh} = $fh;
+  }
+  $application->{output_fh};
+}
+
+
+
+
+
+
+=begin comment
+
+#TBD Verify page title: </script><title>Letters - WSJ.com</title>
+
+#
+# Format of the page.
+# h1 tags identify each heading, which has 1 or more letter.
+# Each letter has one or more paragraphs inside p - /p tags.
+# The author's name is inside p b - /b /p tags.
+# More author data follows inside p i - /i /p tags, at least location
+# (City, State); can also include a person's title and affiliation
+# w/ some organization.
+# The last letter is followed by: 
+#   <!-- article end -->
+# and there is a corresponding 'article start' before the first 
+# letter.
+#
+# The start of a section of letters w/ h1 tag is like this:
+#   <h1 class="boldEighteenTimes" style="margin: 0px 0px 0px 0px;">Perhaps the 2013 Fiscal Cliff  Presents an Opportunity
+#   </h1>
+# Maybe use the 'class' parameter to distinguish this desired
+# heading from any other h1 headings on the page.
+#
+
+my $start_page = get_start_page( $mech, $start_url );
+my $tree = HTML::TreeBuilder->new_from_content($start_page);
+### End of code to read data from network.
+
+save_raw_data( $source_name, $raw_dir, $start_page, $tree );
+
+
+=end comment
+
+=cut
+
 
 exit 1;
 
 sub usage {
     return <<"eousage";
 Usage:
-  $prog -u url
+  $program -u url
 
-$prog requests a web site to return a page, and displays the HTML
+$program requests a web site to return a page, and displays the HTML
 data found there.
 
 Options to control the query
@@ -48,17 +271,55 @@ Options to control the query
 eousage
 }
 
-=begin notes
 
-Notes.
+#
+#
+# Subroutines
+#
+#
 
-1.  Use agent_alias() to get a response from some sites that prohibit
-robots.
+#
+#---------------------------------------------------------------
+sub get_start_page {
+  my ( $mech, $start_url ) = @_;
+  my $response;
+  try {
+    $response = $mech->get($start_url);
+  }
+  catch {
+    my $msg = "ERR: DIE: Caught error while getting web page: $_"
+      . "  response->status_line: [$response->status_line].";
+    log_debug( 'NoShow', $msg, $source_name );
+    die "ERR: Cannot get web page [$start_url]; try later.";
+  };
 
-2.  WWW::Mechanize might not be a good solution to use for pages
-with Javascript.
+  if ( !$response->is_success ) {
+    my $msg = "Bad response to request for [$start_url]: "
+      . $response->status_line;
+    log_debug( 'NoShow', $msg, $source_name );
+    die
+      "ERR: Got bad response to request for [$start_url]; try later.";
+  }
+  return $mech->content();
+}    # End get_start_page.
 
-=end notes
 
-=cut
+#---------------------------------------------------------------
+sub save_raw_data {
+  my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
+
+  #OPT-DBG
+  # Optional: save raw downloaded page & other content for debugging.
+  my $page_file = "$source_name.index-full-episodes.raw";
+  write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
+    $start_page )
+    or log_debug( 'NoShow', $!, $source_name );
+  write_file( "tree_builder_dump_as_html", $tree->as_HTML )
+    or log_debug( 'NoShow', $!, $source_name );
+  write_file( "tree_builder_dump_as_text", { binmode => ':utf8' },
+    $tree->as_text )
+    or log_debug( 'NoShow', $!, $source_name );
+  ### End of OPT-DBG
+}    # End of sub save_raw_data
+
 
