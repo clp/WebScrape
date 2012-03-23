@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Fri 2012 Mar 23 02:23:29 PMPM clpoda> 
+  # Time-stamp: <Fri 2012 Mar 23 03:02:00 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -42,13 +42,9 @@ our $VERSION = '0.01';
 # Initialize
 my $source_name = "wsj";
 my $domain_name = "wsj.com";
-#TBR my $rootdir     = "/home/www";
 my $rootdir     = "/home/clpoda";
-#TBR my $tvshowdir   = "ddt_dev/scraper_done/cbs/tv";
-my $tvshowdir   = "ddt_dev/scraper_done/cbs/tv";
+my $outputdir   = "p/WebScrape/scraped_data/wsj/lte"; #CFG
 my $msg;
-
-
 
 
 # Initialize
@@ -57,8 +53,9 @@ my $msg;
   my $now = localtime;
   #
   # Raw data dir, eg, ./, /tmp, /var/tmp, ~/tmp/raw
-  my $raw_data_dir = "./";
-  my $log_file = $raw_data_dir . "$program.log";
+  #ORG my $log_dir = "./";
+  my $log_dir = "/home/clpoda/p/WebScrape/log/";
+  my $log_file = $log_dir . "$program.log";
   #TBD # Name the $out_file later; it contains a time stamp.
   #TBD my $out_file;
   #
@@ -93,17 +90,9 @@ unless ($start_url) {
 }
 
 my $mech = WWW::Mechanize->new();
-$mech->agent_alias('Linux Mozilla');
-$mech->get($start_url);
-my $web_page = $mech->content();
-
-my $out;
-my $outfile = "out.html";
-$outfile = "wsj.lte.html"; #CFG
-
-open( $out, '>', $outfile );
-print {$out} "$web_page";
-close($out);
+#TBR $mech->agent_alias('Linux Mozilla');
+#TBR $mech->get($start_url);
+#TBR my $web_page = $mech->content();
 
 
 
@@ -120,24 +109,25 @@ sub run {
   #
   # Initialize --------------------------------------------------
 
-
   #TBD.Fri2012_0323_13:14  Fix code below here for scraper.
   #
   my $total_distributions_count = 0;
-  my $total_test_modules_count = 0;
+  my $total_letters_count = 0;
   my $test_related_count = 0;
   my @entries_about_test = ();
   my $total_entries_about_test = 0;
 
-  #TMP1 # TBD init_tvshowdir();
+  init_dirs($rootdir, $outputdir);
 
-  #TMP1 print "   $0: See results at $rootdir/$tvshowdir when done.\n";
-  #TMP1 print "   $0: See log data at /home/www/ddt_dev/log/scraper/. \n\n";
+
+  #TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
+  #TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
   #TMP1 write_file( $showlist_file, "" );
 
   #OPT-DBG
-my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
+  #ORG my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
+  my $raw_dir = "$rootdir/p/WebScrape/scraped_data/wsj/tmp";
   if ( -d $raw_dir ) {
     remove_tree($raw_dir);
   }
@@ -153,8 +143,15 @@ my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
 
   my $tree = HTML::TreeBuilder->new_from_content($start_page);
 
+  my $out;
+  my $outfile = "wsj.lte.html"; #CFG
+  open( $out, '>', $outfile );
+  print {$out} "$start_page";
+  close($out);
+
+
   say "\n-----------------------------------------------------------";
-  say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
+  #DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
   say "\n-----------------------------------------------------------";
   say "DBG \$tree->as_text:\n", $tree->as_text;
 
@@ -162,12 +159,6 @@ my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
 #
 ### Added Sun2012_0318_16:42 
 
-
-=begin comment
-
-=end comment
-
-=cut
 
 
   #---------------------------------------------------------------
@@ -181,8 +172,7 @@ my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
       "$0\n"
     . "  using data src ,$data_src,\n"
     . "  ran from $start_time to $done_time.\n"
-    . "  Found ,$total_test_modules_count, entries with 'Test::'\n"
-    . "  and   ,$total_entries_about_test, entries with 'test'.\n";
+    . "  Found ,$total_letters_count, letters to the editor in $source_name.\n"
 
   DEBUG( $end_msg1 );
   print { $application->{output_fh} } $end_msg1 . "\n";
@@ -277,6 +267,17 @@ eousage
 # Subroutines
 #
 #
+
+#
+#---------------------------------------------------------------
+sub init_dirs {
+  my ( $rootdir, $outputdir ) = @_;
+  if ( -d "$rootdir/$outputdir" ) {
+    remove_tree("$rootdir/$outputdir");
+  }
+  make_path("$rootdir/$outputdir");
+}
+
 
 #
 #---------------------------------------------------------------
