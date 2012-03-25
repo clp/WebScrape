@@ -1,8 +1,10 @@
 #! /usr/bin/env perl
 
+my $USE_LOCAL_DATA = 1; # 1=Do not query web site.
+
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Fri 2012 Mar 23 05:01:13 PMPM clpoda> 
+  # Time-stamp: <Sat 2012 Mar 24 09:34:05 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -43,7 +45,8 @@ our $VERSION = '0.01';
 my $source_name = "wsj";
 my $domain_name = "wsj.com";
 my $rootdir     = "/home/clpoda";
-my $outputdir   = "p/WebScrape/scraped_data/wsj/lte"; #CFG
+#ORG my $outputdir   = "p/WebScrape/scraped_data/wsj/lte"; #CFG
+my $outputdir   = "p/WebScrape/data/wsj/lte"; #CFG
 my $msg;
 
 
@@ -127,7 +130,8 @@ sub run {
 
   #OPT-DBG
   #ORG my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
-  my $raw_dir = "$rootdir/p/WebScrape/scraped_data/wsj/tmp";
+  #ORG2 my $raw_dir = "$rootdir/p/WebScrape/scraped_data/wsj/tmp";
+  my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
   if ( -d $raw_dir ) {
     remove_tree($raw_dir);
   }
@@ -139,9 +143,17 @@ sub run {
   #
   #TBR my $start_url = "http://www.cpan.org";
 
-  my $start_page = get_start_page( $mech, $start_url );
-
-  my $tree = HTML::TreeBuilder->new_from_content($start_page);
+  my $start_page;
+  my $tree;
+  if ( $USE_LOCAL_DATA ) {
+    #F $start_page = "$raw_dir/wsj.lte.raw";
+    $start_page = "$rootdir/p/WebScrape/data/wsj/wsj.lte.raw";
+    $tree = HTML::TreeBuilder->new_from_file($start_page);
+  }
+  else {
+    $start_page = get_start_page( $mech, $start_url );
+    $tree = HTML::TreeBuilder->new_from_content($start_page);
+  }
 
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
@@ -162,10 +174,11 @@ sub run {
 
   # Parse the response & extract desired data.
   #   Select the portion of the page that holds our data.
-  #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker
+  #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
   #   Parse the text for data: heading, article, letter body, etc.
-  while ( <> ) {
-    extract_one_letter( $tree );
+  for ( my $i=0; $i<2; $i++ ) {  #DBG Only get one or a few letters.
+    say "\nDBG Getting letter $i: -----------------------------------------------------------";
+    extract_one_letter_to_editor( $tree );
   }
 
 
@@ -332,9 +345,9 @@ sub save_raw_data {
 
 #TBD Add subs?
 # get_page_with_lte()
-# extract_one_letter()
+# extract_one_letter_to_editor()
 
-sub extract_one_letter {
+sub extract_one_letter_to_editor {
   my $tree = shift;
   my $letter_headline = $tree->look_down(
     '_tag' => 'h1',
@@ -348,6 +361,7 @@ sub extract_one_letter {
   foreach (@letter_paragraphs) {
     #F say "DBG One Para:\n", dump $_;
     say "DBG One Para:\n";
+    $Data::Dumper::Maxdepth = 1;  # 2 shows content of letters.
     say Dumper ($_);
   }
 
