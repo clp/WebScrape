@@ -63,7 +63,8 @@ my $msg;
   #TBD my $out_file;
   #
   #TBD my $data_src = "__DATA__";
-  my $data_src = "web";
+  #TBD my $data_src = "web";
+  my $data_src = "local file copy of web page";
 
 
 # Set up logging.
@@ -103,7 +104,7 @@ my $mech = WWW::Mechanize->new();
 # Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
 __PACKAGE__->new->run unless caller;
 
-sub run {
+sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime();
   print "\n$0: Started run() at $start_time.\n";
@@ -164,7 +165,7 @@ sub run {
   close($out);
 
 
-  say "\n-----------------------------------------------------------";
+  #DBG say "\n-----------------------------------------------------------";
   #DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
   say "\n-----------------------------------------------------------";
   say "DBG \$tree->as_text:\n", $tree->as_text;
@@ -176,11 +177,25 @@ sub run {
   #   Select the portion of the page that holds our data.
   #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
   #   Parse the text for data: heading, article, letter body, etc.
-  for ( my $i=0; $i<2; $i++ ) {  #DBG Only get one or a few letters.
-    say "\nDBG Getting letter $i: -----------------------------------------------------------";
-    extract_one_letter_to_editor( $tree );
-  }
+  my @all_letters_data;
+  #TBD1 for ( my $i=0; $i<2; $i++ ) {  #DBG Only get one or a few letters.
+  #TBD1 say "\nDBG Getting letter $i: -----------------------------------------------------------";
+    my @topics = extract_topics( $tree );
+    foreach ( @topics ) {
+      my @letters = extract_letters($_);
+      foreach ( @letters ) {
+        push @all_letters_data , extract_one_letter_to_editor($_);
+        $total_letters_count++;
+      }
+    }
+    #TBD1 }
 
+  #---------------------------------------------------------------
+  # Save data from all letters found.
+  foreach (@all_letters_data ) {
+    write_file( "all_letters", { binmode => ':utf8' }, $_ )
+      or DEBUG ( 'save_letters_data', $!, $source_name );
+  }
 
   #---------------------------------------------------------------
   # Print summary stats at end of the program.
@@ -202,20 +217,20 @@ sub run {
 close $h_log;
 
 
-sub new {
+sub new { #------------------------------------------------------
   my ($class) = @_;
   my $application = bless {}, $class;
   $application->init;
   $application;
 }
 
-sub init {
+sub init { #-----------------------------------------------------
   # TBD Add some or all init code here later.
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
 }
 
-sub output_fh {
+sub output_fh { #------------------------------------------------
   my ( $application, $fh ) = @_;
   if ($fh) {
     $application->{output_fh} = $fh;
@@ -267,11 +282,11 @@ exit 1;
 
 #
 #
-# Subroutines
+# Subroutines ---------------------------------------------------
 #
 #
 
-sub usage {
+sub usage { #----------------------------------------------------
     return <<"eousage";
 Usage:
   $program -u url
@@ -288,8 +303,7 @@ eousage
 
 
 #
-#---------------------------------------------------------------
-sub init_dirs {
+sub init_dirs { #------------------------------------------------
   my ( $rootdir, $outputdir ) = @_;
   if ( -d "$rootdir/$outputdir" ) {
     remove_tree("$rootdir/$outputdir");
@@ -299,8 +313,7 @@ sub init_dirs {
 
 
 #
-#---------------------------------------------------------------
-sub get_start_page {
+sub get_start_page { #-------------------------------------------
   my ( $mech, $start_url ) = @_;
   my $response;
   try {
@@ -324,8 +337,7 @@ sub get_start_page {
 }    # End get_start_page.
 
 
-#---------------------------------------------------------------
-sub save_raw_data {
+sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
 
   #OPT-DBG
@@ -345,24 +357,56 @@ sub save_raw_data {
 
 #TBD Add subs?
 # get_page_with_lte()
-# extract_one_letter_to_editor()
 
-sub extract_one_letter_to_editor {
+
+sub extract_letters { #------------------------------------------
+  say "DBG extract_letters()";
+  my $topic = shift;
+  #TBD2 my @letters = $topic->parent->look_down(
+  my @letters = $topic->look_down(
+    '_tag' => 'p',
+    # '_tag' => 'h1',
+    # 'class' => 'boldEighteenTimes',
+  )
+  # ->look_down(
+  # '_tag' => 'p',
+  # )  
+  ;
+  $Data::Dumper::Maxdepth = 2;  # 2 shows content
+  say "\nDBG \@letters:";
+  #DBG say Dumper @letters;
+  return @letters;
+}
+
+
+sub extract_topics { #-------------------------------------------
   my $tree = shift;
-  my $letter_headline = $tree->look_down(
+  my @letter_headlines = $tree->look_down(
     '_tag' => 'h1',
     'class' => 'boldEighteenTimes',
   );
+  $Data::Dumper::Maxdepth = 2;  # 2 shows content
+  say "\nDBG \@letter_headlines:";
+  say Dumper @letter_headlines;
+  return @letter_headlines;
+}
+
+
+sub extract_one_letter_to_editor { #-----------------------------
+  my $letter = shift;
+  my @letter_contents = $letter->parent->look_down(
+    '_tag' => 'p',
+  );
 
   # Collect a list of paragraphs of each letter.
-  my @letter_paragraphs =
-    $letter_headline->parent->look_down( "_tag" => "p", );
+  # my @letter_paragraphs =
+  # $letter_headline->parent->look_down( "_tag" => "p", );
 
-  foreach (@letter_paragraphs) {
+  foreach (@letter_contents) {
     #F say "DBG One Para:\n", dump $_;
-    say "DBG One Para:\n";
+    #DBG say "DBG One Para:\n";
     $Data::Dumper::Maxdepth = 1;  # 2 shows content of letters.
-    say Dumper ($_);
+    #DBG say Dumper ($_);
   }
 
   ## HTML on the page to match:
