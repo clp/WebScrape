@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Fri 2012 Mar 23 03:34:18 PMPM clpoda> 
+  # Time-stamp: <Fri 2012 Mar 23 05:01:13 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -20,7 +20,7 @@ use Getopt::Long;
 
 
 #TBD use Carp;
-#TBD use Data::Dumper;
+use Data::Dumper;
 use File::Slurp;
 #TBD use HTML::Entities;
 use HTML::TreeBuilder;
@@ -157,10 +157,16 @@ sub run {
   say "\n-----------------------------------------------------------";
   say "DBG \$tree->as_text:\n", $tree->as_text;
 
-  my $in_file ;
-#
-### Added Sun2012_0318_16:42 
+  #TBR my $in_file ;
 
+
+  # Parse the response & extract desired data.
+  #   Select the portion of the page that holds our data.
+  #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker
+  #   Parse the text for data: heading, article, letter body, etc.
+  while ( <> ) {
+    extract_one_letter( $tree );
+  }
 
 
   #---------------------------------------------------------------
@@ -323,4 +329,37 @@ sub save_raw_data {
   ### End of OPT-DBG
 }    # End of sub save_raw_data
 
+
+#TBD Add subs?
+# get_page_with_lte()
+# extract_one_letter()
+
+sub extract_one_letter {
+  my $tree = shift;
+  my $letter_headline = $tree->look_down(
+    '_tag' => 'h1',
+    'class' => 'boldEighteenTimes',
+  );
+
+  # Collect a list of paragraphs of each letter.
+  my @letter_paragraphs =
+    $letter_headline->parent->look_down( "_tag" => "p", );
+
+  foreach (@letter_paragraphs) {
+    #F say "DBG One Para:\n", dump $_;
+    say "DBG One Para:\n";
+    say Dumper ($_);
+  }
+
+  ## HTML on the page to match:
+  ## TBD
+  #TBD if ($letter_headline) {
+  #TBD ( $ep_element_6, $hex_id, $show_id ) = $letter_headline->parent->as_HTML =~
+  #TBD m{.* 'Full.Episodes','(.*?)', \s* (.*?), \s* (\d+?),  .*}ix;
+  #TBD }
+  #TBD else {
+  #TBD return ( 0, 0, 0 );
+  #TBD }
+  
+}
 
