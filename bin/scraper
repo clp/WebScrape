@@ -14,6 +14,9 @@ my $USE_LOCAL_DATA = 1; # 1=Do not query web site.
 # Status
   # Fri2012_0323_12:51  Scraper works; now parse the data.
 
+# Format of the page: see codenotes.otl file.
+
+
 use strict;
 use warnings;
 
@@ -156,6 +159,8 @@ sub run { #------------------------------------------------------
     $tree = HTML::TreeBuilder->new_from_content($start_page);
   }
 
+  #TBD Verify page title: </script><title>Letters - WSJ.com</title>
+
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   #TBR # Replace w/ write_file:
@@ -174,7 +179,7 @@ sub run { #------------------------------------------------------
   open( $treeout, '>', "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
   $tree->dump( $treeout );
   close($treeout);
-  
+
   #F write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump", $tree->dump );
 
 
@@ -251,45 +256,6 @@ sub output_fh { #------------------------------------------------
   }
   $application->{output_fh};
 }
-
-
-
-
-
-
-=begin comment
-
-#TBD Verify page title: </script><title>Letters - WSJ.com</title>
-
-#
-# Format of the page.
-# h1 tags identify each heading, which has 1 or more letter.
-# Each letter has one or more paragraphs inside p - /p tags.
-# The author's name is inside p b - /b /p tags.
-# More author data follows inside p i - /i /p tags, at least location
-# (City, State); can also include a person's title and affiliation
-# w/ some organization.
-# The last letter is followed by: 
-#   <!-- article end -->
-# and there is a corresponding 'article start' before the first 
-# letter.
-#
-# The start of a section of letters w/ h1 tag is like this:
-#   <h1 class="boldEighteenTimes" style="margin: 0px 0px 0px 0px;">Perhaps the 2013 Fiscal Cliff  Presents an Opportunity
-#   </h1>
-# Maybe use the 'class' parameter to distinguish this desired
-# heading from any other h1 headings on the page.
-#
-
-my $start_page = get_start_page( $mech, $start_url );
-my $tree = HTML::TreeBuilder->new_from_content($start_page);
-### End of code to read data from network.
-
-
-=end comment
-
-=cut
-
 
 exit 1;
 
