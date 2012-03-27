@@ -36,6 +36,7 @@ use feature qw( switch say );
 #TBD use autodie qw( remove_tree );
 #TBD use Storable;
 #TBD use IO::Zlib;
+use HTML::Element::Library;
 
 
 
@@ -139,8 +140,7 @@ sub run { #------------------------------------------------------
   make_path($raw_dir);
 
   #
-  #---------------------------------------------------------------
-  # Get start page w/ data.
+  # Get start page w/ data.  ------------------------------------
   #
   #TBR my $start_url = "http://www.cpan.org";
 
@@ -173,7 +173,7 @@ sub run { #------------------------------------------------------
   #TBR my $in_file ;
 
 
-  # Parse the response & extract desired data.
+  # Parse the response & extract desired data. ------------------
   #   Select the portion of the page that holds our data.
   #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
   #   Parse the text for data: heading, article, letter body, etc.
@@ -193,7 +193,8 @@ sub run { #------------------------------------------------------
   #---------------------------------------------------------------
   # Save data from all letters found.
   foreach (@all_letters_data ) {
-    write_file( "all_letters", { binmode => ':utf8' }, $_ )
+    #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
+    append_file ( "all_letters", { binmode => ':utf8' }, $_ )
       or DEBUG ( 'save_letters_data', $!, $source_name );
   }
 
@@ -363,15 +364,19 @@ sub extract_letters { #------------------------------------------
   say "DBG extract_letters()";
   my $topic = shift;
   #TBD2 my @letters = $topic->parent->look_down(
-  my @letters = $topic->look_down(
-    '_tag' => 'p',
+  #TBD3 my @letters = $topic->look_down(
+  #F my @letters = $topic->siblings(
+  #F my $letter_group = $topic->look_down(
+  my $letter_group = $topic->parent->look_down(
+    # '_tag' => 'p',
     # '_tag' => 'h1',
     # 'class' => 'boldEighteenTimes',
+    # )
+    # ->look_down(
+  '_tag' => 'p',
   )
-  # ->look_down(
-  # '_tag' => 'p',
-  # )  
   ;
+  my @letters = $letter_group->siblings;
   $Data::Dumper::Maxdepth = 2;  # 2 shows content
   say "\nDBG \@letters:";
   #DBG say Dumper @letters;
@@ -394,6 +399,7 @@ sub extract_topics { #-------------------------------------------
 
 sub extract_one_letter_to_editor { #-----------------------------
   my $letter = shift;
+  #TBD3  my @letter_contents = $letter->parent->look_down(
   my @letter_contents = $letter->parent->look_down(
     '_tag' => 'p',
   );
@@ -405,7 +411,7 @@ sub extract_one_letter_to_editor { #-----------------------------
   foreach (@letter_contents) {
     #F say "DBG One Para:\n", dump $_;
     #DBG say "DBG One Para:\n";
-    $Data::Dumper::Maxdepth = 1;  # 2 shows content of letters.
+    $Data::Dumper::Maxdepth = 2;  # 2 shows content of letters.
     #DBG say Dumper ($_);
   }
 
@@ -418,6 +424,7 @@ sub extract_one_letter_to_editor { #-----------------------------
   #TBD else {
   #TBD return ( 0, 0, 0 );
   #TBD }
-  
+
+  return @letter_contents;
 }
 
