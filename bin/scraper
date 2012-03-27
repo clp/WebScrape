@@ -147,9 +147,9 @@ sub run { #------------------------------------------------------
   my $start_page;
   my $tree;
   if ( $USE_LOCAL_DATA ) {
-    #F $start_page = "$raw_dir/wsj.lte.raw";
-    $start_page = "$rootdir/p/WebScrape/data/wsj/wsj.lte.raw";
-    $tree = HTML::TreeBuilder->new_from_file($start_page);
+    $start_page = read_file( "$rootdir/p/WebScrape/data/wsj/wsj.lte.html" );
+    #TBD $tree = HTML::TreeBuilder->new_from_file($start_page);
+    $tree = HTML::TreeBuilder->new_from_content($start_page);
   }
   else {
     $start_page = get_start_page( $mech, $start_url );
@@ -158,11 +158,24 @@ sub run { #------------------------------------------------------
 
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-  my $out;
-  my $outfile = "wsj.lte.html"; #CFG
-  open( $out, '>', $outfile );
-  print {$out} "$start_page";
-  close($out);
+  #TBR # Replace w/ write_file:
+  #TBR my $out;
+  #TBR my $outfile = "wsj.lte.html"; #CFG
+  #TBR open( $out, '>', $outfile );
+  #TBR print {$out} "$start_page";
+  #TBR close($out);
+  #TBR #
+  write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html", $start_page );
+
+  #DBG Save structured view of web page.
+  #TBD my $treedump = $tree->dump;
+  my $treeout;
+  #TBR my $outfile = "wsj.lte.html"; #CFG
+  open( $treeout, '>', "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
+  $tree->dump( $treeout );
+  close($treeout);
+  
+  #F write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump", $tree->dump );
 
 
   #DBG say "\n-----------------------------------------------------------";
