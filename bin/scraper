@@ -1,10 +1,8 @@
 #! /usr/bin/env perl
 
-my $USE_LOCAL_DATA = 1; # 1=Do not query web site.
-
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Sat 2012 Mar 24 09:34:05 PMPM clpoda> 
+  # Time-stamp: <Tue 2012 Mar 27 04:20:08 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -14,35 +12,33 @@ my $USE_LOCAL_DATA = 1; # 1=Do not query web site.
 # Status
   # Fri2012_0323_12:51  Scraper works; now parse the data.
 
-# Format of the page: see codenotes.otl file.
+# Format of the web page: see codenotes.otl file.
 
 
 use strict;
 use warnings;
 
-use Getopt::Long;
-
-
-
 #TBD use Carp;
 use Data::Dumper;
+use File::Path qw(remove_tree make_path);
 use File::Slurp;
+use Getopt::Long;
+use HTML::Element::Library;
 #TBD use HTML::Entities;
 use HTML::TreeBuilder;
 # TBD use JSON;
-use File::Path qw(remove_tree make_path);
 use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
 #TBD use DateTime;
 use Try::Tiny;
 use feature qw( switch say );
-#TBD use autodie qw( remove_tree );
+
+#TBD use autodie ;
 #TBD use Storable;
 #TBD use IO::Zlib;
-use HTML::Element::Library;
 
 
-
+my $USE_LOCAL_DATA = 1; # 1=Do not query web site.
 our $VERSION = '0.01';
 
 # Initialize
@@ -98,11 +94,7 @@ unless ($start_url) {
 }
 
 my $mech = WWW::Mechanize->new();
-#TBR $mech->agent_alias('Linux Mozilla');
-#TBR $mech->get($start_url);
-#TBR my $web_page = $mech->content();
-
-
+$mech->agent_alias('Linux Mozilla');
 
 
 # Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
@@ -119,11 +111,7 @@ sub run { #------------------------------------------------------
 
   #TBD.Fri2012_0323_13:14  Fix code below here for scraper.
   #
-  my $total_distributions_count = 0;
   my $total_letters_count = 0;
-  my $test_related_count = 0;
-  my @entries_about_test = ();
-  my $total_entries_about_test = 0;
 
   init_dirs($rootdir, $outputdir);
 
@@ -131,11 +119,7 @@ sub run { #------------------------------------------------------
   #TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
   #TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
-  #TMP1 write_file( $showlist_file, "" );
-
   #OPT-DBG
-  #ORG my $raw_dir = "$rootdir/ddt_dev/scraper_done/cbs/tmp";
-  #ORG2 my $raw_dir = "$rootdir/p/WebScrape/scraped_data/wsj/tmp";
   my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
   if ( -d $raw_dir ) {
     remove_tree($raw_dir);
@@ -145,8 +129,6 @@ sub run { #------------------------------------------------------
   #
   # Get start page w/ data.  ------------------------------------
   #
-  #TBR my $start_url = "http://www.cpan.org";
-
   my $start_page;
   my $tree;
   if ( $USE_LOCAL_DATA ) {
@@ -163,53 +145,41 @@ sub run { #------------------------------------------------------
 
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-  #TBR # Replace w/ write_file:
-  #TBR my $out;
-  #TBR my $outfile = "wsj.lte.html"; #CFG
-  #TBR open( $out, '>', $outfile );
-  #TBR print {$out} "$start_page";
-  #TBR close($out);
-  #TBR #
   write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html", $start_page );
 
   #DBG Save structured view of web page.
-  #TBD my $treedump = $tree->dump;
   my $treeout;
-  #TBR my $outfile = "wsj.lte.html"; #CFG
   open( $treeout, '>', "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
   $tree->dump( $treeout );
   close($treeout);
 
-  #F write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump", $tree->dump );
-
-
   #DBG say "\n-----------------------------------------------------------";
   #DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
-  say "\n-----------------------------------------------------------";
-  say "DBG \$tree->as_text:\n", $tree->as_text;
-
-  #TBR my $in_file ;
+  #DBG say "\n-----------------------------------------------------------";
+  #DBG say "DBG \$tree->as_text:\n", $tree->as_text;
 
 
+  #
+  # Parse the web page for data.  -------------------------------
+  #
   # Parse the response & extract desired data. ------------------
   #   Select the portion of the page that holds our data.
   #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
+  #   Extract each letter from the group of letters.
   #   Parse the text for data: heading, article, letter body, etc.
   my @all_letters_data;
-  #TBD1 for ( my $i=0; $i<2; $i++ ) {  #DBG Only get one or a few letters.
-  #TBD1 say "\nDBG Getting letter $i: -----------------------------------------------------------";
-    my @topics = extract_topics( $tree );
-    foreach ( @topics ) {
-      my @letters = extract_letters($_);
-      foreach ( @letters ) {
-        push @all_letters_data , extract_one_letter_to_editor($_);
-        $total_letters_count++;
-      }
+  my @topics = extract_topics( $tree );
+  foreach ( @topics ) {
+    my @letters = extract_letters($_);
+    foreach ( @letters ) {
+      push @all_letters_data , extract_one_letter_to_editor($_);
+      $total_letters_count++;
     }
-    #TBD1 }
+  }
 
   #---------------------------------------------------------------
   # Save data from all letters found.
+  write_file( "all_letters", "" );
   foreach (@all_letters_data ) {
     #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
     append_file ( "all_letters", { binmode => ':utf8' }, $_ )
@@ -218,7 +188,7 @@ sub run { #------------------------------------------------------
 
   #---------------------------------------------------------------
   # Print summary stats at end of the program.
-  #TMP4 $tree->delete;
+  $tree->delete;
 
   my $done_time = localtime();
   my ($end_msg1);
@@ -234,6 +204,15 @@ sub run { #------------------------------------------------------
 }  # End of run().
 
 close $h_log;
+
+exit 1;
+
+
+#
+#
+# Subroutines ---------------------------------------------------
+#
+#
 
 
 sub new { #------------------------------------------------------
@@ -257,15 +236,6 @@ sub output_fh { #------------------------------------------------
   $application->{output_fh};
 }
 
-exit 1;
-
-
-#
-#
-# Subroutines ---------------------------------------------------
-#
-#
-
 sub usage { #----------------------------------------------------
     return <<"eousage";
 Usage:
@@ -282,7 +252,6 @@ eousage
 }
 
 
-#
 sub init_dirs { #------------------------------------------------
   my ( $rootdir, $outputdir ) = @_;
   if ( -d "$rootdir/$outputdir" ) {
@@ -292,7 +261,6 @@ sub init_dirs { #------------------------------------------------
 }
 
 
-#
 sub get_start_page { #-------------------------------------------
   my ( $mech, $start_url ) = @_;
   my $response;
@@ -339,30 +307,6 @@ sub save_raw_data { #--------------------------------------------
 # get_page_with_lte()
 
 
-sub extract_letters { #------------------------------------------
-  say "DBG extract_letters()";
-  my $topic = shift;
-  #TBD2 my @letters = $topic->parent->look_down(
-  #TBD3 my @letters = $topic->look_down(
-  #F my @letters = $topic->siblings(
-  #F my $letter_group = $topic->look_down(
-  my $letter_group = $topic->parent->look_down(
-    # '_tag' => 'p',
-    # '_tag' => 'h1',
-    # 'class' => 'boldEighteenTimes',
-    # )
-    # ->look_down(
-  '_tag' => 'p',
-  )
-  ;
-  my @letters = $letter_group->siblings;
-  $Data::Dumper::Maxdepth = 2;  # 2 shows content
-  say "\nDBG \@letters:";
-  #DBG say Dumper @letters;
-  return @letters;
-}
-
-
 sub extract_topics { #-------------------------------------------
   my $tree = shift;
   my @letter_headlines = $tree->look_down(
@@ -373,6 +317,20 @@ sub extract_topics { #-------------------------------------------
   say "\nDBG \@letter_headlines:";
   say Dumper @letter_headlines;
   return @letter_headlines;
+}
+
+
+sub extract_letters { #------------------------------------------
+  say "DBG extract_letters()";
+  my $topic = shift;
+  my $letter_group = $topic->parent->look_down(
+    '_tag' => 'p',
+  );
+  my @letters = $letter_group->siblings;
+  $Data::Dumper::Maxdepth = 2;  # 2 shows content
+  say "\nDBG \@letters:";
+  #DBG say Dumper @letters;
+  return @letters;
 }
 
 
