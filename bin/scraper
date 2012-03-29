@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Mar 29 10:18:01 AMAM clpoda>
+# Time-stamp: <Thu 2012 Mar 29 01:21:22 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -183,11 +183,46 @@ sub run { #------------------------------------------------------
   my $author_locn;
   my $author_data = '';
   my $next_sibling_right;
+
+  ## Loop on each topic. -----------------------------------------
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
     say "DBG topic: ", $topics[$_]->{_content}[0];
 
     ##DBG $letters_under_topic = $sibs[0]->{_content}[3 * $_]->as_text;
     $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
+    my @letter_paragraphs = $letter_start->look_down(
+      #F _tag=>'p'  or  _tag=>'b',
+      _tag=>qr/[p|b]/,
+      #TBD sub {
+             #ORG ($_[0]->attr('name')) eq 'foo'
+             #ORG or ($_[0]->attr('id')) eq 'baz'
+             #F ($_[0]->tag) =~ /<p/
+             #F ($_[0]->tag) eq '<p'
+             #F ($_[0]->attr('_tag')) eq '<p'
+             #F ($_[0]->attr('_tag')) =~ /<p/
+             #TBD5 or ($_[0]->tag) =~ /<b>/
+             #TBD }
+         );
+    say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
+
+    my $one_letter_text = '';
+    LETTER:
+    foreach ( @letter_paragraphs ) {
+      $one_letter_text .= $_->{_content}[0];
+      if ( $_->{_tag} =~ /b/ ) {
+        #TBD
+        say "DBG Found author, so finished one letter: ";
+        say $one_letter_text;
+        say "DBG Next: Get & save author data w/ letter.";
+        say '###\n';
+        push @all_letters_data , $one_letter_text;
+        $one_letter_text = '';
+        $total_letters_count++;
+        next LETTER;
+      }
+      #TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
+    }
+
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
     $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
@@ -395,7 +430,7 @@ sub extract_one_letter_to_editor { #-----------------------------
 
   #TBD3  my @letter_contents = $letter->parent->look_down(
   my @letter_contents
-      = $letter->parent->look_down( '_tag' => 'p', );
+      = $letter->look_down( '_tag' => 'p', );
 
   # Collect a list of paragraphs of each letter.
   # my @letter_paragraphs =
