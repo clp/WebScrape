@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Tue 2012 Mar 27 04:20:08 PMPM clpoda> 
+  # Time-stamp: <Wed 2012 Mar 28 10:21:23 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -169,6 +169,53 @@ sub run { #------------------------------------------------------
   #   Parse the text for data: heading, article, letter body, etc.
   my @all_letters_data;
   my @topics = extract_topics( $tree );
+
+  #TBD Wed2012_0328_10:59  i.2. Use siblings() to get all letters.
+  my $letter_start = $tree->look_down(
+    _tag => 'div',
+    class => "",
+    #TBD )->look_down(
+    #TBD _tag => 'h1'
+  );
+  my @sibs = $letter_start->siblings;
+
+  my $letter_text;
+  my $author_name;
+  my $author_locn;
+  my $author_data = '';
+  my $next_sibling_right;
+  foreach ( 0 .. $#topics ) {  # 0-7 for 8 topics.
+    #DBG $letter_text = $sibs[0]->{_content}[3 * $_]->as_text;
+    $letter_text = $sibs[0]->{_content}[3 * $_]->as_HTML;
+    #TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
+    #TBD push @all_letters_data , extract_one_letter_to_editor($_);
+    $author_locn = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b');
+    last if ( not defined $author_locn );
+    #OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
+    $author_name = $author_locn->as_HTML;
+    # Get all italic lines until no more are found, when next letter or topic starts,
+    # or at end of all letters:
+    #OK $author_data = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
+    #TBD $next_sibling_right = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
+    $next_sibling_right = $author_locn->look_up(_tag=>'p')->right;
+    while ( defined $next_sibling_right ) {
+      my $nsr_italic = $next_sibling_right->look_down(_tag=>'i');
+      last if ( not defined $nsr_italic );
+      $author_data .= $nsr_italic->as_HTML;
+      $next_sibling_right = $next_sibling_right->right
+    }
+    say "DBG author_name: ,$author_name,";
+    say "DBG author_data: ,$author_data,";
+    push @all_letters_data , $letter_text;
+    push @all_letters_data , "\n\n";  #DBG
+    $author_data = '';
+    $total_letters_count++;
+  }
+
+=begin topics_loop
+
+#TBDtest Wed2012_0328_11:33 
+
   foreach ( @topics ) {
     my @letters = extract_letters($_);
     foreach ( @letters ) {
@@ -176,6 +223,11 @@ sub run { #------------------------------------------------------
       $total_letters_count++;
     }
   }
+
+=end topics_loop
+
+=cut
+
 
   #---------------------------------------------------------------
   # Save data from all letters found.
@@ -315,7 +367,7 @@ sub extract_topics { #-------------------------------------------
   );
   $Data::Dumper::Maxdepth = 2;  # 2 shows content
   say "\nDBG \@letter_headlines:";
-  say Dumper @letter_headlines;
+  #DBG say Dumper @letter_headlines;
   return @letter_headlines;
 }
 
