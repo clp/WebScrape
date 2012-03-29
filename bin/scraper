@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Mar 28 10:39:06 PMPM clpoda>
+# Time-stamp: <Thu 2012 Mar 29 10:18:01 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -11,6 +11,8 @@
 # and a program w/ site-specific code & data for wsj.com
 # Status
 # Fri2012_0323_12:51  Scraper works; now parse the data.
+# Thu2012_0329_09:24  Parsing topics OK; get author data OK.
+# Next:  Extract each letter & save for analysis.
 
 # Format of the web page: see codenotes.otl file.
 
@@ -72,7 +74,6 @@ my $data_src = "local file copy of web page";
 # Set up logging.
 Log::Log4perl->easy_init(
   {
-
     #OK level => $INFO,
     #OK level  => $WARN,
     level => $DEBUG,
@@ -84,8 +85,6 @@ Log::Log4perl->easy_init(
 # Prepare to write o/p file.
 my $h_log;
 open $h_log, ">>$log_file";
-
-# close $h_log;
 
 my $start_url;
 $start_url
@@ -102,20 +101,17 @@ unless ($start_url) {
 my $mech = WWW::Mechanize->new();
 $mech->agent_alias('Linux Mozilla');
 
-# Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
+#TBD Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
 __PACKAGE__->new->run unless caller;
 
 sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime();
-  print "\n$0: Started run() at $start_time.\n";
+  #DBG print "\n$0: Started run() at $start_time.\n";
   DEBUG("Started run() at $start_time");
 
   ##
   ## Initialize --------------------------------------------------
-
-  ##TBD.Fri2012_0323_13:14  Fix code below here for scraper.
-  ##
   my $total_letters_count = 0;
 
   init_dirs( $rootdir, $outputdir );
@@ -136,9 +132,10 @@ sub run { #------------------------------------------------------
   my $start_page;
   my $tree;
   if ($USE_LOCAL_DATA) {
+    ## Read file into $start_page for correct handling of raw 
+    ## data, regardless of which branch is taken.
     $start_page = read_file(
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-    ##TBD $tree = HTML::TreeBuilder->new_from_file($start_page);
     $tree = HTML::TreeBuilder->new_from_content($start_page);
   }
   else {
@@ -148,17 +145,12 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
+  ##DBG:
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-  write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html",
-    $start_page );
-
-  ##DBG Save structured view of web page.
-  my $treeout;
-  open( $treeout, '>',
-    "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
-  $tree->dump($treeout);
-  close($treeout);
+  ##DBG:
+  ## write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html",
+    ## $start_page );
 
   ##DBG say "\n-----------------------------------------------------------";
   ##DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
@@ -186,13 +178,16 @@ sub run { #------------------------------------------------------
   my @sibs = $letter_start->siblings;
 
   my $letter_text;
+  my $letters_under_topic;
   my $author_name;
   my $author_locn;
   my $author_data = '';
   my $next_sibling_right;
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
-    ##DBG $letter_text = $sibs[0]->{_content}[3 * $_]->as_text;
-    $letter_text = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
+    say "DBG topic: ", $topics[$_]->{_content}[0];
+
+    ##DBG $letters_under_topic = $sibs[0]->{_content}[3 * $_]->as_text;
+    $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
     $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
@@ -215,7 +210,7 @@ sub run { #------------------------------------------------------
     }
     say "DBG author_name: ,$author_name,";
     say "DBG author_data: ,$author_data,";
-    push @all_letters_data, $letter_text;
+    push @all_letters_data, $letters_under_topic;
     push @all_letters_data, "\n\n";         #DBG
     $author_data = '';
     $total_letters_count++;
@@ -344,8 +339,16 @@ sub get_start_page { #-------------------------------------------
 sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
 
-#OPT-DBG
-# Optional: save raw downloaded page & other content for debugging.
+  ###OPT-DBG
+  ## Optional: save raw downloaded page & other content for debugging.
+
+  # Save structured view of web page.
+  my $treeout;
+  open( $treeout, '>',
+    "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
+  $tree->dump($treeout);
+  close($treeout);
+
   my $page_file = "$source_name.lte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
@@ -369,7 +372,7 @@ sub extract_topics { #-------------------------------------------
     'class' => 'boldEighteenTimes',
   );
   $Data::Dumper::Maxdepth = 2;    # 2 shows content
-  say "\nDBG \@letter_headlines:";
+  #DBG say "\nDBG \@letter_headlines:";
 
   #DBG say Dumper @letter_headlines;
   return @letter_headlines;
