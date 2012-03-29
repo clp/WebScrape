@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-  # Time-stamp: <Wed 2012 Mar 28 10:21:23 PMPM clpoda> 
+  # Time-stamp: <Wed 2012 Mar 28 10:39:06 PMPM clpoda> 
   # Scrape the wsj.com site for letters to the editor
   #
 # Plan
@@ -106,34 +106,34 @@ sub run { #------------------------------------------------------
   print "\n$0: Started run() at $start_time.\n";
   DEBUG( "Started run() at $start_time" );
 
-  #
-  # Initialize --------------------------------------------------
+  ##
+  ## Initialize --------------------------------------------------
 
-  #TBD.Fri2012_0323_13:14  Fix code below here for scraper.
-  #
+  ##TBD.Fri2012_0323_13:14  Fix code below here for scraper.
+  ##
   my $total_letters_count = 0;
 
   init_dirs($rootdir, $outputdir);
 
 
-  #TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
-  #TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
+  ##TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
+  ##TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
-  #OPT-DBG
+  ##OPT-DBG
   my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
   if ( -d $raw_dir ) {
     remove_tree($raw_dir);
   }
   make_path($raw_dir);
 
-  #
-  # Get start page w/ data.  ------------------------------------
-  #
+  ##
+  ## Get start page w/ data.  ------------------------------------
+  ##
   my $start_page;
   my $tree;
   if ( $USE_LOCAL_DATA ) {
     $start_page = read_file( "$rootdir/p/WebScrape/data/wsj/wsj.lte.html" );
-    #TBD $tree = HTML::TreeBuilder->new_from_file($start_page);
+    ##TBD $tree = HTML::TreeBuilder->new_from_file($start_page);
     $tree = HTML::TreeBuilder->new_from_content($start_page);
   }
   else {
@@ -141,41 +141,41 @@ sub run { #------------------------------------------------------
     $tree = HTML::TreeBuilder->new_from_content($start_page);
   }
 
-  #TBD Verify page title: </script><title>Letters - WSJ.com</title>
+  ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html", $start_page );
 
-  #DBG Save structured view of web page.
+  ##DBG Save structured view of web page.
   my $treeout;
   open( $treeout, '>', "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
   $tree->dump( $treeout );
   close($treeout);
 
-  #DBG say "\n-----------------------------------------------------------";
-  #DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
-  #DBG say "\n-----------------------------------------------------------";
-  #DBG say "DBG \$tree->as_text:\n", $tree->as_text;
+  ##DBG say "\n-----------------------------------------------------------";
+  ##DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
+  ##DBG say "\n-----------------------------------------------------------";
+  ##DBG say "DBG \$tree->as_text:\n", $tree->as_text;
 
 
-  #
-  # Parse the web page for data.  -------------------------------
-  #
-  # Parse the response & extract desired data. ------------------
-  #   Select the portion of the page that holds our data.
-  #   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
-  #   Extract each letter from the group of letters.
-  #   Parse the text for data: heading, article, letter body, etc.
+  ##
+  ## Parse the web page for data.  -------------------------------
+  ##
+  ## Parse the response & extract desired data. ------------------
+  ##   Select the portion of the page that holds our data.
+  ##   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
+  ##   Extract each letter from the group of letters.
+  ##   Parse the text for data: heading, article, letter body, etc.
   my @all_letters_data;
   my @topics = extract_topics( $tree );
 
-  #TBD Wed2012_0328_10:59  i.2. Use siblings() to get all letters.
+  ##TBD Wed2012_0328_10:59  i.2. Use siblings() to get all letters.
   my $letter_start = $tree->look_down(
     _tag => 'div',
     class => "",
-    #TBD )->look_down(
-    #TBD _tag => 'h1'
+    ##TBD )->look_down(
+    ##TBD _tag => 'h1'
   );
   my @sibs = $letter_start->siblings;
 
@@ -185,18 +185,18 @@ sub run { #------------------------------------------------------
   my $author_data = '';
   my $next_sibling_right;
   foreach ( 0 .. $#topics ) {  # 0-7 for 8 topics.
-    #DBG $letter_text = $sibs[0]->{_content}[3 * $_]->as_text;
+    ##DBG $letter_text = $sibs[0]->{_content}[3 * $_]->as_text;
     $letter_text = $sibs[0]->{_content}[3 * $_]->as_HTML;
-    #TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
-    #TBD push @all_letters_data , extract_one_letter_to_editor($_);
+    ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
+    ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
     $author_locn = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b');
     last if ( not defined $author_locn );
-    #OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
+    ##OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
     $author_name = $author_locn->as_HTML;
-    # Get all italic lines until no more are found, when next letter or topic starts,
-    # or at end of all letters:
-    #OK $author_data = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
-    #TBD $next_sibling_right = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
+    ## Get all italic lines until no more are found, when next letter or topic starts,
+    ## or at end of all letters:
+    ##OK $author_data = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
+    ##TBD $next_sibling_right = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
     $next_sibling_right = $author_locn->look_up(_tag=>'p')->right;
     while ( defined $next_sibling_right ) {
       my $nsr_italic = $next_sibling_right->look_down(_tag=>'i');
@@ -229,8 +229,8 @@ sub run { #------------------------------------------------------
 =cut
 
 
-  #---------------------------------------------------------------
-  # Save data from all letters found.
+  ##---------------------------------------------------------------
+  ## Save data from all letters found.
   write_file( "all_letters", "" );
   foreach (@all_letters_data ) {
     #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
@@ -238,8 +238,8 @@ sub run { #------------------------------------------------------
       or DEBUG ( 'save_letters_data', $!, $source_name );
   }
 
-  #---------------------------------------------------------------
-  # Print summary stats at end of the program.
+  ##---------------------------------------------------------------
+  ## Print summary stats at end of the program.
   $tree->delete;
 
   my $done_time = localtime();
