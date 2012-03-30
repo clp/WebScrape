@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:52:00 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 02:56:25 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -150,34 +150,28 @@ sub run { #------------------------------------------------------
   ##   Select the portion of the page that holds our data.
   ##   Extract each letter from the group of letters.
   ##   TBD: Parse the text for data: heading, article, letter body, etc.
-  my @all_letters_data;
+  my @all_letters_to_editor;
   my @topics = extract_topics($tree);
 
   ##TBD Wed2012_0328_10:59  i.2. Use siblings() to get all letters.
   my $letter_start = $tree->look_down(
     _tag  => 'div',
     class => "",
-    ##TBD )->look_down(
-    ##TBD _tag => 'h1'
   );
 
-  #TBR? my @sibs = $letter_start->siblings;
-  my @sibs;
-
+  my $author_data = '';
+  my $author_locn;
+  my $author_name;
   my $letter_text;
   my $letters_under_topic;     #TBR?
   my $letters_under_topic3;    #TBR?
-  my $author_name;
-  my $author_locn;
-  my $author_data = '';
   my $next_sibling_right;
-
-  #ORG my $topic_start = $letter_start;
+  my @sibs;
   my $topic_start;
 
   ## Loop on each topic. -----------------------------------------
 TOPIC:
-  foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
+  foreach ( 0 .. $#topics ) {
     my $current_topic = $topics[$_]->{_content}[0];
     say "DBG topic: ", $current_topic;
 
@@ -238,8 +232,8 @@ LETTER:
       if ($_) {
         $one_letter_text .= $_;
 
-   #OK push @all_letters_data, { letter_content => $_->as_HTML };
-        push @all_letters_data,
+   #OK push @all_letters_to_editor, { letter_content => $_->as_HTML };
+        push @all_letters_to_editor,
             { letter_content => $_->as_text };
       }
       else {
@@ -257,11 +251,11 @@ LETTER:
         next LETTER;
       }
 
-      ##TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
+      ##TBD5 push @all_letters_to_editor , extract_one_letter_to_editor($_);
     }    # End foreach LETTER loop.
 
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
-    ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
+    ##TBD push @all_letters_to_editor , extract_one_letter_to_editor($_);
     #TBD11 $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
     #TBD11 ->look_down( _tag => 'b' );
     $author_locn = $sibs[0]->parent->look_down( _tag => 'b' );
@@ -284,8 +278,8 @@ LETTER:
     say "DBG author_name: ,$author_name,";
     say "DBG author_data: ,$author_data,";
 
-    #TBD6 push @all_letters_data, $letters_under_topic;
-    #TBD14 push @all_letters_data, "\n\n";    #DBG
+    #TBD6 push @all_letters_to_editor, $letters_under_topic;
+    #TBD14 push @all_letters_to_editor, "\n\n";    #DBG
     $topic_start
         = $author_locn->look_up( _tag => 'div', class => "" )
         ->right;
@@ -304,7 +298,7 @@ LETTER:
   foreach ( @topics ) {
     my @letters = extract_letters($_);
     foreach ( @letters ) {
-      push @all_letters_data , extract_one_letter_to_editor($_);
+      push @all_letters_to_editor , extract_one_letter_to_editor($_);
       $total_letters_count++;
     }
   }
@@ -316,7 +310,7 @@ LETTER:
   ##---------------------------------------------------------------
   ## Save data from all letters found.
   write_file( "all_letters", "" );
-  foreach (@all_letters_data) {
+  foreach (@all_letters_to_editor) {
 
     #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
     #F my %d = join %$_ , "\n";
