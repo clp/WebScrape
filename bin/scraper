@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Mar 29 09:57:11 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 08:21:57 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -82,6 +82,7 @@ my $data_src = "local file copy of web page";
 # Set up logging.
 Log::Log4perl->easy_init(
   {
+
     #OK level => $INFO,
     #OK level  => $WARN,
     level => $DEBUG,
@@ -115,6 +116,7 @@ __PACKAGE__->new->run unless caller;
 sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime();
+
   #DBG print "\n$0: Started run() at $start_time.\n";
   DEBUG("Started run() at $start_time");
 
@@ -140,7 +142,7 @@ sub run { #------------------------------------------------------
   my $start_page;
   my $tree;
   if ($USE_LOCAL_DATA) {
-    ## Read file into $start_page for correct handling of raw 
+    ## Read file into $start_page for correct handling of raw
     ## data, regardless of which branch is taken.
     $start_page = read_file(
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
@@ -158,7 +160,7 @@ sub run { #------------------------------------------------------
 
   ##DBG:
   ## write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html",
-    ## $start_page );
+  ## $start_page );
 
   ##DBG say "\n-----------------------------------------------------------";
   ##DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
@@ -183,32 +185,36 @@ sub run { #------------------------------------------------------
     ##TBD )->look_down(
     ##TBD _tag => 'h1'
   );
+
   #TBR? my @sibs = $letter_start->siblings;
   my @sibs;
 
   my $letter_text;
-  my $letters_under_topic;  #TBR?
-  my $letters_under_topic3;  #TBR?
+  my $letters_under_topic;     #TBR?
+  my $letters_under_topic3;    #TBR?
   my $author_name;
   my $author_locn;
   my $author_data = '';
   my $next_sibling_right;
+
   #ORG my $topic_start = $letter_start;
   my $topic_start;
 
   ## Loop on each topic. -----------------------------------------
-  TOPIC:
+TOPIC:
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
     say "DBG topic: ", $topics[$_]->{_content}[0];
 
-    #TBD Make the sub a pattern match? Using the exact heading may be a problem.
-    $topic_start = $letter_start->look_down (
-      _tag=>'h1',
+    ##TBD Make the sub a pattern match? Using the exact heading may be a problem.
+    $topic_start = $letter_start->look_down(
+      _tag => 'h1',
       sub { $_[0]->as_HTML =~ /$topics[$_]->{_content}[0]/ }
     );
+
     #TBD Why do some topics fail here-not found?
     if ($topic_start) {
-      @sibs = $topic_start->siblings;  # All siblings under $topic_start
+      @sibs = $topic_start
+          ->siblings;    # All siblings under $topic_start
     }
     else {
       say "DBG No \$topic_start found here: ,$topic_start,";
@@ -216,56 +222,59 @@ sub run { #------------------------------------------------------
     }
 
     ##DBG $letters_under_topic = $sibs[0]->{_content}[3 * $_]->as_text;
-    #TBD9 $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
+    ##TBD9 $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
     $letters_under_topic3 = $sibs[0]->{_content}[ 3 * $_ ];
 
-    #F my @letter_paragraphs = $letter_start->look_down(
-    #TBD7 my @letter_paragraphs = $letters_under_topic2->look_down(
-    #TBD7 _tag=>qr/[p|b|i|a|]/,
-    #TBD7 );
+    ##F my @letter_paragraphs = $letter_start->look_down(
+    ##TBD7 my @letter_paragraphs = $letters_under_topic2->look_down(
+    ##TBD7 _tag=>qr/[p|b|i|a|]/,
+    ##TBD7 );
     my @letter_paragraphs;
-    #TBD10 if ( $letters_under_topic3 ) {
-    #TBD10 #ORG my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
-    #TBD10 my @letter_paragraphs = split /<p/, $letters_under_topic3;
-    #TBD10 say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
-    #TBD10 }
+
+    ##TBD10 if ( $letters_under_topic3 ) {
+    ##TBD10 #ORG my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
+    ##TBD10 my @letter_paragraphs = split /<p/, $letters_under_topic3;
+    ##TBD10 say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
+    ##TBD10 }
 
     foreach (@sibs) {
-      push @letter_paragraphs , $_;
+      push @letter_paragraphs, $_;
     }
     say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
 
     my $one_letter_text = '';
-    LETTER:
-    foreach ( @letter_paragraphs ) {
+LETTER:
+    foreach (@letter_paragraphs) {
+
       #TBD8 if ( $_->{_content}[0] ) {
-        #TBD8 $one_letter_text .= $_->{_content}[0];
-      if ( $_) {
+      #TBD8 $one_letter_text .= $_->{_content}[0];
+      if ($_) {
         $one_letter_text .= $_;
       }
       else {
         next LETTER;
       }
       if ( $_ =~ /<b>/ ) {
+
         #TBD
         say "DBG Found author, so finished one letter: ";
         say $one_letter_text;
         say "DBG Next: Get & save author data w/ letter.";
         say '###\n';
-        push @all_letters_data , $one_letter_text;
+        push @all_letters_data, $one_letter_text;
         $one_letter_text = '';
         $total_letters_count++;
         next LETTER;
       }
-      #TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
+
+      ##TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
     }
 
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
     #TBD11 $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
     #TBD11 ->look_down( _tag => 'b' );
-    $author_locn = $sibs[0]->parent
-        ->look_down( _tag => 'b' );
+    $author_locn = $sibs[0]->parent->look_down( _tag => 'b' );
     last if ( not defined $author_locn );
     ##OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
     $author_name = $author_locn->as_HTML;
@@ -284,12 +293,14 @@ sub run { #------------------------------------------------------
     }
     say "DBG author_name: ,$author_name,";
     say "DBG author_data: ,$author_data,";
+
     #TBD6 push @all_letters_data, $letters_under_topic;
-    push @all_letters_data, "\n\n";         #DBG
-    $topic_start = $author_locn->look_up(_tag=>'div', class=>"")->right ;
+    push @all_letters_data, "\n\n";    #DBG
+    $topic_start
+        = $author_locn->look_up( _tag => 'div', class => "" )
+        ->right;
     $author_data = '';
     $total_letters_count++;
-
 
     ## Finished w/ one topic; go to the next. -------------------
     ## TBD.
@@ -452,7 +463,7 @@ sub extract_topics { #-------------------------------------------
     'class' => 'boldEighteenTimes',
   );
   $Data::Dumper::Maxdepth = 2;    # 2 shows content
-  #DBG say "\nDBG \@letter_headlines:";
+       #DBG say "\nDBG \@letter_headlines:";
 
   #DBG say Dumper @letter_headlines;
   return @letter_headlines;
@@ -474,8 +485,7 @@ sub extract_one_letter_to_editor { #-----------------------------
   my $letter = shift;
 
   #TBD3  my @letter_contents = $letter->parent->look_down(
-  my @letter_contents
-      = $letter->look_down( '_tag' => 'p', );
+  my @letter_contents = $letter->look_down( '_tag' => 'p', );
 
   # Collect a list of paragraphs of each letter.
   # my @letter_paragraphs =
