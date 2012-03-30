@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 03:49:56 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 03:55:08 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -159,13 +159,6 @@ sub run { #------------------------------------------------------
     class => "",
   );
 
-  my $author_data = '';
-  my $author_locn;
-  my $author_name;
-  my $letter_text;
-  my $letters_under_topic;     #TBR?
-  my $letters_under_topic3;    #TBR?
-  my $next_sibling_right;
   my @sibs;
   my $topic_start;
 
@@ -195,9 +188,6 @@ TOPIC:
       next TOPIC;
     }
 
-    ##DBG $letters_under_topic = $sibs[0]->{_content}[3 * $_]->as_text;
-    ##TBD9 $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
-    $letters_under_topic3 = $sibs[0]->{_content}[ 3 * $_ ];
 
     ##F my @letter_paragraphs = $letter_start->look_down(
     ##TBD7 my @letter_paragraphs = $letters_under_topic2->look_down(
@@ -205,9 +195,7 @@ TOPIC:
     ##TBD7 );
     my @letter_paragraphs;
 
-    ##TBD10 if ( $letters_under_topic3 ) {
     ##TBD10 #ORG my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
-    ##TBD10 my @letter_paragraphs = split /<p/, $letters_under_topic3;
     ##TBD10 say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
     ##TBD10 }
 
@@ -241,47 +229,6 @@ LETTER:
         next LETTER;
       }
     }    # End foreach LETTER loop.
-
-=begin comment
-
-    ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
-    ##TBD push @all_letters_to_editor , extract_one_letter_to_editor($_);
-    #TBD11 $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
-    #TBD11 ->look_down( _tag => 'b' );
-    $author_locn = $sibs[0]->parent->look_down( _tag => 'b' );
-    last if ( not defined $author_locn );
-    ##OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
-    $author_name = $author_locn->as_HTML;
-    ## Get all italic lines until no more are found, when next letter or topic starts,
-    ## or at end of all letters:
-    ##OK $author_data = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
-    ##TBD $next_sibling_right = $author_locn->look_up(_tag=>'p')->right->look_down(_tag=>'i')->as_HTML;
-    $next_sibling_right
-        = $author_locn->look_up( _tag => 'p' )->right;
-    while ( defined $next_sibling_right ) {
-      my $nsr_italic
-          = $next_sibling_right->look_down( _tag => 'i' );
-      last if ( not defined $nsr_italic );
-      $author_data .= $nsr_italic->as_HTML;
-      $next_sibling_right = $next_sibling_right->right;
-    }
-    say "DBG author_name: ,$author_name,";
-    say "DBG author_data: ,$author_data,";
-
-    #TBD6 push @all_letters_to_editor, $letters_under_topic;
-    #TBD14 push @all_letters_to_editor, "\n\n";    #DBG
-    $topic_start
-        = $author_locn->look_up( _tag => 'div', class => "" )
-        ->right;
-    $author_data = '';
-    $total_letters_count++;
-
-    ## Finished w/ one topic; go to the next. -------------------
-    ## TBD.
-
-=end comment
-
-=cut
 
 
 
