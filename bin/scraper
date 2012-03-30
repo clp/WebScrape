@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 08:36:10 AMAM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 01:27:36 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -203,11 +203,15 @@ sub run { #------------------------------------------------------
   ## Loop on each topic. -----------------------------------------
 TOPIC:
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
-    say "DBG topic: ", $topics[$_]->{_content}[0];
+    #OK say "DBG topic: ", $topics[$_]->{_content}[0];
+    my $current_topic = $topics[$_]->{_content}[0];
+    say "DBG topic: ", $current_topic;
+    push @all_letters_data, { topic => $current_topic };
 
     ##TBD Make the sub a pattern match? Using the exact heading may be a problem.
+    ##
     ## Use as_text() method instead of as_HTML(); the latter 
-    ## causes failures when $topic_start includes apostrophe
+    ## caused failures when $topic_start included an apostrophe
     ## that must be escaped (maybe fails for other symbols too).
     $topic_start = $letter_start->look_down(
       _tag => 'h1',
@@ -247,31 +251,42 @@ TOPIC:
 
     my $one_letter_text = '';
 LETTER:
-    foreach (@letter_paragraphs) {
+    ##Bug Fri2012_0330_09:28  Convert @sibs or $one_letter_text 
+    ## from HTML Elt Hash to HTML here, so it is saved as HTML,
+    ## OR keep data in hashes throughout the code until it is 
+    ## needed in text or HTML form?
+    ##
+    ##TBD foreach (@letter_paragraphs) { #}
+    foreach (@sibs) {
 
-      #TBD8 if ( $_->{_content}[0] ) {
+      #TBD8 if ( $_->{_content}[0] ) { #}
       #TBD8 $one_letter_text .= $_->{_content}[0];
       if ($_) {
         $one_letter_text .= $_;
+        push @all_letters_data, { letter_content => $_->as_HTML };
       }
       else {
         next LETTER;
       }
-      if ( $_ =~ /<b>/ ) {
+      #TBD12 if ( $_ =~ /<b>/ ) {
+      #F if ( $_->{_content}[0] =~ /<b>/ ) {
+      #F if ( $_->{_content}[0]->as_HTML =~ /<b>/ ) {
+      #WRONG if ( $_->parent->as_HTML =~ /<b>/ ) {
+      if ( $_->as_HTML =~ /<b>/ ) {
 
         #TBD
         say "DBG Found author, so finished one letter: ";
         say $one_letter_text;
         say "DBG Next: Get & save author data w/ letter.";
         say '###\n';
-        push @all_letters_data, $one_letter_text;
+        #TBR? push @all_letters_data, { author => $one_letter_text };
         $one_letter_text = '';
         $total_letters_count++;
         next LETTER;
       }
 
       ##TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
-    }
+    }  # End foreach LETTER loop.
 
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
@@ -296,6 +311,8 @@ LETTER:
     }
     say "DBG author_name: ,$author_name,";
     say "DBG author_data: ,$author_data,";
+    push @all_letters_data, { author => $author_name };
+    push @all_letters_data, { author_data => $author_data };
 
     #TBD6 push @all_letters_data, $letters_under_topic;
     push @all_letters_data, "\n\n";    #DBG
@@ -308,7 +325,7 @@ LETTER:
     ## Finished w/ one topic; go to the next. -------------------
     ## TBD.
     ##
-  }
+  }  # End foreach TOPIC loop.
 
 =begin topics_loop
 
