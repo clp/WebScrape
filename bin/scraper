@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:56:25 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 03:00:56 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -175,11 +175,12 @@ TOPIC:
     my $current_topic = $topics[$_]->{_content}[0];
     say "DBG topic: ", $current_topic;
 
-    ##TBD Make the sub a pattern match? Using the exact heading may be a problem.
+    ##TBD Make the sub a pattern match? Using the exact heading 
+    ## may cause a problem.
     ##
     ## Use as_text() method instead of as_HTML(); the latter
     ## caused failures when $topic_start included an apostrophe
-    ## that must be escaped (maybe fails for other symbols too).
+    ## that must be escaped (may fail w/ other symbols too).
     $topic_start = $letter_start->look_down(
       _tag => 'h1',
       sub { $_[0]->as_text =~ qr{$current_topic}i }
@@ -188,11 +189,9 @@ TOPIC:
     ## Catch problems.
     if ($topic_start) {
       @sibs = $topic_start->siblings;
-
-      # All siblings under $topic_start
     }
     else {
-      say "DBG No \$topic_start found here: ,$topic_start,";
+      DEBUG "\$topic_start not found: ,$topic_start,";
       next TOPIC;
     }
 
