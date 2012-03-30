@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 01:27:36 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 01:50:57 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -263,7 +263,8 @@ LETTER:
       #TBD8 $one_letter_text .= $_->{_content}[0];
       if ($_) {
         $one_letter_text .= $_;
-        push @all_letters_data, { letter_content => $_->as_HTML };
+        #OK push @all_letters_data, { letter_content => $_->as_HTML };
+        push @all_letters_data, { letter_content => $_->as_text };
       }
       else {
         next LETTER;
@@ -349,8 +350,11 @@ LETTER:
   foreach (@all_letters_data) {
 
     #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
-    append_file( "all_letters", { binmode => ':utf8' }, $_ )
+    #F my %d = join %$_ , "\n";
+    my %d = %$_ ;
+    append_file( "all_letters", { binmode => ':utf8' }, values %d )
         or DEBUG( 'save_letters_data', $!, $source_name );
+    append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
   ##---------------------------------------------------------------
