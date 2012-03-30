@@ -201,13 +201,13 @@ sub run { #------------------------------------------------------
   ## Loop on each topic. -----------------------------------------
 TOPIC:
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
-    #OK say "DBG topic: ", $topics[$_]->{_content}[0];
+        #OK say "DBG topic: ", $topics[$_]->{_content}[0];
     my $current_topic = $topics[$_]->{_content}[0];
     say "DBG topic: ", $current_topic;
 
     ##TBD Make the sub a pattern match? Using the exact heading may be a problem.
     ##
-    ## Use as_text() method instead of as_HTML(); the latter 
+    ## Use as_text() method instead of as_HTML(); the latter
     ## caused failures when $topic_start included an apostrophe
     ## that must be escaped (maybe fails for other symbols too).
     $topic_start = $letter_start->look_down(
@@ -217,8 +217,9 @@ TOPIC:
 
     ## Catch problems.
     if ($topic_start) {
-      @sibs = $topic_start ->siblings;
-        # All siblings under $topic_start
+      @sibs = $topic_start->siblings;
+
+      # All siblings under $topic_start
     }
     else {
       say "DBG No \$topic_start found here: ,$topic_start,";
@@ -248,9 +249,9 @@ TOPIC:
 
     my $one_letter_text = '';
 LETTER:
-    ##Bug Fri2012_0330_09:28  Convert @sibs or $one_letter_text 
+    ##Bug Fri2012_0330_09:28  Convert @sibs or $one_letter_text
     ## from HTML Elt Hash to HTML here, so it is saved as HTML,
-    ## OR keep data in hashes throughout the code until it is 
+    ## OR keep data in hashes throughout the code until it is
     ## needed in text or HTML form?
     ##
     ##TBD foreach (@letter_paragraphs) { #}
@@ -260,8 +261,10 @@ LETTER:
       #TBD8 $one_letter_text .= $_->{_content}[0];
       if ($_) {
         $one_letter_text .= $_;
-        #OK push @all_letters_data, { letter_content => $_->as_HTML };
-        push @all_letters_data, { letter_content => $_->as_text };
+
+   #OK push @all_letters_data, { letter_content => $_->as_HTML };
+        push @all_letters_data,
+            { letter_content => $_->as_text };
       }
       else {
         next LETTER;
@@ -279,7 +282,7 @@ LETTER:
       }
 
       ##TBD5 push @all_letters_data , extract_one_letter_to_editor($_);
-    }  # End foreach LETTER loop.
+    }    # End foreach LETTER loop.
 
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
@@ -316,7 +319,7 @@ LETTER:
     ## Finished w/ one topic; go to the next. -------------------
     ## TBD.
     ##
-  }  # End foreach TOPIC loop.
+  }    # End foreach TOPIC loop.
 
 =begin topics_loop
 
@@ -341,8 +344,9 @@ LETTER:
 
     #TBD write_file( "all_letters", { binmode => ':utf8' }, $_ )
     #F my %d = join %$_ , "\n";
-    my %d = %$_ ;
-    append_file( "all_letters", { binmode => ':utf8' }, values %d )
+    my %d = %$_;
+    append_file( "all_letters", { binmode => ':utf8' },
+      values %d )
         or DEBUG( 'save_letters_data', $!, $source_name );
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
