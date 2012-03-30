@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Mar 29 07:50:22 PMPM clpoda>
+# Time-stamp: <Thu 2012 Mar 29 09:57:11 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -13,6 +13,14 @@
 # Fri2012_0323_12:51  Scraper works; now parse the data.
 # Thu2012_0329_09:24  Parsing topics OK; get author data OK.
 # Next:  Extract each letter & save for analysis.
+
+#TBD Thu2012_0329_21:54  current issues
+#   Fill file all_letters properly: @all_letters_data not right.
+#   $topic_start fails for some topics.
+#   Get text not hashes for @letter_paragraphs?
+#   Find approach that works for all data & use it.
+#
+# ---------------------------------------------------------------
 
 # Format of the web page: see codenotes.otl file.
 
@@ -180,30 +188,52 @@ sub run { #------------------------------------------------------
 
   my $letter_text;
   my $letters_under_topic;  #TBR?
-  my $letters_under_topic2;  #TBR?
+  my $letters_under_topic3;  #TBR?
   my $author_name;
   my $author_locn;
   my $author_data = '';
   my $next_sibling_right;
-  my $topic_start = $letter_start;
+  #ORG my $topic_start = $letter_start;
+  my $topic_start;
 
   ## Loop on each topic. -----------------------------------------
+  TOPIC:
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
     say "DBG topic: ", $topics[$_]->{_content}[0];
 
-    @sibs = $topic_start->siblings;
+    #TBD Make the sub a pattern match? Using the exact heading may be a problem.
+    $topic_start = $letter_start->look_down (
+      _tag=>'h1',
+      sub { $_[0]->as_HTML =~ /$topics[$_]->{_content}[0]/ }
+    );
+    #TBD Why do some topics fail here-not found?
+    if ($topic_start) {
+      @sibs = $topic_start->siblings;  # All siblings under $topic_start
+    }
+    else {
+      say "DBG No \$topic_start found here: ,$topic_start,";
+      next TOPIC;
+    }
+
     ##DBG $letters_under_topic = $sibs[0]->{_content}[3 * $_]->as_text;
     #TBD9 $letters_under_topic = $sibs[0]->{_content}[ 3 * $_ ]->as_HTML;
-    $letters_under_topic2 = $sibs[0]->{_content}[ 3 * $_ ];
+    $letters_under_topic3 = $sibs[0]->{_content}[ 3 * $_ ];
+
     #F my @letter_paragraphs = $letter_start->look_down(
     #TBD7 my @letter_paragraphs = $letters_under_topic2->look_down(
     #TBD7 _tag=>qr/[p|b|i|a|]/,
     #TBD7 );
     my @letter_paragraphs;
-    if ( $letters_under_topic2 ) {
-      my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
-      say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
+    #TBD10 if ( $letters_under_topic3 ) {
+    #TBD10 #ORG my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
+    #TBD10 my @letter_paragraphs = split /<p/, $letters_under_topic3;
+    #TBD10 say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
+    #TBD10 }
+
+    foreach (@sibs) {
+      push @letter_paragraphs , $_;
     }
+    say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
 
     my $one_letter_text = '';
     LETTER:
@@ -232,7 +262,9 @@ sub run { #------------------------------------------------------
 
     ##TBD $one_paragraph = $sibs[0]->{_content}[0]{_content}[$i];
     ##TBD push @all_letters_data , extract_one_letter_to_editor($_);
-    $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
+    #TBD11 $author_locn = $sibs[0]->{_content}[ 3 * $_ ]
+    #TBD11 ->look_down( _tag => 'b' );
+    $author_locn = $sibs[0]->parent
         ->look_down( _tag => 'b' );
     last if ( not defined $author_locn );
     ##OK $author_name = $sibs[0]->{_content}[3 * $_]->look_down(_tag=>'b')->as_HTML;
