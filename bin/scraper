@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:27:47 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 02:39:46 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -201,7 +201,6 @@ sub run { #------------------------------------------------------
   ## Loop on each topic. -----------------------------------------
 TOPIC:
   foreach ( 0 .. $#topics ) {    # 0-7 for 8 topics.
-        #OK say "DBG topic: ", $topics[$_]->{_content}[0];
     my $current_topic = $topics[$_]->{_content}[0];
     say "DBG topic: ", $current_topic;
 
@@ -212,7 +211,7 @@ TOPIC:
     ## that must be escaped (maybe fails for other symbols too).
     $topic_start = $letter_start->look_down(
       _tag => 'h1',
-      sub { $_[0]->as_text =~ qr{$topics[$_]->{_content}[0]}i }
+      sub { $_[0]->as_text =~ qr{$current_topic}i }
     );
 
     ## Catch problems.
