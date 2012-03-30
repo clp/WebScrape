@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 03:00:56 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 03:36:58 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -186,7 +186,7 @@ TOPIC:
       sub { $_[0]->as_text =~ qr{$current_topic}i }
     );
 
-    ## Catch problems.
+    ##TBR? Catch problems.  Used for debug; maybe rm it now.
     if ($topic_start) {
       @sibs = $topic_start->siblings;
     }
@@ -218,12 +218,6 @@ TOPIC:
 
     my $one_letter_text = '';
 LETTER:
-    ##Bug Fri2012_0330_09:28  Convert @sibs or $one_letter_text
-    ## from HTML Elt Hash to HTML here, so it is saved as HTML,
-    ## OR keep data in hashes throughout the code until it is
-    ## needed in text or HTML form?
-    ##
-    ##TBD foreach (@letter_paragraphs) { #}
     foreach (@sibs) {
 
       #TBD8 if ( $_->{_content}[0] ) { #}
@@ -231,7 +225,6 @@ LETTER:
       if ($_) {
         $one_letter_text .= $_;
 
-   #OK push @all_letters_to_editor, { letter_content => $_->as_HTML };
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
       }
@@ -239,13 +232,10 @@ LETTER:
         next LETTER;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
-
-        #TBD
-        say "DBG Found author, so finished one letter: ";
-        say $one_letter_text;
-        say "DBG Next: Get & save author data w/ letter.";
-        say '###\n';
         $one_letter_text = '';
+
+        # Count of authors, not items on the page.
+        # Won't include Clarifications, Corrections. 
         $total_letters_count++;
         next LETTER;
       }
@@ -290,21 +280,6 @@ LETTER:
     ##
   }    # End foreach TOPIC loop.
 
-=begin topics_loop
-
-#TBDtest Wed2012_0328_11:33 
-
-  foreach ( @topics ) {
-    my @letters = extract_letters($_);
-    foreach ( @letters ) {
-      push @all_letters_to_editor , extract_one_letter_to_editor($_);
-      $total_letters_count++;
-    }
-  }
-
-=end topics_loop
-
-=cut
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
