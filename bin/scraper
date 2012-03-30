@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 03:39:59 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 03:40:48 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -285,8 +285,6 @@ LETTER:
   ## Save data from all letters found.
   write_file( "all_letters", "" );
   foreach (@all_letters_to_editor) {
-
-    my %d = %$_;
     append_file( "all_letters", { binmode => ':utf8' },
       values %$_ )
         or DEBUG( 'save_letters_data', $!, $source_name );
