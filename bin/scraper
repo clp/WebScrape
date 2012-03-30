@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:45:08 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 02:52:00 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -84,8 +84,7 @@ Log::Log4perl->easy_init(
 );
 
 
-my $start_url;
-$start_url
+my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
 unless ( GetOptions( 'start_url=s' => \$start_url, ) ) {
   die usage();
@@ -106,7 +105,6 @@ sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime();
 
-  #DBG print "\n$0: Started run() at $start_time.\n";
   DEBUG("Started run() at $start_time");
 
   ##
@@ -127,7 +125,6 @@ sub run { #------------------------------------------------------
 
   ##
   ## Get start page w/ data.  ------------------------------------
-  ##
   my $start_page;
   my $tree;
   if ($USE_LOCAL_DATA) {
@@ -147,23 +144,12 @@ sub run { #------------------------------------------------------
   ##DBG:
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-  ##DBG:
-  ## write_file( "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.html",
-  ## $start_page );
 
-  ##DBG say "\n-----------------------------------------------------------";
-  ##DBG say "DBG \$tree->as_HTML:\n", $tree->as_HTML;
-  ##DBG say "\n-----------------------------------------------------------";
-  ##DBG say "DBG \$tree->as_text:\n", $tree->as_text;
-
-  ##
-  ## Parse the web page for data.  -------------------------------
   ##
   ## Parse the response & extract desired data. ------------------
   ##   Select the portion of the page that holds our data.
-  ##   Grab all text from h1 tag until the next h1 tag, or end-of-letters-marker.
   ##   Extract each letter from the group of letters.
-  ##   Parse the text for data: heading, article, letter body, etc.
+  ##   TBD: Parse the text for data: heading, article, letter body, etc.
   my @all_letters_data;
   my @topics = extract_topics($tree);
 
