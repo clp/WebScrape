@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:39:46 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 02:45:08 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -12,15 +12,12 @@
 # Status
 # Fri2012_0323_12:51  Scraper works; now parse the data.
 # Thu2012_0329_09:24  Parsing topics OK; get author data OK.
-# Next:  Extract each letter & save for analysis.
+# Fri2012_0330_14:41  Extract each letter & save for analysis.
 
-#TBD Thu2012_0329_21:54  current issues
-#   Get text not hashes for @letter_paragraphs?
-#   Find approach that works for all data & use it.
 #
 # ---------------------------------------------------------------
 
-# Format of the web page: see codenotes.otl file.
+# For format of the web page: see codenotes.otl file.
 
 use strict;
 use warnings;
@@ -55,7 +52,6 @@ my $source_name = "wsj";
 my $domain_name = "wsj.com";
 my $rootdir     = "/home/clpoda";
 
-#ORG my $outputdir   = "p/WebScrape/scraped_data/wsj/lte"; #CFG
 my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
 my $msg;
 
@@ -80,7 +76,6 @@ my $data_src = "local file copy of web page";
 # Set up logging.
 Log::Log4perl->easy_init(
   {
-
     #OK level => $INFO,
     #OK level  => $WARN,
     level => $DEBUG,
@@ -88,10 +83,6 @@ Log::Log4perl->easy_init(
   }
 );
 
-#
-# Prepare to write o/p file.
-my $h_log;
-open $h_log, ">>$log_file";
 
 my $start_url;
 $start_url
@@ -367,7 +358,6 @@ LETTER:
 
 }    # End of run().
 
-close $h_log;
 
 exit 1;
 
