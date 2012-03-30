@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 02:11:51 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 02:27:47 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -15,8 +15,6 @@
 # Next:  Extract each letter & save for analysis.
 
 #TBD Thu2012_0329_21:54  current issues
-#   Fill file all_letters properly: @all_letters_data not right.
-#   $topic_start fails for some topics.
 #   Get text not hashes for @letter_paragraphs?
 #   Find approach that works for all data & use it.
 #
@@ -206,7 +204,6 @@ TOPIC:
     #OK say "DBG topic: ", $topics[$_]->{_content}[0];
     my $current_topic = $topics[$_]->{_content}[0];
     say "DBG topic: ", $current_topic;
-    push @all_letters_data, { topic => $current_topic };
 
     ##TBD Make the sub a pattern match? Using the exact heading may be a problem.
     ##
@@ -276,7 +273,6 @@ LETTER:
         say $one_letter_text;
         say "DBG Next: Get & save author data w/ letter.";
         say '###\n';
-        #TBR? push @all_letters_data, { author => $one_letter_text };
         $one_letter_text = '';
         $total_letters_count++;
         next LETTER;
