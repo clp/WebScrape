@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 05:23:00 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 08:05:00 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -13,7 +13,9 @@
 # Fri2012_0323_12:51  Scraper works; now parse the data.
 # Thu2012_0329_09:24  Parsing topics OK; get author data OK.
 # Fri2012_0330_14:41  Extract each letter & save for analysis.
-
+#   Extract is OK; but no metadata fields are stored for simple
+#   retrieval & analysis.
+# TBD  Save letter text & metadata into a structure.
 #
 # ---------------------------------------------------------------
 
@@ -128,8 +130,8 @@ sub run { #------------------------------------------------------
   my $start_page;
   my $tree;
   if ($USE_LOCAL_DATA) {
-    ## Read file into $start_page for correct handling of raw
-    ## data, regardless of which branch is taken.
+    ## Read the local file into $start_page for correct handling
+    ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
     $tree = HTML::TreeBuilder->new_from_content($start_page);
@@ -148,13 +150,12 @@ sub run { #------------------------------------------------------
   ##
   ## Parse the response & extract desired data. ------------------
   ##   Select the portion of the page that holds our data.
-  ##   Extract each letter from the group of letters.
+  ##   Extract each headline & store them in @topics.
   ##   Extract each sibling node from the tree.
   ##   TBD: Parse the text for data: heading, article, letter body, etc.
   my @all_letters_to_editor;
   my @topics = extract_topics($tree);
 
-  ##TBD Wed2012_0328_10:59  i.2. Use siblings() to get all letters.
   my $letter_start = $tree->look_down(
     _tag  => 'div',
     class => "",
@@ -320,17 +321,13 @@ sub get_start_page { #-------------------------------------------
 sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
 
-  ###OPT-DBG
-
-  # Save structured view of web page.
+  ## Save structured view of web page.
   my $treeout;
-  open( $treeout, '>',
-    #ORG "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
-    "$raw_dir/wsj.lte.treedump" );
+  open( $treeout, '>', "$raw_dir/wsj.lte.treedump" );
   $tree->dump($treeout);
   close($treeout);
 
-  ## save raw downloaded page & decoded content for debugging.
+  ## Save raw downloaded page & decoded content for debugging.
   my $page_file = "$source_name.lte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
@@ -341,11 +338,8 @@ sub save_raw_data { #--------------------------------------------
     { binmode => ':utf8' },
     $tree->as_text )
       or DEBUG( 'save_raw_data()', $!, $source_name );
-  ### End of OPT-DBG
 }    # End of sub save_raw_data
 
-#TBD Add subs?
-# get_page_with_lte()
 
 sub extract_topics { #-------------------------------------------
   my $tree             = shift;
@@ -359,6 +353,7 @@ sub extract_topics { #-------------------------------------------
   #DBG say Dumper @letter_headlines;
   return @letter_headlines;
 }
+
 
 sub extract_letters { #------------------------------------------
   say "DBG extract_letters()";
