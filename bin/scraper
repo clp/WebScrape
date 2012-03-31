@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 05:15:39 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 05:18:14 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -201,7 +201,7 @@ LETTER:
         next LETTER;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
-        # Count of authors, not items on the page.
+        # Count of authors, not letters or items on the page.
         # Won't include Clarifications, Corrections. 
         #
         # TBD Handle the case of an item w/ > 1 author,
@@ -211,7 +211,6 @@ LETTER:
         next LETTER;
       }
     }    # End foreach LETTER loop.
-
   }    # End foreach TOPIC loop.
 
 
