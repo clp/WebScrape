@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 05:18:14 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 05:23:00 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -276,8 +276,8 @@ sub usage { #----------------------------------------------------
 Usage:
   $program -u url
 
-$program requests a web site to return a page, and displays the HTML
-data found there.
+$program requests a web site to return a page, and displays
+the HTML data found there.
 
 Options to control the query
 
@@ -321,15 +321,16 @@ sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
 
   ###OPT-DBG
-  ## Optional: save raw downloaded page & other content for debugging.
 
   # Save structured view of web page.
   my $treeout;
   open( $treeout, '>',
-    "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
+    #ORG "$rootdir/p/WebScrape/data/wsj/tmp/wsj.lte.treedump" );
+    "$raw_dir/wsj.lte.treedump" );
   $tree->dump($treeout);
   close($treeout);
 
+  ## save raw downloaded page & decoded content for debugging.
   my $page_file = "$source_name.lte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
