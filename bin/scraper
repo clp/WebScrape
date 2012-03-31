@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 05:10:43 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 05:13:48 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -189,21 +189,6 @@ TOPIC:
       next TOPIC;
     }
 
-
-    ##F my @letter_paragraphs = $letter_start->look_down(
-    ##TBD7 my @letter_paragraphs = $letters_under_topic2->look_down(
-    ##TBD7 _tag=>qr/[p|b|i|a|]/,
-    ##TBD7 );
-    my @letter_paragraphs;
-
-    ##TBD10 #ORG my @letter_paragraphs = split /<p/, $letters_under_topic2->as_HTML;
-    ##TBD10 say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
-    ##TBD10 }
-
-    foreach (@sibs) {
-      push @letter_paragraphs, $_;
-    }
-    #DBG say "DBG \@letter_paragraphs:\n###@letter_paragraphs\n###";
 
     my $one_letter_text = '';
 LETTER:
