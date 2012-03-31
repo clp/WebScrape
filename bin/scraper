@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 05:14:41 PMPM clpoda>
+# Time-stamp: <Fri 2012 Mar 30 05:15:39 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -190,15 +190,10 @@ TOPIC:
     }
 
 
-    #TBR? my $one_letter_text = '';
 LETTER:
     foreach (@sibs) {
 
-      #TBD8 if ( $_->{_content}[0] ) { #}
-      #TBR? #TBD8 $one_letter_text .= $_->{_content}[0];
       if ($_) {
-        #TBR? $one_letter_text .= $_;
-
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
       }
@@ -206,8 +201,6 @@ LETTER:
         next LETTER;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
-        #TBR? $one_letter_text = '';
-
         # Count of authors, not items on the page.
         # Won't include Clarifications, Corrections. 
         #
