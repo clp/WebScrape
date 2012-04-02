@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Mar 30 08:05:00 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 01 04:43:28 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -191,17 +191,23 @@ TOPIC:
     }
 
 
+    my @current_letter_to_editor;
+    my @structured_letters;
 LETTER:
     foreach (@sibs) {
 
       if ($_) {
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
+        push @current_letter_to_editor, $_;
       }
       else {
         next LETTER;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
+        push @structured_letters, 
+            analyze_one_letter( \@current_letter_to_editor );
+        @current_letter_to_editor = ();
         # Count of authors, not letters or items on the page.
         # Won't include Clarifications, Corrections. 
         #
@@ -250,6 +256,26 @@ exit 1;
 # Subroutines ---------------------------------------------------
 #
 #
+sub analyze_one_letter {
+  my $r = shift;
+  my @current_letter_to_editor = @{$r};
+  my %current_letter = ();
+  my $letter_text;
+
+  foreach ( @current_letter_to_editor ) {
+    if ($_->as_HTML !~ /<b>/ ) {
+      $letter_text .= $_->as_text;
+      next;
+    }
+    $current_letter{letter_text} = $letter_text;
+    # Assume first <b> tag identifies first author & terminates 
+    # body of letter; and remaining lines have only author data.
+    my @author_data = <@current_letter_to_editor>;
+
+    return \%current_letter;
+  }
+}
+
 
 sub new { #------------------------------------------------------
   my ($class) = @_;
