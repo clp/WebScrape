@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 02 04:35:35 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 03 01:42:16 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -162,12 +162,13 @@ sub run { #------------------------------------------------------
   );
 
   my @sibs;
+  my $topic_number = 0;
   my $topic_start;
 
   ## Loop on each topic. -----------------------------------------
 TOPIC:
-  foreach ( 0 .. $#topics ) {
-    my $current_topic = $topics[$_]->{_content}[0];
+  foreach ( @topics ) {
+    my $current_topic  = $_->{_content}[0];
     say "DBG topic: ", $current_topic;
 
     ##TBD Make the sub a pattern match? Using the exact heading 
@@ -184,9 +185,11 @@ TOPIC:
     ##TBR? Catch problems.  Used for debug; maybe rm it now.
     if ($topic_start) {
       @sibs = $topic_start->siblings;
+      $topic_number++;
     }
     else {
-      DEBUG "\$topic_start not found: ,$topic_start,";
+      DEBUG "\$topic_start not found for \$topic_number: ,$topic_number,";
+      $topic_number++;
       next TOPIC;
     }
 
@@ -370,15 +373,15 @@ sub save_raw_data { #--------------------------------------------
 
 sub extract_topics { #-------------------------------------------
   my $tree             = shift;
-  my @letter_headlines = $tree->look_down(
+  my @topics = $tree->look_down(
     '_tag'  => 'h1',
     'class' => 'boldEighteenTimes',
   );
   $Data::Dumper::Maxdepth = 2;    # 2 shows content
-       #DBG say "\nDBG \@letter_headlines:";
+       #DBG say "\nDBG \@topics:";
 
-  #DBG say Dumper @letter_headlines;
-  return @letter_headlines;
+  #DBG say Dumper @topics;
+  return @topics;
 }
 
 
