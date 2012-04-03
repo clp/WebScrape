@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 01 04:43:28 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 02 04:35:35 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -199,6 +199,7 @@ LETTER:
       if ($_) {
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
+        # Save objects for analysis:
         push @current_letter_to_editor, $_;
       }
       else {
