@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 03 01:42:16 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 03 01:51:12 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -156,7 +156,7 @@ sub run { #------------------------------------------------------
   my @all_letters_to_editor;
   my @topics = extract_topics($tree);
 
-  my $letter_start = $tree->look_down(
+  my $topic_parent = $tree->look_down(
     _tag  => 'div',
     class => "",
   );
@@ -177,7 +177,7 @@ TOPIC:
     ## Use as_text() method instead of as_HTML(); the latter
     ## caused failures when $topic_start included an apostrophe
     ## that must be escaped (may fail w/ other symbols too).
-    $topic_start = $letter_start->look_down(
+    $topic_start = $topic_parent->look_down(
       _tag => 'h1',
       sub { $_[0]->as_text =~ qr{$current_topic}i }
     );
