@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 03 10:45:50 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 01:36:44 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -164,6 +164,7 @@ sub run { #------------------------------------------------------
   my @lines_under_a_topic;
   my $topic_number = 0;
   my $topic_start;
+  my @structured_letters_for_topic = ();
 
   ## Loop on each topic. -----------------------------------------
 TOPIC:
@@ -200,8 +201,8 @@ TOPIC:
     my $current_letter = '';
     my %current_letter = ();
     my @current_letter_to_editor;
+    my $details ;
     my @structured_letters;
-    my @structured_letters_for_topic = ();
 LINE:
     foreach (@lines_under_a_topic) {
 
@@ -215,7 +216,7 @@ LINE:
       else {
         next LINE;
       }
-      #TBD Change logic to check for author first.
+      #TBD Check for author first, then author data, then next letter.
       if ( $_->as_HTML =~ /<b>/ ) {
         #TBR pop @all_letters_to_editor;
         #TBR pop @current_letter_to_editor;
@@ -248,9 +249,15 @@ LINE:
         say "DBG letter count: ", $total_letters_count;
         next LINE;
       }
-      elsif ( $_->as_HTML =~ /<i>/ ) {
+
+      #TBF How to ignore <i> tags inside letter body, & to use them
+      # after the <b> tag?
+      #   Check $current_author before entering loop;
+      #   and reset $current_author after each letter is finished.
+      elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
         $author_data = $_->as_text;
-        push $current_letter{authors}->{$current_author}{details} , $author_data;
+        #F push [$current_letter{authors}->{$current_author}] , $author_data;
+        push @{ $current_letter{authors}->{$current_author}{details} },  $author_data;
         #
         # TBD How to detect when last <i> tag for a letter has been seen,
         # & then push the %current_letter to AoH of letters for this topic?
@@ -275,6 +282,17 @@ LINE:
       values %$_ )
         or DEBUG( 'save_letters_data', $!, $source_name );
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
+  }
+
+
+  ##---------------------------------------------------------------
+  ## Save structured data from all letters found.
+  write_file( "structured_letters", "" );
+  foreach (@structured_letters_for_topic) {
+    append_file( "structured_letters", { binmode => ':utf8' },
+      values %$_ )
+        or DEBUG( 'save_letters_data', $!, $source_name );
+    append_file( "structured_letters", { binmode => ':utf8' }, "\n" );
   }
 
   ##---------------------------------------------------------------
