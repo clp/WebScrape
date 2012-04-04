@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 03 06:55:29 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 03 10:13:30 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -197,7 +197,7 @@ TOPIC:
 
     my @current_letter_to_editor;
     my @structured_letters;
-LETTER:
+LINE:
     foreach (@lines_under_a_topic) {
 
       if ($_) {
@@ -207,22 +207,24 @@ LETTER:
         push @current_letter_to_editor, $_;
       }
       else {
-        next LETTER;
+        next LINE;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
         #TBR pop @all_letters_to_editor;
         #TBR pop @current_letter_to_editor;
 
         # TBD Save existing content as letter body.
-        # TBD Get remaining content as author data.
+        # TBD Get remaining content as (one or more) author's data.
           # <b> author name
           # <i> author data
-          # If next array element is <i>, save as author data
-          # Else next letter.
+          # If next line is <i>, save as author data until no more <i> tags.
+          # If next line is <b>, save as next author name; repeat until no more <b>.*<i>.* tags.
           # When no more <i> tags are found, the current letter is finished.
-        # 
+          # If next line is <p> w/o <b>, next letter has been found.
+          # Else no more letters under this topic.
+        #
         push @structured_letters, 
-            analyze_one_letter( \@current_letter_to_editor );
+            analyze_one_letter( $_, \@current_letter_to_editor );
         @current_letter_to_editor = ();
         #
         # Count of authors, not letters or items on the page.
@@ -232,9 +234,9 @@ LETTER:
         # or w/ 0 authors.
         $total_letters_count++;
         say "DBG letter count: ", $total_letters_count;
-        next LETTER;
+        next LINE;
       }
-    }    # End foreach LETTER loop.
+    }    # End foreach LINE loop.
   }    # End foreach TOPIC loop.
 
 
@@ -274,7 +276,8 @@ exit 1;
 #
 #
 sub analyze_one_letter {
-  my $r = shift;
+  my $line = shift;
+  my $r    = shift;
   my @current_letter_to_editor = @{$r};
   my %current_letter = ();
   my $letter_text;
