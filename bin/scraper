@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 03 10:13:30 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 03 10:45:50 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -195,8 +195,13 @@ TOPIC:
     }
 
 
+    my $author_data = '';
+    my $current_author = '';
+    my $current_letter = '';
+    my %current_letter = ();
     my @current_letter_to_editor;
     my @structured_letters;
+    my @structured_letters_for_topic = ();
 LINE:
     foreach (@lines_under_a_topic) {
 
@@ -205,13 +210,20 @@ LINE:
             { letter_content => $_->as_text };
         # Save objects for analysis:
         push @current_letter_to_editor, $_;
+        $current_letter .= $_;
       }
       else {
         next LINE;
       }
+      #TBD Change logic to check for author first.
       if ( $_->as_HTML =~ /<b>/ ) {
         #TBR pop @all_letters_to_editor;
         #TBR pop @current_letter_to_editor;
+        $current_author = $_->as_text;
+        $current_letter{authors}->{$current_author}{name} = $current_author;
+        $current_letter{body} = $current_letter ;
+        # Clear the var to prepare for next letter, if any is found.
+        $current_letter = '';
 
         # TBD Save existing content as letter body.
         # TBD Get remaining content as (one or more) author's data.
@@ -236,6 +248,21 @@ LINE:
         say "DBG letter count: ", $total_letters_count;
         next LINE;
       }
+      elsif ( $_->as_HTML =~ /<i>/ ) {
+        $author_data = $_->as_text;
+        push $current_letter{authors}->{$current_author}{details} , $author_data;
+        #
+        # TBD How to detect when last <i> tag for a letter has been seen,
+        # & then push the %current_letter to AoH of letters for this topic?
+        # Is this OK, or will it add redundant entries when more than one
+        # <i> tag for a letter is found?:
+        push @structured_letters_for_topic, %current_letter;
+      }
+      #TBD Do I need this clause to handle body text paragraphs?:
+      #TBR? elsif ( $_->as_HTML =~ /<p>/ ) {
+      #TBR? $author_data = $_->as_text;
+      #TBR? push $current_letter{authors}->{current_author}{details} , $author_data;
+      #TBR? }
     }    # End foreach LINE loop.
   }    # End foreach TOPIC loop.
 
