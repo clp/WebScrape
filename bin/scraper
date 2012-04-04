@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 01:36:44 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 04:46:12 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -34,7 +34,7 @@ use HTML::Element::Library;
 #TBD use HTML::Entities;
 use HTML::TreeBuilder;
 
-# TBD use JSON;
+use JSON;
 use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
 
@@ -225,6 +225,7 @@ LINE:
         $current_letter{body} = $current_letter ;
         # Clear the var to prepare for next letter, if any is found.
         $current_letter = '';
+        $current_letter{topic} = $current_topic;
 
         # TBD Save existing content as letter body.
         # TBD Get remaining content as (one or more) author's data.
@@ -240,8 +241,8 @@ LINE:
             analyze_one_letter( $_, \@current_letter_to_editor );
         @current_letter_to_editor = ();
         #
-        # Count of authors, not letters or items on the page.
-        # Won't include Clarifications, Corrections. 
+        # This is a count of authors, not letters or items on the page.
+        # Won't yet include Clarifications, Corrections. 
         #
         # TBD Handle the case of an item w/ > 1 author,
         # or w/ 0 authors.
@@ -256,14 +257,25 @@ LINE:
       #   and reset $current_author after each letter is finished.
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
         $author_data = $_->as_text;
-        #F push [$current_letter{authors}->{$current_author}] , $author_data;
         push @{ $current_letter{authors}->{$current_author}{details} },  $author_data;
         #
         # TBD How to detect when last <i> tag for a letter has been seen,
         # & then push the %current_letter to AoH of letters for this topic?
-        # Is this OK, or will it add redundant entries when more than one
+        # Is this code OK, or will it add redundant entries when more than one
         # <i> tag for a letter is found?:
         push @structured_letters_for_topic, %current_letter;
+
+        # Write each letter to a separate file.
+        # Maybe overwrite the file as each new <i> tag is found,
+        # and the last file written should have all the data.
+        ##---------------------------------------------------------------
+        write_file( ./wsj/2012/mmdd/$total_letters_count, "" );
+        write_file( ./wsj/2012/mmdd/$total_letters_count, { binmode => ':utf8' },
+          encode_json (\%current_letter) )
+            or DEBUG( 'save_one_letter_data', $!, $source_name );
+        }
+
+
       }
       #TBD Do I need this clause to handle body text paragraphs?:
       #TBR? elsif ( $_->as_HTML =~ /<p>/ ) {
