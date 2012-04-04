@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 04:46:12 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 04:50:49 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -266,10 +266,9 @@ LINE:
         push @structured_letters_for_topic, %current_letter;
 
         # Write each letter to a separate file.
-        # Maybe overwrite the file as each new <i> tag is found,
+        # Overwrite the file as each new <i> tag is found,
         # and the last file written should have all the data.
         ##---------------------------------------------------------------
-        write_file( ./wsj/2012/mmdd/$total_letters_count, "" );
         write_file( ./wsj/2012/mmdd/$total_letters_count, { binmode => ':utf8' },
           encode_json (\%current_letter) )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
