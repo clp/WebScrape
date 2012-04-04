@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 03 01:51:12 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 03 06:55:29 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -161,7 +161,7 @@ sub run { #------------------------------------------------------
     class => "",
   );
 
-  my @sibs;
+  my @lines_under_a_topic;
   my $topic_number = 0;
   my $topic_start;
 
@@ -184,7 +184,8 @@ TOPIC:
 
     ##TBR? Catch problems.  Used for debug; maybe rm it now.
     if ($topic_start) {
-      @sibs = $topic_start->siblings;
+      #ORG @letters_under_a_topic = $topic_start->siblings;
+      @lines_under_a_topic = $topic_start->siblings;
       $topic_number++;
     }
     else {
@@ -197,7 +198,7 @@ TOPIC:
     my @current_letter_to_editor;
     my @structured_letters;
 LETTER:
-    foreach (@sibs) {
+    foreach (@lines_under_a_topic) {
 
       if ($_) {
         push @all_letters_to_editor,
@@ -209,9 +210,21 @@ LETTER:
         next LETTER;
       }
       if ( $_->as_HTML =~ /<b>/ ) {
+        #TBR pop @all_letters_to_editor;
+        #TBR pop @current_letter_to_editor;
+
+        # TBD Save existing content as letter body.
+        # TBD Get remaining content as author data.
+          # <b> author name
+          # <i> author data
+          # If next array element is <i>, save as author data
+          # Else next letter.
+          # When no more <i> tags are found, the current letter is finished.
+        # 
         push @structured_letters, 
             analyze_one_letter( \@current_letter_to_editor );
         @current_letter_to_editor = ();
+        #
         # Count of authors, not letters or items on the page.
         # Won't include Clarifications, Corrections. 
         #
@@ -272,9 +285,12 @@ sub analyze_one_letter {
       next;
     }
     $current_letter{letter_text} = $letter_text;
+
     # Assume first <b> tag identifies first author & terminates 
     # body of letter; and remaining lines have only author data.
-    my @author_data = <@current_letter_to_editor>;
+    #TBF How to slurp rest of current letter into an array for analysis?
+    # Maybe s/b done before this sub is called.
+    #TBF my @author_data = <@current_letter_to_editor>;
 
     return \%current_letter;
   }
