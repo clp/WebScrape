@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 04:50:49 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 05:23:49 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -269,12 +269,9 @@ LINE:
         # Overwrite the file as each new <i> tag is found,
         # and the last file written should have all the data.
         ##---------------------------------------------------------------
-        write_file( ./wsj/2012/mmdd/$total_letters_count, { binmode => ':utf8' },
+        write_file( "./wsj/2012/mmdd/$total_letters_count", { binmode => ':utf8' },
           encode_json (\%current_letter) )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
-        }
-
-
       }
       #TBD Do I need this clause to handle body text paragraphs?:
       #TBR? elsif ( $_->as_HTML =~ /<p>/ ) {
@@ -295,16 +292,6 @@ LINE:
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
-
-  ##---------------------------------------------------------------
-  ## Save structured data from all letters found.
-  write_file( "structured_letters", "" );
-  foreach (@structured_letters_for_topic) {
-    append_file( "structured_letters", { binmode => ':utf8' },
-      values %$_ )
-        or DEBUG( 'save_letters_data', $!, $source_name );
-    append_file( "structured_letters", { binmode => ':utf8' }, "\n" );
-  }
 
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
