@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 08:23:34 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 08:56:32 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -259,13 +259,16 @@ LINE:
           # Found a new letter.
           $current_letter{authors}{details} = ();
           $prior_author = $current_author;
-          #TBD1 pop @current_letter_to_editor;
         }
         #
         # TBD How to detect when last <i> tag for a letter has been seen,
         # & then push the %current_letter to AoH of letters for this topic?
         # Is this code OK, or will it add redundant entries when more than one
         # <i> tag for a letter is found?:
+
+        # Clear this var in this block also, to prevent wrong 
+        # data from being stored.
+        $current_letter_text = '';
 
         $author_data = $_->as_text;
         push @{ $current_letter{authors}{details} },  $author_data;
