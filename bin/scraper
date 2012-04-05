@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 05:42:09 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 05:57:37 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -164,7 +164,6 @@ sub run { #------------------------------------------------------
   my @lines_under_a_topic;
   my $topic_number = 0;
   my $topic_start;
-  #TBR my @structured_letters_for_topic = ();
 
   ## Loop on each topic. -----------------------------------------
 TOPIC:
@@ -253,7 +252,7 @@ LINE:
 
       #TBF How to ignore <i> tags inside letter body, & to use them
       # after the <b> tag?
-      #   Check $current_author before entering loop;
+      #   i.1. Check $current_author before entering loop;
       #   and reset $current_author after each letter is finished.
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
         $author_data = $_->as_text;
@@ -264,8 +263,6 @@ LINE:
         # Is this code OK, or will it add redundant entries when more than one
         # <i> tag for a letter is found?:
 
-        #TBR push @structured_letters_for_topic, %current_letter;
-
         # Write each letter to a separate file.
         # Overwrite the file as each new <i> tag is found,
         # and the last file written for that letter should have 
@@ -274,6 +271,7 @@ LINE:
           encode_json (\%current_letter) )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
       }
+
       #TBD Do I need this clause to handle body text paragraphs?:
       #TBR? elsif ( $_->as_HTML =~ /<p>/ ) {
       #TBR? $author_data = $_->as_text;
