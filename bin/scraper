@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 05:32:38 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 05:42:09 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -198,7 +198,7 @@ TOPIC:
 
     my $author_data = '';
     my $current_author = '';
-    my $current_letter = '';
+    my $current_letter_text = '';
     my %current_letter = ();
     my @current_letter_to_editor;
     my $details ;
@@ -211,7 +211,7 @@ LINE:
             { letter_content => $_->as_text };
         # Save objects for analysis:
         push @current_letter_to_editor, $_;
-        $current_letter .= $_->as_text;
+        $current_letter_text .= $_->as_text;
       }
       else {
         next LINE;
@@ -222,9 +222,9 @@ LINE:
         #TBR pop @current_letter_to_editor;
         $current_author = $_->as_text;
         $current_letter{authors}->{$current_author}{name} = $current_author;
-        $current_letter{body} = $current_letter ;
+        $current_letter{body} = $current_letter_text ;
         # Clear the var to prepare for next letter, if any is found.
-        $current_letter = '';
+        $current_letter_text = '';
         $current_letter{topic} = $current_topic;
 
         # TBD Save existing content as letter body.
