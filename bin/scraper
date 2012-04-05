@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 07:12:35 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 07:41:20 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -201,6 +201,7 @@ TOPIC:
     my %current_letter = ();
     my @current_letter_to_editor;
     my $details ;
+    my $prior_author = '';
     my @structured_letters;
 LINE:
     foreach (@lines_under_a_topic) {
@@ -258,22 +259,30 @@ LINE:
       #   and clear $current_author after each letter is finished.
       # TBD Clear $current_author after each letter is finished.
       # TBD Clear details after each letter is finished.
+      # i.2. A new letter is started when $current_author changes.
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
-        $author_data = $_->as_text;
-        push @{ $current_letter{authors}{details} },  $author_data;
+        if ($current_author ne $prior_author){
+          # Found a new letter.
+          $current_letter{authors}{details} = ();
+          $prior_author = $current_author;
+        }
         #
         # TBD How to detect when last <i> tag for a letter has been seen,
         # & then push the %current_letter to AoH of letters for this topic?
         # Is this code OK, or will it add redundant entries when more than one
         # <i> tag for a letter is found?:
 
+        $author_data = $_->as_text;
+        push @{ $current_letter{authors}{details} },  $author_data;
         # Write each letter to a separate file.
         # Overwrite the file as each new <i> tag is found,
         # and the last file written for that letter should have 
         # all its data.
-        write_file( "./wsj/2012/mmdd/$total_letters_count", { binmode => ':utf8' },
+        write_file( "./wsj/2012/mmdd/$total_letters_count",
+          { binmode => ':utf8' },
           encode_json (\%current_letter) )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
+
       }
 
       #TBD Do I need this clause to handle body text paragraphs?:
