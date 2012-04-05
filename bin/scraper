@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 09:05:28 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 09:13:36 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -15,7 +15,7 @@
 # Fri2012_0330_14:41  Extract each letter & save for analysis.
 #   Extract is OK; but no metadata fields are stored for simple
 #   retrieval & analysis.
-# TBD  Save letter text & metadata into a structure.
+# Wed2012_0404_21:07  Save letter text & metadata into a structure.
 #
 # ---------------------------------------------------------------
 
@@ -184,7 +184,6 @@ TOPIC:
 
     ##TBR? Catch problems.  Used for debug; maybe rm it now.
     if ($topic_start) {
-      #ORG @letters_under_a_topic = $topic_start->siblings;
       @lines_under_a_topic = $topic_start->siblings;
       $topic_number++;
     }
@@ -206,6 +205,7 @@ LINE:
     foreach (@lines_under_a_topic) {
 
       if ($_) {
+        # DBG Save each line for debug.
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
         # Save objects for analysis:
@@ -214,15 +214,15 @@ LINE:
       else {
         next LINE;
       }
-      #TBD Check for author first, then author data, then next letter.
+      ##TBD Check for author first, then for author data.
       if ( $_->as_HTML =~ /<b>/ ) {
-        #TBR pop @all_letters_to_editor;
         $current_author = $_->as_text;
-        #ORG2 $current_letter{authors}->{$current_author}{name} = $current_author;
         $current_letter{authors}{name} = $current_author;
-        # Assume the <b> tag marks end of letter body.
+
+        ## Assume the <b> tag marks end of letter body.
         $current_letter{body} = $current_letter_text ;
-        # Clear the var to prepare for next letter, if any is found.
+
+        ## Clear the var to prepare for next letter.
         $current_letter_text = '';
         $current_letter{topic} = $current_topic;
 
@@ -281,7 +281,6 @@ LINE:
           { binmode => ':utf8' },
           encode_json (\%current_letter) )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
-
       }
 
     }    # End foreach LINE loop.
@@ -316,8 +315,9 @@ LINE:
 
 }    # End of run().
 
-
 exit 1;
+
+
 
 #
 #
@@ -332,7 +332,7 @@ sub new { #------------------------------------------------------
 }
 
 sub init { #-----------------------------------------------------
-           # TBD Add some or all init code here later.
+  ## TBD Add some or all init code here later.
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
 }
