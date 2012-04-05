@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 05 11:18:18 AMAM clpoda>
+# Time-stamp: <Thu 2012 Apr 05 11:28:18 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -47,7 +47,7 @@ use feature qw( switch say );
 #TBD use IO::Zlib;
 
 my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
-our $VERSION = '0.01';
+our $VERSION = '0.10';
 
 # Initialize
 my $source_name = "wsj";
