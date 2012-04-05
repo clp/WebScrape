@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 07:41:20 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 08:23:34 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -199,7 +199,6 @@ TOPIC:
     my $current_author = '';
     my $current_letter_text = '';
     my %current_letter = ();
-    my @current_letter_to_editor;
     my $details ;
     my $prior_author = '';
     my @structured_letters;
@@ -210,7 +209,6 @@ LINE:
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
         # Save objects for analysis:
-        push @current_letter_to_editor, $_;
         $current_letter_text .= $_->as_text;
       }
       else {
@@ -219,7 +217,6 @@ LINE:
       #TBD Check for author first, then author data, then next letter.
       if ( $_->as_HTML =~ /<b>/ ) {
         #TBR pop @all_letters_to_editor;
-        #TBR pop @current_letter_to_editor;
         $current_author = $_->as_text;
         #ORG2 $current_letter{authors}->{$current_author}{name} = $current_author;
         $current_letter{authors}{name} = $current_author;
@@ -239,9 +236,6 @@ LINE:
           # If next line is <p> w/o <b>, next letter has been found.
           # Else no more letters under this topic.
         #
-        push @structured_letters, 
-            analyze_one_letter( $_, \@current_letter_to_editor );
-        @current_letter_to_editor = ();
         #
         # This is a count of authors, not letters or items on the page.
         # Won't yet include Clarifications, Corrections. 
@@ -265,6 +259,7 @@ LINE:
           # Found a new letter.
           $current_letter{authors}{details} = ();
           $prior_author = $current_author;
+          #TBD1 pop @current_letter_to_editor;
         }
         #
         # TBD How to detect when last <i> tag for a letter has been seen,
@@ -278,6 +273,7 @@ LINE:
         # Overwrite the file as each new <i> tag is found,
         # and the last file written for that letter should have 
         # all its data.
+        # TBD Obtain & use the correct values in the path:
         write_file( "./wsj/2012/mmdd/$total_letters_count",
           { binmode => ':utf8' },
           encode_json (\%current_letter) )
@@ -285,11 +281,6 @@ LINE:
 
       }
 
-      #TBD Do I need this clause to handle body text paragraphs?:
-      #TBR? elsif ( $_->as_HTML =~ /<p>/ ) {
-      #TBR? $author_data = $_->as_text;
-      #TBR? push $current_letter{authors}->{current_author}{details} , $author_data;
-      #TBR? }
     }    # End foreach LINE loop.
   }    # End foreach TOPIC loop.
 
