@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 11:20:50 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 05 11:18:18 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -78,13 +78,13 @@ my $data_src = "local file copy of web page";
 # Set up logging.
 Log::Log4perl->easy_init(
   {
+
     #OK level => $INFO,
     #OK level  => $WARN,
     level => $DEBUG,
     file  => ">>$program.log"
   }
 );
-
 
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
@@ -146,7 +146,6 @@ sub run { #------------------------------------------------------
   ##DBG:
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-
   ##
   ## Parse the response & extract desired data. ------------------
   ##   Select the portion of the page that holds our data.
@@ -167,11 +166,11 @@ sub run { #------------------------------------------------------
 
   ## Loop on each topic. -----------------------------------------
 TOPIC:
-  foreach ( @topics ) {
-    my $current_topic  = $_->{_content}[0];
+  foreach (@topics) {
+    my $current_topic = $_->{_content}[0];
     say "DBG topic: ", $current_topic;
 
-    ##TBD Make the sub a pattern match? Using the exact heading 
+    ##TBD Make the sub a pattern match? Using the exact heading
     ## may cause a problem.
     ##
     ## Use as_text() method instead of as_HTML(); the latter
@@ -188,26 +187,29 @@ TOPIC:
       $topic_number++;
     }
     else {
-      DEBUG "\$topic_start not found for \$topic_number: ,$topic_number,";
+      DEBUG
+          "\$topic_start not found for \$topic_number: ,$topic_number,";
       $topic_number++;
       next TOPIC;
     }
 
-
-    my $author_data = '';
-    my $current_author = '';
+    my $author_data         = '';
+    my $current_author      = '';
     my $current_letter_text = '';
-    my %current_letter = ();
-    my $details ;
+    my %current_letter      = ();
+    my $details;
     my $prior_author = '';
     my @structured_letters;
 LINE:
+
     foreach (@lines_under_a_topic) {
 
       if ($_) {
+
         # DBG Save each line for debug.
         push @all_letters_to_editor,
             { letter_content => $_->as_text };
+
         # Save objects for analysis:
         $current_letter_text .= $_->as_text;
       }
@@ -220,73 +222,78 @@ LINE:
         $current_letter{authors}{name} = $current_author;
 
         ## Assume the <b> tag marks end of letter body.
-        $current_letter{body} = $current_letter_text ;
+        $current_letter{body} = $current_letter_text;
 
         ## Clear the var to prepare for next letter.
         $current_letter_text = '';
         $current_letter{topic} = $current_topic;
 
-        # TBD Get remaining content as (one or more) author's data.
-          # <b> author name
-          # <i> author data
-          # If next line is <i>, save as author data until no more <i> tags.
-          # If next line is <b>, save as next author name; repeat until no more <b>.*<i>.* tags.
-          # When no more <i> tags are found, the current letter is finished.
-          # If next line is <p> w/o <b>, next letter has been found.
-          # Else no more letters under this topic.
-        #
-        #
-        # TBD This is a count of authors, not letters or items 
-        # on the page.  Can it be improved?
-        # Won't yet include Clarifications, Corrections. 
-        #
-        # TBD Handle the case of an item w/ > 1 author,
-        # or w/ 0 authors.
+        ## TBD Get remaining content as (one or more) author's data.
+          ## <b> author name
+          ## <i> author data
+          ## If next line is <i>, save as author data until no more <i> tags.
+          ## If next line is <b>, save as next author name; repeat until no more <b>.*<i>.* tags.
+          ## When no more <i> tags are found, the current letter is finished.
+          ## If next line is <p> w/o <b>, next letter has been found.
+          ## Else no more letters under this topic.
+        ##
+        ##
+        ## TBD This is a count of authors, not letters or items
+        ## on the page.  How an it be improved?
+        ## Won't yet include Clarifications, Corrections.
+        ##
+        ## TBD Handle the case of an item w/ > 1 author,
+        ## or w/ 0 authors.
         $total_letters_count++;
         say "DBG letter count: ", $total_letters_count;
         next LINE;
       }
 
-      #TBF How to ignore <i> tags inside letter body, & to use them
-      # after the <b> tag?
-      #   i.1. Check $current_author before entering loop;
-      #   and clear $current_author after each letter is finished.
-      # TBD Clear $current_author after each letter is finished.
-      # TBD Clear details after each letter is finished.
-      # i.2. A new letter is started when $current_author changes.
-      #
+      ##TBF How to ignore <i> tags inside letter body, & to use them
+      ## after the <b> tag?
+      ##   i.1. Check $current_author before entering loop;
+      ##   and clear $current_author after each letter is finished.
+      ## TBD Clear $current_author after each letter is finished.
+      ## TBD Clear details after each letter is finished.
+      ## i.2. A new letter is started when $current_author changes.
+      ##
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
-        if ($current_author ne $prior_author){
+        if ( $current_author ne $prior_author ) {
+
           # Found a new letter.
           $current_letter{authors}{details} = ();
           $prior_author = $current_author;
         }
-        #
-        # TBD How to detect when last <i> tag for a letter has been seen,
-        # & then push the %current_letter to AoH of letters for this topic?
-        # Is this code OK, or will it add redundant entries when more than one
-        # <i> tag for a letter is found?:
 
-        # Clear this var in this block also, to prevent wrong 
-        # data from being stored.
+        ##
+        ## TBD How to detect when last <i> tag for a letter has been seen,
+        ## & then push the %current_letter to AoH of letters for this topic?
+        ## Is this code OK, or will it add redundant entries when more than one
+        ## <i> tag for a letter is found?:
+
+        ## Clear this var in this block also, to prevent wrong
+        ## data from being stored.
         $current_letter_text = '';
 
         $author_data = $_->as_text;
-        push @{ $current_letter{authors}{details} },  $author_data;
-        # Write each letter to a separate file.
-        # Overwrite the file as each new <i> tag is found,
-        # and the last file written for that letter should have 
-        # all its data.
-        # TBD Obtain & use the correct values in the path:
-        write_file( "./wsj/2012/mmdd/$total_letters_count",
+        push @{ $current_letter{authors}{details} },
+            $author_data;
+
+        ## Write each letter to a separate file.
+        ## Overwrite the file as each new <i> tag is found,
+        ## and the last file written for that letter should have
+        ## all its data.
+        ## TBD Obtain & use the correct values in the path:
+        write_file(
+          "./wsj/2012/mmdd/$total_letters_count",
           { binmode => ':utf8' },
-          encode_json (\%current_letter) )
+          encode_json( \%current_letter )
+            )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
       }
 
     }    # End foreach LINE loop.
   }    # End foreach TOPIC loop.
-
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
@@ -297,7 +304,6 @@ LINE:
         or DEBUG( 'save_letters_data', $!, $source_name );
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
-
 
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
@@ -317,8 +323,6 @@ LINE:
 }    # End of run().
 
 exit 1;
-
-
 
 #
 #
@@ -414,20 +418,18 @@ sub save_raw_data { #--------------------------------------------
       or DEBUG( 'save_raw_data()', $!, $source_name );
 }
 
-
 sub extract_topics { #-------------------------------------------
-  my $tree             = shift;
+  my $tree   = shift;
   my @topics = $tree->look_down(
     '_tag'  => 'h1',
     'class' => 'boldEighteenTimes',
   );
   $Data::Dumper::Maxdepth = 2;    # 2 shows content
-       #DBG say "\nDBG \@topics:";
+  ##DBG say "\nDBG \@topics:";
 
-  #DBG say Dumper @topics;
+  ##DBG say Dumper @topics;
   return @topics;
 }
-
 
 sub extract_letters { #------------------------------------------
   say "DBG extract_letters()";
