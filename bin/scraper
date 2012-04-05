@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 08:56:32 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 09:05:28 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -324,31 +324,6 @@ exit 1;
 # Subroutines ---------------------------------------------------
 #
 #
-sub analyze_one_letter {
-  my $line = shift;
-  my $r    = shift;
-  my @current_letter_to_editor = @{$r};
-  my %current_letter = ();
-  my $letter_text;
-
-  foreach ( @current_letter_to_editor ) {
-    if ($_->as_HTML !~ /<b>/ ) {
-      $letter_text .= $_->as_text;
-      next;
-    }
-    $current_letter{letter_text} = $letter_text;
-
-    # Assume first <b> tag identifies first author & terminates 
-    # body of letter; and remaining lines have only author data.
-    #TBF How to slurp rest of current letter into an array for analysis?
-    # Maybe s/b done before this sub is called.
-    #TBF my @author_data = <@current_letter_to_editor>;
-
-    return \%current_letter;
-  }
-}
-
-
 sub new { #------------------------------------------------------
   my ($class) = @_;
   my $application = bless {}, $class;
@@ -414,7 +389,7 @@ sub get_start_page { #-------------------------------------------
         "ERR: Got bad response to request for [$start_url]; try later.";
   }
   return $mech->content();
-}    # End get_start_page.
+}
 
 sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
@@ -436,7 +411,7 @@ sub save_raw_data { #--------------------------------------------
     { binmode => ':utf8' },
     $tree->as_text )
       or DEBUG( 'save_raw_data()', $!, $source_name );
-}    # End of sub save_raw_data
+}
 
 
 sub extract_topics { #-------------------------------------------
