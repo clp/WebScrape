@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 04 09:13:36 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 04 11:20:50 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -226,7 +226,6 @@ LINE:
         $current_letter_text = '';
         $current_letter{topic} = $current_topic;
 
-        # TBD Save existing content as letter body.
         # TBD Get remaining content as (one or more) author's data.
           # <b> author name
           # <i> author data
@@ -237,7 +236,8 @@ LINE:
           # Else no more letters under this topic.
         #
         #
-        # This is a count of authors, not letters or items on the page.
+        # TBD This is a count of authors, not letters or items 
+        # on the page.  Can it be improved?
         # Won't yet include Clarifications, Corrections. 
         #
         # TBD Handle the case of an item w/ > 1 author,
@@ -254,6 +254,7 @@ LINE:
       # TBD Clear $current_author after each letter is finished.
       # TBD Clear details after each letter is finished.
       # i.2. A new letter is started when $current_author changes.
+      #
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
         if ($current_author ne $prior_author){
           # Found a new letter.
