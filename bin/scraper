@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 05 11:28:18 AMAM clpoda>
+# Time-stamp: <Thu 2012 Apr 05 06:02:07 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -46,7 +46,7 @@ use feature qw( switch say );
 #TBD use Storable;
 #TBD use IO::Zlib;
 
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -168,6 +168,7 @@ sub run { #------------------------------------------------------
 TOPIC:
   foreach (@topics) {
     my $current_topic = $_->{_content}[0];
+    $current_topic =~ s/\s+$//;
     say "DBG topic: ", $current_topic;
 
     ##TBD Make the sub a pattern match? Using the exact heading
@@ -199,7 +200,7 @@ TOPIC:
     my %current_letter      = ();
     my $details;
     my $prior_author = '';
-    my @structured_letters;
+    #TBR my @structured_letters;
 LINE:
 
     foreach (@lines_under_a_topic) {
@@ -402,6 +403,7 @@ sub save_raw_data { #--------------------------------------------
   ## Save structured view of web page.
   my $treeout;
   open( $treeout, '>', "$raw_dir/wsj.lte.treedump" );
+  binmode $treeout, ':utf8';
   $tree->dump($treeout);
   close($treeout);
 
