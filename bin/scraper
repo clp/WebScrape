@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 05 06:02:07 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 06 12:40:26 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -71,9 +71,7 @@ my $log_file = $log_dir . "$program.log";
 #TBD # Name the $out_file later; it contains a time stamp.
 #TBD my $out_file;
 #
-#TBD my $data_src = "__DATA__";
-#TBD my $data_src = "web";
-my $data_src = "local file copy of web page";
+my $data_src = "unknown, maybe __DATA__";
 
 # Set up logging.
 Log::Log4perl->easy_init(
@@ -135,10 +133,12 @@ sub run { #------------------------------------------------------
     $start_page = read_file(
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
     $tree = HTML::TreeBuilder->new_from_content($start_page);
+    $data_src = "local copy of web page";
   }
   else {
     $start_page = get_start_page( $mech, $start_url );
     $tree = HTML::TreeBuilder->new_from_content($start_page);
+    $data_src = "web";
   }
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
