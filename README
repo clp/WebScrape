@@ -1,3 +1,18 @@
+WebScrape version 0.10
+=================================
+
+All code has been written in bin/scraper, which is a prototype
+for the code that will be in WebScrape.pm eventually.  It now
+fetches a page from a web site and extracts specific data from
+that page.
+
+It can use a local file instead of querying the web site, and 
+extract the data from it.  There are two test scripts in the t/
+subdirectory that rely on the static data file, which have been
+useful during debugging.
+
+
+
 WebScrape version 0.01
 =================================
 
