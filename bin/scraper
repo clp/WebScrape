@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 06 12:40:26 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 06 05:41:44 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -39,6 +39,7 @@ use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
 
 #TBD use DateTime;
+use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
@@ -152,6 +153,31 @@ sub run { #------------------------------------------------------
   ##   Extract each headline & store them in @topics.
   ##   Extract each sibling node from the tree.
   ##   TBD: Parse the text for data: heading, article, letter body, etc.
+
+  ## Get date of publication.
+  ## var serverTime = new Date("April 06, 2012 00:45:28");
+  my ($pub_date_raw) = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
+  say "DBG date: ,$pub_date_raw,";
+  my $parser = DateTime::Format::Natural->new;
+  my $dt = $parser->parse_datetime($pub_date_raw);
+  #TBR @dt = $parser->parse_datetime_duration($date_string);
+
+  if ($parser->success) {
+      # operate on $dt/@dt, for example:
+      printf("%02d.%02d.%4d %02d:%02d:%02d\n", $dt->day,
+                                               $dt->month,
+                                               $dt->year,
+                                               $dt->hour,
+                                               $dt->min,
+                                               $dt->sec);
+  } else {
+      warn $parser->error;
+  }
+
+
+
+
+  ## Get topic data.
   my @all_letters_to_editor;
   my @topics = extract_topics($tree);
 
@@ -285,8 +311,13 @@ LINE:
         ## and the last file written for that letter should have
         ## all its data.
         ## TBD Obtain & use the correct values in the path:
+        ##
+        #TBD2  ## Make dirs if needed.
+          # "./wsj/" . $dt->year ."/" . $dt->month.$dt->day. "/$total_letters_count",
+
         write_file(
-          "./wsj/2012/mmdd/$total_letters_count",
+          #F "./wsj/$dt->year/$dt->month.$dt->day/$total_letters_count",
+          "./wsj/" . $dt->year ."/" . $dt->month.$dt->day. "/$total_letters_count",
           { binmode => ':utf8' },
           encode_json( \%current_letter )
             )
@@ -314,9 +345,10 @@ LINE:
   my ($end_msg1);
   $end_msg1
       = "$0\n"
-      . "  using data src ,$data_src,\n"
-      . "  ran from $start_time to $done_time.\n"
-      . "  Found ,$total_letters_count, letters to the editor in $source_name.\n";
+      . "  using data src ,$data_src, for letters to the editor in $source_name\n"
+      . "  Program ran from $start_time to $done_time.\n"
+      . "  Found ,$total_letters_count, letters to the editor in $source_name,"
+      . "  printed on $pub_date_raw.\n";
 
   DEBUG($end_msg1);
   print { $application->{output_fh} } $end_msg1 . "\n";
