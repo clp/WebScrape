@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 06 05:41:44 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 09 01:07:26 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -158,7 +158,8 @@ sub run { #------------------------------------------------------
   ## var serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw) = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
   say "DBG date: ,$pub_date_raw,";
-  my $parser = DateTime::Format::Natural->new;
+  #F my $parser = DateTime::Format::Natural->new( format => 'yyyy_mmdd');
+  my $parser = DateTime::Format::Natural->new( format => 'mm/dd/yyyy');
   my $dt = $parser->parse_datetime($pub_date_raw);
   #TBR @dt = $parser->parse_datetime_duration($date_string);
 
@@ -226,12 +227,19 @@ TOPIC:
     my %current_letter      = ();
     my $details;
     my $prior_author = '';
+    my $current_line = '';
+    my $prior_line = '';
     #TBR my @structured_letters;
 LINE:
-
     foreach (@lines_under_a_topic) {
 
       if ($_) {
+
+        $prior_line = $current_line;
+        $current_line = $_;
+        # TBD Use $prior_line & $current_line to test for end of ltr; 
+        ## if $prior =~ <i>  && $current !~ <b> or <i>, then a new letter TBD?
+          ## This must handle <i> tags in body of letter.
 
         # DBG Save each line for debug.
         push @all_letters_to_editor,
@@ -245,6 +253,7 @@ LINE:
       }
       ##TBD Check for author first, then for author data.
       if ( $_->as_HTML =~ /<b>/ ) {
+        # TBD Use $prior_line & $current_line to test for >1 authors: if $prior =~ <i>...
         $current_author = $_->as_text;
         $current_letter{authors}{name} = $current_author;
 
@@ -261,7 +270,8 @@ LINE:
           ## If next line is <i>, save as author data until no more <i> tags.
           ## If next line is <b>, save as next author name; repeat until no more <b>.*<i>.* tags.
           ## When no more <i> tags are found, the current letter is finished.
-          ## If next line is <p> w/o <b>, next letter has been found.
+          ##ORG ## If next line is <p> w/o <b>, next letter has been found.
+          ## If next line is <a ...><p><a ...> w/o <b>, next letter has been found.
           ## Else no more letters under this topic.
         ##
         ##
@@ -272,7 +282,7 @@ LINE:
         ## TBD Handle the case of an item w/ > 1 author,
         ## or w/ 0 authors.
         $total_letters_count++;
-        say "DBG letter count: ", $total_letters_count;
+        say "DBG author (not letter) count: ", $total_letters_count;
         next LINE;
       }
 
@@ -310,14 +320,26 @@ LINE:
         ## Overwrite the file as each new <i> tag is found,
         ## and the last file written for that letter should have
         ## all its data.
-        ## TBD Obtain & use the correct values in the path:
         ##
-        #TBD2  ## Make dirs if needed.
-          # "./wsj/" . $dt->year ."/" . $dt->month.$dt->day. "/$total_letters_count",
+        ## Make dirs if needed.
+        my $m = $dt->month;
+        my $d = $dt->day;
+        ##
+        ## TBD Use $author_count until an accurate letter count is avbl.
+        my $author_count = $total_letters_count;
+        ##
+        ## Add leading zeroes to values used in path, including file name,
+        ## to get 2-digit strings.
+        for ($m, $d, $author_count) {
+          $_ = "0" . $_ if $_ <= 9;
+        }
+        my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
+        if ( !-d $daily_dir ) {
+          make_path($daily_dir);
+        }
 
         write_file(
-          #F "./wsj/$dt->year/$dt->month.$dt->day/$total_letters_count",
-          "./wsj/" . $dt->year ."/" . $dt->month.$dt->day. "/$total_letters_count",
+          "./$daily_dir/$author_count",
           { binmode => ':utf8' },
           encode_json( \%current_letter )
             )
@@ -347,7 +369,7 @@ LINE:
       = "$0\n"
       . "  using data src ,$data_src, for letters to the editor in $source_name\n"
       . "  Program ran from $start_time to $done_time.\n"
-      . "  Found ,$total_letters_count, letters to the editor in $source_name,"
+      . "  Found ,$total_letters_count, authors to letters to the editor in $source_name,"
       . "  printed on $pub_date_raw.\n";
 
   DEBUG($end_msg1);
