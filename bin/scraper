@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 09 01:07:26 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 10 04:52:16 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -16,6 +16,7 @@
 #   Extract is OK; but no metadata fields are stored for simple
 #   retrieval & analysis.
 # Wed2012_0404_21:07  Save letter text & metadata into a structure.
+# TBD Fix parse bugs-not separating letters into files properly.
 #
 # ---------------------------------------------------------------
 
@@ -47,7 +48,7 @@ use feature qw( switch say );
 #TBD use Storable;
 #TBD use IO::Zlib;
 
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -132,7 +133,9 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+      # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+      # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
     $tree = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
@@ -154,23 +157,17 @@ sub run { #------------------------------------------------------
   ##   Extract each sibling node from the tree.
   ##   TBD: Parse the text for data: heading, article, letter body, etc.
 
+  ## TBF b.9. serverTime can be one day before printed date of wsj.
   ## Get date of publication.
   ## var serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw) = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
   say "DBG date: ,$pub_date_raw,";
-  #F my $parser = DateTime::Format::Natural->new( format => 'yyyy_mmdd');
-  my $parser = DateTime::Format::Natural->new( format => 'mm/dd/yyyy');
+  my $parser = DateTime::Format::Natural->new();
   my $dt = $parser->parse_datetime($pub_date_raw);
-  #TBR @dt = $parser->parse_datetime_duration($date_string);
 
+  ## TBD Move to where $dt is used?
   if ($parser->success) {
-      # operate on $dt/@dt, for example:
-      printf("%02d.%02d.%4d %02d:%02d:%02d\n", $dt->day,
-                                               $dt->month,
-                                               $dt->year,
-                                               $dt->hour,
-                                               $dt->min,
-                                               $dt->sec);
+      # operate on $dt.
   } else {
       warn $parser->error;
   }
@@ -237,7 +234,7 @@ LINE:
 
         $prior_line = $current_line;
         $current_line = $_;
-        # TBD Use $prior_line & $current_line to test for end of ltr; 
+        ## TBD Use $prior_line & $current_line to test for end of ltr; 
         ## if $prior =~ <i>  && $current !~ <b> or <i>, then a new letter TBD?
           ## This must handle <i> tags in body of letter.
 
@@ -251,10 +248,27 @@ LINE:
       else {
         next LINE;
       }
-      ##TBD Check for author first, then for author data.
+      ##TBD Check for anchor tags first, then for author data.
+      if ( $_->as_HTML =~ /<a/ ) {
+        ## TBD Use $prior_line & $current_line to test for end of ltr in a topic.
+        if ($prior_line =~ /<a/  && $current_line =~ /<a/) {
+          # Found end of prior letter.
+          say "DBG if <a> block  \$current_author: ,$current_author,";
+          say "DBG if <a> block  \$prior_line: ,$prior_line,";
+          say "DBG if <a> block  \$current_line: ,$current_line,";
+          ##
+          ## TBD Now what: next line or topic, or last?
+          $current_author      = '';
+          next LINE;
+        }
+          ## This must handle <i> tags in body of letter.
+      }
+
+      ##TBD Check for author name, then for author data.
       if ( $_->as_HTML =~ /<b>/ ) {
         # TBD Use $prior_line & $current_line to test for >1 authors: if $prior =~ <i>...
         $current_author = $_->as_text;
+        say "DBG if <b> block  \$current_author: ,$current_author,";
         $current_letter{authors}{name} = $current_author;
 
         ## Assume the <b> tag marks end of letter body.
@@ -283,6 +297,15 @@ LINE:
         ## or w/ 0 authors.
         $total_letters_count++;
         say "DBG author (not letter) count: ", $total_letters_count;
+
+        ## TBD Tue2012_0410_10:13  NO, THIS CAUSES PROBLEMS.
+        ## TBD Maybe Clear current_author here, so the following test for 
+        ## italics will only find author data and will ignore italics
+        ## inside a letter body?
+        ## OR
+        ## Look into $total_letters_count not being incremented when
+        ## the <b> tag for author David S. Clancy.
+        ## TBR $current_author      = '';
         next LINE;
       }
 
@@ -295,9 +318,12 @@ LINE:
       ## i.2. A new letter is started when $current_author changes.
       ##
       elsif ( $_->as_HTML =~ /<i>/ and $current_author ) {
+        say "DBG if <i> block  \$current_author: ,$current_author,";
+        say "DBG if <i> block  \$_->as_HTML: ,", $_->as_HTML;
         if ( $current_author ne $prior_author ) {
 
-          # Found a new letter.
+          ## Found a new letter.
+          ## TBD Does this work for letters w/ >1 author?
           $current_letter{authors}{details} = ();
           $prior_author = $current_author;
         }
@@ -344,6 +370,12 @@ LINE:
           encode_json( \%current_letter )
             )
             or DEBUG( 'save_one_letter_data', $!, $source_name );
+
+        ## TBD Also clear cur_auth here, at end of all author data?
+        ## But if author has >1 italic line of data, this var 
+        ## should not be cleared, until all those italic lines
+        ## are read & written for this author.
+        ##TBR?   $current_author      = '';
       }
 
     }    # End foreach LINE loop.
