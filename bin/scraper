@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 02:16:26 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 03:42:56 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -135,10 +135,11 @@ sub run { #------------------------------------------------------
     $start_page = read_file(
       # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
       # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-      #FULL "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
+      #FULL 
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
+      #TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
     $tree = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
@@ -256,7 +257,8 @@ LINE:
       ## TBD.Wed2012_0411_15:57  Extract all author data, then return to LINE loop.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## TBD Thu2012_0412_13:36  Now handle all lines as author data, until end of current letter.
+        ## TBD Thu2012_0412_13:36  Now handle all following lines 
+        ## as author data, until end of current letter.
         $current_author = $letter_line->as_text;
         say "DBG if <b> block  \$current_author: ,$current_author,";
         $current_letter{authors}{name} = $current_author;
@@ -290,6 +292,38 @@ LINE:
           say '  End of \@author_struct';
 
           if ( $_->as_HTML =~ /<a/ ) {
+            # Found end of a letter's author data.
+
+            # TBD Maybe write the file here, one time only, then clear data vars for next cycle?
+            ## Write each letter to a separate file.
+            ## Overwrite the file as each new <i> tag is found,
+            ## and the last file written for that letter should have
+            ## all its data.
+            ##
+            ## Make dirs if needed.
+            my $m = $dt->month;
+            my $d = $dt->day;
+            ##
+            ## TBD Use $author_count until an accurate letter count is avbl.
+            my $author_count = $total_letters_count;
+            ##
+            ## Add leading zeroes to values used in path, including file name,
+            ## to get 2-digit strings.
+            for ($m, $d, $author_count) {
+              $_ = "0" . $_ if $_ <= 9;
+            }
+            my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
+            if ( !-d $daily_dir ) {
+              make_path($daily_dir);
+            }
+
+            write_file(
+              "./$daily_dir/$author_count",
+              { binmode => ':utf8' },
+              encode_json( \%current_letter )
+                )
+                or DEBUG( 'save_one_letter_data', $!, $source_name );
+            say "DBG After write_file $daily_dir/$author_count";
             @author_struct = (); # Initlz for next letter & author?
             next LINE;
           }
@@ -302,44 +336,19 @@ LINE:
           $author_data = $_->as_text;
           push @{ $current_letter{authors}{details} },
               $author_data;
+          $author_data         = '';  #TBD Reset it here, or elsewhere?
 
-          ## Write each letter to a separate file.
-          ## Overwrite the file as each new <i> tag is found,
-          ## and the last file written for that letter should have
-          ## all its data.
-          ##
-          ## Make dirs if needed.
-          my $m = $dt->month;
-          my $d = $dt->day;
-          ##
-          ## TBD Use $author_count until an accurate letter count is avbl.
-          my $author_count = $total_letters_count;
-          ##
-          ## Add leading zeroes to values used in path, including file name,
-          ## to get 2-digit strings.
-          for ($m, $d, $author_count) {
-            $_ = "0" . $_ if $_ <= 9;
-          }
-          my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
-          if ( !-d $daily_dir ) {
-            make_path($daily_dir);
-          }
-
-          write_file(
-            "./$daily_dir/$author_count",
-            { binmode => ':utf8' },
-            encode_json( \%current_letter )
-              )
-              or DEBUG( 'save_one_letter_data', $!, $source_name );
 
         }  # End of foreach (@lines_under_a_topic)
 
         # End of TBD5.Thu2012_0412_13:04  #######################################
         ### End Save to file.
 
+        # TBD Clear %current_letter here?
         next LINE;
       }  # End of <b> loop.
       else {
+        # TBD Clear %current_letter here?
         next LINE;
       }
 
