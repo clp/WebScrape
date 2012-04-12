@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 01:17:39 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 02:16:26 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -135,10 +135,10 @@ sub run { #------------------------------------------------------
     $start_page = read_file(
       # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
       # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
+      #FULL "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-      #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
     $tree = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
@@ -232,9 +232,10 @@ TOPIC:
     #TBR my @structured_letters;
 LINE:
     #F foreach ($letter_line = shift @lines_under_a_topic) {
-    foreach (@lines_under_a_topic) {
-      #TBD4 $letter_line = shift @lines_under_a_topic;
-      $letter_line = $_;
+    #TBD6 foreach (@lines_under_a_topic) {
+    while (@lines_under_a_topic) {
+      $letter_line = shift @lines_under_a_topic;
+      #TBD4 $letter_line = $_;
 
       say "DBG LINE block: \$letter_line->as_HTML: ,", $letter_line->as_HTML;
       ##ORG if ($_) { #}
@@ -243,10 +244,10 @@ LINE:
 
         # DBG Save each line for debug.
         push @all_letters_to_editor,
-            { letter_content => $_->as_text };
+            { letter_content => $letter_line->as_text };
 
         # Save objects for analysis:
-        $current_letter_text .= $_->as_text;
+        $current_letter_text .= $letter_line->as_text;
       }
       else {
         next LINE;
@@ -254,6 +255,8 @@ LINE:
 
       ## TBD.Wed2012_0411_15:57  Extract all author data, then return to LINE loop.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
+
+        ## TBD Thu2012_0412_13:36  Now handle all lines as author data, until end of current letter.
         $current_author = $letter_line->as_text;
         say "DBG if <b> block  \$current_author: ,$current_author,";
         $current_letter{authors}{name} = $current_author;
@@ -276,6 +279,8 @@ LINE:
 
         ## TBD Wed2012_0411_15:58 
         ## Loop to get all author data.
+        ##    TBD For this to work, lines of @lines_under_a_topic must
+        ##    be shifted off of it in loop 1 and in this loop.
         foreach (@lines_under_a_topic) {
           ## Remove lines from the array.
           #TBR? shift @lines_under_a_topic;
@@ -327,7 +332,7 @@ LINE:
               )
               or DEBUG( 'save_one_letter_data', $!, $source_name );
 
-        }  # End of foreach (@lines_under_a_topic) {
+        }  # End of foreach (@lines_under_a_topic)
 
         # End of TBD5.Thu2012_0412_13:04  #######################################
         ### End Save to file.
