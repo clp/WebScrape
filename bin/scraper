@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 10 04:52:16 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 11 09:46:09 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -224,19 +224,18 @@ TOPIC:
     my %current_letter      = ();
     my $details;
     my $prior_author = '';
-    my $current_line = '';
-    my $prior_line = '';
+    my @author_struct = ();
+    my $letter_line;
     #TBR my @structured_letters;
 LINE:
+    #F foreach ($letter_line = shift @lines_under_a_topic) {
     foreach (@lines_under_a_topic) {
+      $letter_line = shift @lines_under_a_topic;
 
-      if ($_) {
-
-        $prior_line = $current_line;
-        $current_line = $_;
-        ## TBD Use $prior_line & $current_line to test for end of ltr; 
-        ## if $prior =~ <i>  && $current !~ <b> or <i>, then a new letter TBD?
-          ## This must handle <i> tags in body of letter.
+      say "DBG LINE block: \$letter_line->as_HTML: ,", $letter_line->as_HTML;
+      ##ORG if ($_) { #}
+      ## Remove lines from the array.
+      if ($letter_line) {
 
         # DBG Save each line for debug.
         push @all_letters_to_editor,
@@ -248,47 +247,20 @@ LINE:
       else {
         next LINE;
       }
-      ##TBD Check for anchor tags first, then for author data.
-      if ( $_->as_HTML =~ /<a/ ) {
-        ## TBD Use $prior_line & $current_line to test for end of ltr in a topic.
-        if ($prior_line =~ /<a/  && $current_line =~ /<a/) {
-          # Found end of prior letter.
-          say "DBG if <a> block  \$current_author: ,$current_author,";
-          say "DBG if <a> block  \$prior_line: ,$prior_line,";
-          say "DBG if <a> block  \$current_line: ,$current_line,";
-          ##
-          ## TBD Now what: next line or topic, or last?
-          $current_author      = '';
-          next LINE;
-        }
-          ## This must handle <i> tags in body of letter.
-      }
 
-      ##TBD Check for author name, then for author data.
-      if ( $_->as_HTML =~ /<b>/ ) {
-        # TBD Use $prior_line & $current_line to test for >1 authors: if $prior =~ <i>...
-        $current_author = $_->as_text;
+      ## TBD.Wed2012_0411_15:57  Extract all author data, then return to LINE loop.
+      if ( $letter_line->as_HTML =~ /<b>/ ) {
+        $current_author = $letter_line->as_text;
         say "DBG if <b> block  \$current_author: ,$current_author,";
         $current_letter{authors}{name} = $current_author;
 
         ## Assume the <b> tag marks end of letter body.
         $current_letter{body} = $current_letter_text;
+        $current_letter{topic} = $current_topic;
 
         ## Clear the var to prepare for next letter.
         $current_letter_text = '';
-        $current_letter{topic} = $current_topic;
 
-        ## TBD Get remaining content as (one or more) author's data.
-          ## <b> author name
-          ## <i> author data
-          ## If next line is <i>, save as author data until no more <i> tags.
-          ## If next line is <b>, save as next author name; repeat until no more <b>.*<i>.* tags.
-          ## When no more <i> tags are found, the current letter is finished.
-          ##ORG ## If next line is <p> w/o <b>, next letter has been found.
-          ## If next line is <a ...><p><a ...> w/o <b>, next letter has been found.
-          ## Else no more letters under this topic.
-        ##
-        ##
         ## TBD This is a count of authors, not letters or items
         ## on the page.  How an it be improved?
         ## Won't yet include Clarifications, Corrections.
@@ -298,17 +270,51 @@ LINE:
         $total_letters_count++;
         say "DBG author (not letter) count: ", $total_letters_count;
 
-        ## TBD Tue2012_0410_10:13  NO, THIS CAUSES PROBLEMS.
-        ## TBD Maybe Clear current_author here, so the following test for 
-        ## italics will only find author data and will ignore italics
-        ## inside a letter body?
-        ## OR
-        ## Look into $total_letters_count not being incremented when
-        ## the <b> tag for author David S. Clancy.
-        ## TBR $current_author      = '';
+        ## TBD Wed2012_0411_15:58 
+        ## Loop to get all author data.
+        foreach (@lines_under_a_topic) {
+          ## Remove lines from the array.
+          #TBR? shift @lines_under_a_topic;
+
+          ##DBG:
+          foreach (@author_struct) {say "DBG \@author_struct->as_HTML: ", $_->as_HTML};
+          say '  End of \@author_struct';
+
+          if ( $_->as_HTML =~ /<a/ ) {
+            @author_struct = (); # Initlz for next letter & author?
+            next LINE;
+          }
+          push @author_struct, $_;
+          shift @lines_under_a_topic;
+        }
+        next LINE;
+      }  # End of <b> loop.
+      else {
         next LINE;
       }
 
+
+=begin italic
+
+      ##############################################################################
+      ##############################################################################
+      ##TBD Check for anchor tags first, then for author data.
+      if ( $_->as_HTML =~ /<a/ ) {
+          # Found end of prior letter.
+          say "DBG if <a> block  \$current_author: ,$current_author,";
+          ##
+          ## TBD Now what: next line or topic, or last?
+          $current_author      = '';
+          next LINE;
+        }
+      ##############################################################################
+      ##############################################################################
+
+
+
+      ##
+      ## TMP.Wed2012_0411_16:12   Comment this code temp, while testing.
+      ##
       ##TBF How to ignore <i> tags inside letter body, & to use them
       ## after the <b> tag?
       ##   i.1. Check $current_author before entering loop;
@@ -376,7 +382,14 @@ LINE:
         ## should not be cleared, until all those italic lines
         ## are read & written for this author.
         ##TBR?   $current_author      = '';
-      }
+      }  # End of <i> loop.
+
+=end italic
+
+=cut
+
+#####################################################################
+#####################################################################
 
     }    # End foreach LINE loop.
   }    # End foreach TOPIC loop.
