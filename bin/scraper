@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 09:55:18 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 10:01:49 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -68,6 +68,7 @@ my $total_letters_count;
 my @author_struct = ();
 my %current_letter      = ();
 my $author_count = 0;
+my $daily_dir;
 
 #
 # Raw data dir, eg, ./, /tmp, /var/tmp, ~/tmp/raw
@@ -177,7 +178,7 @@ sub run { #------------------------------------------------------
   ## TBD Move to where $dt is used?
   if ($parser->success) {
     # operate on $dt.
-    initialize_output_dir();
+    $daily_dir = initialize_output_dir();
   } else {
       warn $parser->error;
   }
@@ -458,23 +459,24 @@ sub get_start_page { #-------------------------------------------
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
 
-  ## Make dirs if needed.
-  my $m = $dt->month;
-  my $d = $dt->day;
+  #TBR ## Make dirs if needed.
+  #TBR my $m = $dt->month;
+  #TBR my $d = $dt->day;
 
   ## TBD Use $author_count until an accurate letter count is avbl.
   $author_count = $total_letters_count;
 
   ## Add leading zeroes to values used in path, including file name,
   ## to get 2-digit strings.
-  for ($m, $d, $author_count) {
+  #TBR? for ($m, $d, $author_count) {
+  for ($author_count) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
-  if ( !-d $daily_dir ) {
-    make_path($daily_dir);
-  }
+  #TBR my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
+  #TBR if ( !-d $daily_dir ) {
+  #TBR make_path($daily_dir);
+  #TBR }
 
   write_file(
       "./$daily_dir/$author_count",
@@ -584,5 +586,6 @@ sub initialize_output_dir {
     remove_tree($daily_dir);
   }
   make_path($daily_dir);
+  return $daily_dir;
 }
 
