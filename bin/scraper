@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 10:39:57 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 08:19:53 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -329,9 +329,10 @@ AUTHOR:
           else {
             say "In <b> loop, found line that does not match a, b, i:";
             say "  ", $current_line->as_HTML;
-            say "Skip to next line.";
-            #TBD next LINE;  #TBR Will probably fail; test it.
-            next ;  #TBD Test it.
+            say "Assume end of letter, save it, then start to read next letter.";
+            # TBD Maybe use 'last' here; or save_letter_to_file() here?
+              # Can I assume that reaching this point is end of single letter under a topic?
+            last;
           }
 
 
@@ -476,7 +477,7 @@ sub save_letter_to_file { #--------------------------------------
       encode_json( $ref_current_letter )
       )
       or DEBUG( 'save_one_letter_data', $!, $source_name );
-  #DBG say "DBG After write_file $daily_dir/$author_count";
+  say "DBG After write_file $daily_dir/$author_count";
   @author_struct = (); # Initlz for next letter & author?
   $current_letter{authors}{details} = ();
 }
