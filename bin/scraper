@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 08:14:16 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 09:48:41 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -176,7 +176,8 @@ sub run { #------------------------------------------------------
 
   ## TBD Move to where $dt is used?
   if ($parser->success) {
-      # operate on $dt.
+    # operate on $dt.
+    initialize_output_dir();
   } else {
       warn $parser->error;
   }
@@ -572,10 +573,20 @@ sub extract_one_letter_to_editor { #-----------------------------
 sub initialize_output_dir {
   ### TBF Thu2012_0412_20:11  Remove dir if exists-erase old files so diff gives accurate results.
   ### TBD Must include code for leading zeroes, etc.
+
+  ## Make dirs if needed.
+  my $m = $dt->month;
+  my $d = $dt->day;
+
+  ## Add leading zeroes to values used in path, including file name,
+  ## to get 2-digit strings.
+  for ($m, $d) {
+    $_ = "0" . $_ if $_ <= 9;
+  }
+
   my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
   if ( -d $daily_dir ) {
     remove_tree($daily_dir);
   }
   make_path($daily_dir);
-
 }
