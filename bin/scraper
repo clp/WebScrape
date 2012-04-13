@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 05:55:36 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 07:34:22 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -63,6 +63,11 @@ my $msg;
 my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
 my $now = localtime;
+my $dt;
+my $total_letters_count;
+my @author_struct = ();
+my %current_letter      = ();
+my $author_count = 0;
 
 #
 # Raw data dir, eg, ./, /tmp, /var/tmp, ~/tmp/raw
@@ -111,7 +116,7 @@ sub run { #------------------------------------------------------
 
   ##
   ## Initialize --------------------------------------------------
-  my $total_letters_count = 0;
+  $total_letters_count = 0;
 
   init_dirs( $rootdir, $outputdir );
 
@@ -167,7 +172,7 @@ sub run { #------------------------------------------------------
   my ($pub_date_raw) = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
   say "DBG date: ,$pub_date_raw,";
   my $parser = DateTime::Format::Natural->new();
-  my $dt = $parser->parse_datetime($pub_date_raw);
+  $dt = $parser->parse_datetime($pub_date_raw);
 
   ## TBD Move to where $dt is used?
   if ($parser->success) {
@@ -225,10 +230,8 @@ TOPIC:
     my $author_data         = '';
     my $current_author      = '';
     my $current_letter_text = '';
-    my %current_letter      = ();
     my $details;
     my $prior_author = '';
-    my @author_struct = ();
     my $letter_line;
     #TBR my @structured_letters;
 
@@ -287,7 +290,7 @@ AUTHOR:
         ## Loop to get all author data.
         ##    TBD For this to work, lines of @lines_under_a_topic must
         ##    be shifted off of it in loop 1 and in this loop.
-        my $author_count = 0;
+        $author_count = 0;
         my $current_line;
         while (@lines_under_a_topic) {
           ## Remove lines from the array.
@@ -298,56 +301,23 @@ AUTHOR:
           ##DBG: say '  End of \@author_struct';
 
           if ( $current_line->as_HTML =~ /<a/ ) {
-            # Found end of a letter's author data.
+            ## Found the end of a letter's author data where
+            ## there are multiple letters per topic.
 
-            ## Write each letter to a separate file.
-            ##
-            ## Make dirs if needed.
-            my $m = $dt->month;
-            my $d = $dt->day;
-            ##
-            ## TBD Use $author_count until an accurate letter count is avbl.
-            $author_count = $total_letters_count;
-            ##
-            ## Add leading zeroes to values used in path, including file name,
-            ## to get 2-digit strings.
-            for ($m, $d, $author_count) {
-              $_ = "0" . $_ if $_ <= 9;
-            }
-            my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
-            if ( !-d $daily_dir ) {
-              make_path($daily_dir);
-            }
-
-            write_file(
-              "./$daily_dir/$author_count",
-              { binmode => ':utf8' },
-              encode_json( \%current_letter )
-                )
-                or DEBUG( 'save_one_letter_data', $!, $source_name );
-            say "DBG After write_file $daily_dir/$author_count";
-            @author_struct = (); # Initlz for next letter & author?
-            $current_letter{authors}{details} = ();
+            save_letter_to_file (\%current_letter);
             next LINE;
           }  # End of if ( $current_line->as_HTML =~ /<a/ )
 
-          #F if ( $letter_line->as_HTML =~ /<i>/ ) {
           if ( $current_line->as_HTML =~ /<i>/ ) {
-            #ORG push @author_struct, $_;
-            #F push @author_struct, $letter_line->as_text;
             push @author_struct, $current_line->as_text;
-            #TBR? shift @lines_under_a_topic;
 
-            ## Save to file.
-
-            #? $author_data = $letter_line->as_text;
             $author_data = $current_line->as_text;
             push @{ $current_letter{authors}{details} },
                 $author_data;
-            $author_data         = '';  #TBD Reset it here, or elsewhere?
-
+            #TBR? $author_data         = '';  #TBD Reset it here, or elsewhere?
           }
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
+            ## TBF What code belongs here?
             # Ignore the author already handled.
             if ( $current_line->as_text eq $current_author ) {
               say "DBG Ignore current author in this loop; skip to next.";
@@ -369,9 +339,22 @@ AUTHOR:
           }
 
 
-        }  # End of foreach (@lines_under_a_topic)
+        }  # End of while (@lines_under_a_topic)
 
-        # End of TBD5.Thu2012_0412_13:04  #######################################
+        ## If no more lines are under the topic, save the letter
+        ## to a file - this saves topics w/ only one letter,
+        ## that do not have <a> tags that separate them from
+        ## prior letters.
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        ## TBD Thu2012_0412_18:26 
+        save_letter_to_file (\%current_letter);
+
         ### End Save to file.
 
         # TBD Clear %current_letter here?
@@ -382,6 +365,38 @@ AUTHOR:
         next LINE;
       }
 
+#TBD Thu2012_0412_18:36 
+sub save_letter_to_file {
+  my $ref_current_letter = shift;
+  ## Write each letter to a separate file.
+  ##
+  ## Make dirs if needed.
+  my $m = $dt->month;
+  my $d = $dt->day;
+  ##
+  ## TBD Use $author_count until an accurate letter count is avbl.
+  $author_count = $total_letters_count;
+  ##
+  ## Add leading zeroes to values used in path, including file name,
+  ## to get 2-digit strings.
+  for ($m, $d, $author_count) {
+    $_ = "0" . $_ if $_ <= 9;
+  }
+  my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
+  if ( !-d $daily_dir ) {
+    make_path($daily_dir);
+  }
+
+  write_file(
+    "./$daily_dir/$author_count",
+    { binmode => ':utf8' },
+    encode_json( $ref_current_letter )
+      )
+      or DEBUG( 'save_one_letter_data', $!, $source_name );
+  say "DBG After write_file $daily_dir/$author_count";
+  @author_struct = (); # Initlz for next letter & author?
+  $current_letter{authors}{details} = ();
+}
 
 
 
