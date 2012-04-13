@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 03:42:56 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 05:55:36 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -231,6 +231,8 @@ TOPIC:
     my @author_struct = ();
     my $letter_line;
     #TBR my @structured_letters;
+
+    ## First loop for letters.
 LINE:
     #F foreach ($letter_line = shift @lines_under_a_topic) {
     #TBD6 foreach (@lines_under_a_topic) {
@@ -238,7 +240,7 @@ LINE:
       $letter_line = shift @lines_under_a_topic;
       #TBD4 $letter_line = $_;
 
-      say "DBG LINE block: \$letter_line->as_HTML: ,", $letter_line->as_HTML;
+      ## DBG say "DBG LINE block: \$letter_line->as_HTML: ,", $letter_line->as_HTML;
       ##ORG if ($_) { #}
       ## Remove lines from the array.
       if ($letter_line) {
@@ -254,7 +256,9 @@ LINE:
         next LINE;
       }
 
+      ## Second loop for letters.
       ## TBD.Wed2012_0411_15:57  Extract all author data, then return to LINE loop.
+AUTHOR:
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
         ## TBD Thu2012_0412_13:36  Now handle all following lines 
@@ -283,29 +287,27 @@ LINE:
         ## Loop to get all author data.
         ##    TBD For this to work, lines of @lines_under_a_topic must
         ##    be shifted off of it in loop 1 and in this loop.
-        foreach (@lines_under_a_topic) {
+        my $author_count = 0;
+        my $current_line;
+        while (@lines_under_a_topic) {
           ## Remove lines from the array.
-          #TBR? shift @lines_under_a_topic;
+          $current_line = shift @lines_under_a_topic;
 
           ##DBG:
-          foreach (@author_struct) {say "DBG \@author_struct->as_HTML: ", $_->as_HTML};
-          say '  End of \@author_struct';
+          ##DBG: foreach (@author_struct) {say "DBG \@author_struct->as_HTML: ", $_->as_HTML};
+          ##DBG: say '  End of \@author_struct';
 
-          if ( $_->as_HTML =~ /<a/ ) {
+          if ( $current_line->as_HTML =~ /<a/ ) {
             # Found end of a letter's author data.
 
-            # TBD Maybe write the file here, one time only, then clear data vars for next cycle?
             ## Write each letter to a separate file.
-            ## Overwrite the file as each new <i> tag is found,
-            ## and the last file written for that letter should have
-            ## all its data.
             ##
             ## Make dirs if needed.
             my $m = $dt->month;
             my $d = $dt->day;
             ##
             ## TBD Use $author_count until an accurate letter count is avbl.
-            my $author_count = $total_letters_count;
+            $author_count = $total_letters_count;
             ##
             ## Add leading zeroes to values used in path, including file name,
             ## to get 2-digit strings.
@@ -325,18 +327,46 @@ LINE:
                 or DEBUG( 'save_one_letter_data', $!, $source_name );
             say "DBG After write_file $daily_dir/$author_count";
             @author_struct = (); # Initlz for next letter & author?
+            $current_letter{authors}{details} = ();
             next LINE;
+          }  # End of if ( $current_line->as_HTML =~ /<a/ )
+
+          #F if ( $letter_line->as_HTML =~ /<i>/ ) {
+          if ( $current_line->as_HTML =~ /<i>/ ) {
+            #ORG push @author_struct, $_;
+            #F push @author_struct, $letter_line->as_text;
+            push @author_struct, $current_line->as_text;
+            #TBR? shift @lines_under_a_topic;
+
+            ## Save to file.
+
+            #? $author_data = $letter_line->as_text;
+            $author_data = $current_line->as_text;
+            push @{ $current_letter{authors}{details} },
+                $author_data;
+            $author_data         = '';  #TBD Reset it here, or elsewhere?
+
           }
-          push @author_struct, $_;
-          #TBR? shift @lines_under_a_topic;
-
-          ### Save to file.
-          # TBD5.Thu2012_0412_13:04  #######################################
-
-          $author_data = $_->as_text;
-          push @{ $current_letter{authors}{details} },
-              $author_data;
-          $author_data         = '';  #TBD Reset it here, or elsewhere?
+          elsif ( $current_line->as_HTML =~ /<b>/ ) {
+            # Ignore the author already handled.
+            if ( $current_line->as_text eq $current_author ) {
+              say "DBG Ignore current author in this loop; skip to next.";
+              next;
+            }
+            $author_data         = '';  #TBD Reset it here, or elsewhere?
+            #F next AUTHOR;
+            #F.no.out.files  last;
+            #F next;
+            #F.bad.scope? say "DBG Found another <b> tag = another author for letter ,$author_count,";
+            say "DBG Found another <b> tag = another author for letter ,$total_letters_count,";
+          }
+          else {
+            say "In <b> loop, found line that does not match a, b, i:";
+            say "  ", $current_line->as_HTML;
+            say "Skip to next line.";
+            #TBD next LINE;  #TBR Will probably fail; test it.
+            next ;  #TBD Test it.
+          }
 
 
         }  # End of foreach (@lines_under_a_topic)
