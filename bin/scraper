@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 08:19:53 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 09:09:21 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -142,9 +142,9 @@ sub run { #------------------------------------------------------
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
       # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-      # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-      #FULL 
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
+      # TST2 
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+      #FULL "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
       #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
       #TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
@@ -325,6 +325,8 @@ AUTHOR:
             #F.bad.scope? say "DBG Found another <b> tag = another author for letter ,$author_count,";
             say "DBG Found another <b> tag = another author for letter ,$total_letters_count,";
             #TBD Thu2012_0412_20:06  next AUTHOR;
+            prepare_to_save_new_author_data;
+            next;  # TBD After prep, repeat the <b> while loop?
           }
           else {
             say "In <b> loop, found line that does not match a, b, i:";
@@ -348,7 +350,7 @@ AUTHOR:
         next LINE;
       }  # End of <b> loop.
       else {
-        # TBD Clear %current_letter here?
+        # TBD Clear %current_letter here? NO.
         next LINE;
       }
 
@@ -384,6 +386,34 @@ AUTHOR:
 }    # End of run().
 
 exit 1;
+
+sub prepare_to_save_new_author_data{
+  ## TBD Thu2012_0412_13:36  Now handle all following lines 
+  ## as author data, until end of current letter.
+  $current_author = $letter_line->as_text;
+  say "DBG if <b> block  \$current_author: ,$current_author,";
+  $current_letter{authors}{name} = $current_author;
+
+  ## Assume the <b> tag marks end of letter body.
+  $current_letter{body} = $current_letter_text;
+  $current_letter{topic} = $current_topic;
+
+  ## Clear the var to prepare for next letter.
+  $current_letter_text = '';
+
+  ## TBD This is a count of authors, not letters or items
+  ## on the page.  How an it be improved?
+  ## Won't yet include Clarifications, Corrections.
+  ##
+  ## TBD Handle the case of an item w/ > 1 author,
+  ## or w/ 0 authors.
+  $total_letters_count++;
+  say "DBG author (not letter) count: ", $total_letters_count;
+
+  ## TBD Wed2012_0411_15:58 
+  ## Loop to get all author data.
+  $author_count = 0;
+}
 
 #
 #
