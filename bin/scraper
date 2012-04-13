@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 09:48:41 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 09:55:18 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -568,13 +568,8 @@ sub extract_one_letter_to_editor { #-----------------------------
 }
 
 
-### TBF Thu2012_0412_20:11  Remove dir if exists-erase old files so diff gives accurate results.
-### TBF Thu2012_0412_20:11  Remove dir if exists-erase old files so diff gives accurate results.
+## Remove dir if it exists-erase old files so diff gives accurate results.
 sub initialize_output_dir {
-  ### TBF Thu2012_0412_20:11  Remove dir if exists-erase old files so diff gives accurate results.
-  ### TBD Must include code for leading zeroes, etc.
-
-  ## Make dirs if needed.
   my $m = $dt->month;
   my $d = $dt->day;
 
@@ -590,3 +585,4 @@ sub initialize_output_dir {
   }
   make_path($daily_dir);
 }
+
