@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 11:56:32 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 12:37:13 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -17,7 +17,7 @@
 #   retrieval & analysis.
 # Wed2012_0404_21:07  Save letter text & metadata into a structure.
 # Thu2012_0412_22:07  Fix parse bugs-not separating letters into files properly.
-# TBD  Handle letter w/ >1 author correctly.
+# Fri2012_0413_12:09  Handle letter w/ >1 author correctly.
 #
 # ---------------------------------------------------------------
 
@@ -68,7 +68,7 @@ my $dt;
 my $total_letters_count;
 my @author_struct  = ();
 my %current_letter = ();
-my $author_count = 0;
+my $author_count   = 0;
 my $daily_dir;
 
 #
@@ -141,19 +141,22 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-      # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-      #FULL 
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw");
-      #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
-      #OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-      #TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
-    $tree = HTML::TreeBuilder->new_from_content($start_page);
+
+    # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+    # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+    #FULL
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw"
+    );
+
+#OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
+#OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
+#TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
+    $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
   else {
     $start_page = get_start_page( $mech, $start_url );
-    $tree = HTML::TreeBuilder->new_from_content($start_page);
+    $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "web";
   }
 
@@ -172,21 +175,21 @@ sub run { #------------------------------------------------------
   ## TBF b.9. serverTime can be one day before printed date of wsj.
   ## Get date of publication.
   ## var serverTime = new Date("April 06, 2012 00:45:28");
-  my ($pub_date_raw) = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
+  my ($pub_date_raw)
+      = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
   say "DBG date: ,$pub_date_raw,";
   my $parser = DateTime::Format::Natural->new();
   $dt = $parser->parse_datetime($pub_date_raw);
 
   ## TBD Move to where $dt is used?
-  if ($parser->success) {
+  if ( $parser->success ) {
+
     # operate on $dt.
     $daily_dir = initialize_output_dir();
-  } else {
-      warn $parser->error;
   }
-
-
-
+  else {
+    warn $parser->error;
+  }
 
   ## Get topic data.
   my @all_letters_to_editor;
@@ -260,17 +263,19 @@ LINE:
 
       ## Second loop for letters.
       ## Extract all author data, then return to LINE loop.
-AUTHOR:
+  AUTHOR:
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## TBD Thu2012_0412_13:36  Now handle all following lines 
+        ## TBD Thu2012_0412_13:36  Now handle all following lines
         ## as author data, until end of current letter.
         $current_author = $letter_line->as_text;
-        say "DBG if <b> block  \$current_author: ,$current_author,";
-        $current_letter{author}{$current_author}{name} = $current_author;
+        say
+            "DBG if <b> block  \$current_author: ,$current_author,";
+        $current_letter{author}{$current_author}{name}
+            = $current_author;
 
         ## Assume the <b> tag marks end of letter body.
-        $current_letter{body} = $current_letter_text;
+        $current_letter{body}  = $current_letter_text;
         $current_letter{topic} = $current_topic;
 
         ## Clear the var to prepare for next letter.
@@ -283,9 +288,10 @@ AUTHOR:
         ## TBD Handle the case of an item w/ > 1 author,
         ## or w/ 0 authors.
         $total_letters_count++;
-        say "DBG author (not letter) count: ", $total_letters_count;
+        say "DBG author (not letter) count: ",
+            $total_letters_count;
 
-        ## TBD Wed2012_0411_15:58 
+        ## TBD Wed2012_0411_15:58
         ## Loop to get all author data.
         $author_count = 0;
         my $current_line;
@@ -300,7 +306,7 @@ AUTHOR:
             ## Found the end of a letter's author data where
             ## there are multiple letters per topic.
 
-            save_letter_to_file (\%current_letter);
+            save_letter_to_file( \%current_letter );
             next LINE;
           }
 
@@ -308,57 +314,44 @@ AUTHOR:
             push @author_struct, $current_line->as_text;
 
             $author_data = $current_line->as_text;
-            push @{ $current_letter{author}{$current_author}{details} },
+            push @{ $current_letter{author}{$current_author}
+                  {details} },
                 $author_data;
           }
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
-            ## TBF What code belongs here?
-            # Ignore the author that was already handled.
             if ( $current_line->as_text eq $current_author ) {
-              say "DBG Current author was already saved; skip to next.";
+              # Ignore the author that was already handled.
               next;
             }
-            # Handle the new author for existing letter.
+
+            # Handle the new author for an existing letter.
             $current_author = $current_line->as_text;
-            $author_data         = '';  #TBD Reset it here, or elsewhere?
-            #F next AUTHOR;
-            #F.no.out.files  last;
-            #F next;
-            #F.bad.scope? say "DBG Found another <b> tag = another author for letter ,$author_count,";
-            say "DBG Found another <b> tag = another author for letter ,$total_letters_count,";
-            push @{ $current_letter{author}{$current_author}{name} },
+            $author_data = '';  # Reset it here.
+            push @{ $current_letter{author}{$current_author}
+                  {name} },
                 $current_author;
 
-            ## TBD prepare_to_save_new_author_data;
-            next;  # TBD After prep, repeat the <b> while loop?
-            ### OR
-            ## Terminate the current author data structure;
-            ## Start a new author data struct w/ new name from <b> tag;
-            ## Then repeat the loop to get author data.
+            next; # Get data for this new author.
           }
           else {
-            say "In <b> loop, found line that does not match a, b, i:";
-            say "  ", $current_line->as_HTML;
-            say "Assume end of letter, save it, then start to read next letter.";
-            # TBD Maybe use 'last' here; or save_letter_to_file() here?
-              # Can I assume that reaching this point is end of single letter under a topic?
+            # In <b> loop, found line that does not match a, b, or i tags.
+            # Assume it marks the end of the letter.
+            # Save it, then start to read next letter.
             last;
           }
 
-
-        }  # End of while (@lines_under_a_topic)
+        }    # End of while (@lines_under_a_topic)
 
         ## If no more lines are under the topic, save the letter
-        ## to a file.  This saves letters under topics w/ only 
+        ## to a file.  This saves letters under topics w/ only
         ## one letter,
         ## that do not have <a> tags that I use to mark the end
         ## of a letter.
-        save_letter_to_file (\%current_letter);
+        save_letter_to_file( \%current_letter );
 
         next LINE;
-      }  # End of <b> loop.
+      }    # End of <b> loop.
       else {
-        # TBD Clear %current_letter here? NO.
         next LINE;
       }
 
@@ -394,41 +387,6 @@ AUTHOR:
 }    # End of run().
 
 exit 1;
-
-=begin sub_prep
-
-sub prepare_to_save_new_author_data{
-  ## TBD Thu2012_0412_13:36  Now handle all following lines 
-  ## as author data, until end of current letter.
-  $current_author = $letter_line->as_text;
-  say "DBG if <b> block  \$current_author: ,$current_author,";
-  $current_letter{$current_author}{name} = $current_author;
-
-  ## Assume the <b> tag marks end of letter body.
-  $current_letter{body} = $current_letter_text;
-  $current_letter{topic} = $current_topic;
-
-  ## Clear the var to prepare for next letter.
-  $current_letter_text = '';
-
-  ## TBD This is a count of authors, not letters or items
-  ## on the page.  How an it be improved?
-  ## Won't yet include Clarifications, Corrections.
-  ##
-  ## TBD Handle the case of an item w/ > 1 author,
-  ## or w/ 0 authors.
-  $total_letters_count++;
-  say "DBG author (not letter) count: ", $total_letters_count;
-
-  ## TBD Wed2012_0411_15:58 
-  ## Loop to get all author data.
-  $author_count = 0;
-}
-
-=end sub_prep
-
-=cut
-
 
 #
 #
@@ -502,7 +460,6 @@ sub get_start_page { #-------------------------------------------
   return $mech->content();
 }
 
-
 ## Write each letter to a separate file.
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
@@ -517,19 +474,17 @@ sub save_letter_to_file { #--------------------------------------
   }
 
   write_file(
-      "./$daily_dir/$author_count",
-      { binmode => ':utf8' },
-      encode_json( $ref_current_letter )
-      )
-      or DEBUG( 'save_one_letter_data', $!, $source_name );
+    "./$daily_dir/$author_count",
+    { binmode => ':utf8' },
+    encode_json($ref_current_letter)
+  ) or DEBUG( 'save_one_letter_data', $!, $source_name );
   say "DBG After write_file $daily_dir/$author_count";
-  @author_struct = (); # Initlz for next letter & author?
-  #ORG.OK $current_letter{authors}{details} = ();
-  #TBD $current_letter{author}{$current_author}{details} = ();
-  #TBD:
+  @author_struct = ();    # Initlz for next letter & author?
+     #ORG.OK $current_letter{authors}{details} = ();
+     #TBD $current_letter{author}{$current_author}{details} = ();
+     #TBD:
   %current_letter = ();
 }
-
 
 sub save_raw_data { #--------------------------------------------
   my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
@@ -567,50 +522,6 @@ sub extract_topics { #-------------------------------------------
   return @topics;
 }
 
-sub extract_letters { #------------------------------------------
-  say "DBG extract_letters()";
-  my $topic        = shift;
-  my $letter_group = $topic->parent->look_down( '_tag' => 'p', );
-  my @letters      = $letter_group->siblings;
-  $Data::Dumper::Maxdepth = 2;    # 2 shows content
-  say "\nDBG \@letters:";
-
-  #DBG say Dumper @letters;
-  return @letters;
-}
-
-sub extract_one_letter_to_editor { #-----------------------------
-  my $letter = shift;
-
-  #TBD3  my @letter_contents = $letter->parent->look_down(
-  my @letter_contents = $letter->look_down( '_tag' => 'p', );
-
-  # Collect a list of paragraphs of each letter.
-  # my @letter_paragraphs =
-  # $letter_headline->parent->look_down( "_tag" => "p", );
-
-  foreach (@letter_contents) {
-
-    #F say "DBG One Para:\n", dump $_;
-    #DBG say "DBG One Para:\n";
-    $Data::Dumper::Maxdepth = 2;    # 2 shows content of letters.
-                                    #DBG say Dumper ($_);
-  }
-
-  ## HTML on the page to match:
-  ## TBD
-#TBD if ($letter_headline) {
-#TBD ( $ep_element_6, $hex_id, $show_id ) = $letter_headline->parent->as_HTML =~
-#TBD m{.* 'Full.Episodes','(.*?)', \s* (.*?), \s* (\d+?),  .*}ix;
-#TBD }
-#TBD else {
-#TBD return ( 0, 0, 0 );
-#TBD }
-
-  return @letter_contents;
-}
-
-
 ## Remove dir if it exists-erase old files so diff gives accurate results.
 sub initialize_output_dir {
   my $m = $dt->month;
@@ -618,11 +529,11 @@ sub initialize_output_dir {
 
   ## Add leading zeroes to values used in path, including file name,
   ## to get 2-digit strings.
-  for ($m, $d) {
+  for ( $m, $d ) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir = "./wsj/" . $dt->year. "/" . $m.$d;
+  my $daily_dir = "./wsj/" . $dt->year . "/" . $m . $d;
   if ( -d $daily_dir ) {
     remove_tree($daily_dir);
   }
