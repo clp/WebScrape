@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 12 10:20:59 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 12 10:39:57 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -125,6 +125,7 @@ sub run { #------------------------------------------------------
   ##TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
   ##TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
+  ## TBD Use init*dir() sub?
   ##OPT-DBG
   my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
   if ( -d $raw_dir ) {
@@ -510,7 +511,7 @@ sub extract_topics { #-------------------------------------------
     '_tag'  => 'h1',
     'class' => 'boldEighteenTimes',
   );
-  $Data::Dumper::Maxdepth = 2;    # 2 shows content
+  ##DBG $Data::Dumper::Maxdepth = 2;    # Value of 2 shows content
   ##DBG say "\nDBG \@topics:";
 
   ##DBG say Dumper @topics;
