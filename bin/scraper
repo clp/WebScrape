@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 09:09:21 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 11:22:43 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -327,6 +327,10 @@ AUTHOR:
             #TBD Thu2012_0412_20:06  next AUTHOR;
             prepare_to_save_new_author_data;
             next;  # TBD After prep, repeat the <b> while loop?
+            ### OR
+            ## Terminate the current author data structure;
+            ## Start a new author data struct w/ new name from <b> tag;
+            ## Then repeat the loop to get author data.
           }
           else {
             say "In <b> loop, found line that does not match a, b, i:";
