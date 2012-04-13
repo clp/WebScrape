@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 02:07:23 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 02:25:38 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -289,7 +289,6 @@ LINE:
         say "DBG author (not letter) count: ",
             $total_letters_count;
 
-        ## TBD Wed2012_0411_15:58
         ## Loop to get all author data.
         $author_count = 0;
         my $current_line;
@@ -312,7 +311,7 @@ LINE:
           }
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
             if ( $current_line->as_text eq $current_author ) {
-              # Skip the author that was already handled.
+              # Ignore the author that was already handled.
               next;
             }
 
