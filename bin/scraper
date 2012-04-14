@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 07:18:00 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 07:35:55 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -55,9 +55,7 @@ our $VERSION = '0.10';
 # Initialize
 my $source_name = "wsj";
 my $domain_name = "wsj.com";
-my $rootdir     = "/home/clpoda";
 
-my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
 my $msg;
 
 # Initialize
@@ -82,8 +80,7 @@ my $data_src = "unknown, maybe __DATA__";
 # level => $INFO,
 # level  => $WARN,
 Log::Log4perl->easy_init(
-  {
-    level => $DEBUG,
+  { level => $DEBUG,
     file  => ">>$program.debug.log"
   }
 );
@@ -114,13 +111,16 @@ sub run { #------------------------------------------------------
   ##
   ## Initialize --------------------------------------------------
   $total_authors_count = 0;
-  $letters_count = 0;
+  $letters_count       = 0;
 
+  my $rootdir     = "/home/clpoda";
+  my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
   init_dirs( $rootdir, $outputdir );
 
   ##TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
   ##TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
+  ## TBD Combine init_dirs & init*dir subs.
   ## TBD Use init*dir() sub?
   ##OPT-DBG
   my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
@@ -294,10 +294,11 @@ LINE:
           if ( $current_line->as_HTML =~ /<i>/ ) {
             push @{ $current_letter{author}{$current_author}
                   {details} },
-              $current_line->as_text;
+                $current_line->as_text;
           }
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
             if ( $current_line->as_text eq $current_author ) {
+
               # Ignore the author that was already handled.
               next;
             }
@@ -309,12 +310,13 @@ LINE:
                 $current_author;
 
             $total_authors_count++;
-            next; # Get data for this new author.
+            next;    # Get data for this new author.
           }
           else {
-            # In <b> loop, found line that does not match a, b, or i tags.
-            # Assume it marks the end of the letter.
-            # Save it, then start to read next letter.
+
+   # In <b> loop, found line that does not match a, b, or i tags.
+   # Assume it marks the end of the letter.
+   # Save it, then start to read next letter.
             last;
           }
 
@@ -322,7 +324,7 @@ LINE:
 
         ## If no more lines are under the topic, save the letter
         ## to a file.  This saves letters under topics w/ only
-        ## one letter, that do not have an <a> tag that marks 
+        ## one letter, that do not have an <a> tag that marks
         ## the end of a letter.
         $letters_count++;
         save_letter_to_file( \%current_letter );
@@ -404,11 +406,12 @@ eousage
 }
 
 sub init_dirs { #------------------------------------------------
-  my ( $rootdir, $outputdir ) = @_;
-  if ( -d "$rootdir/$outputdir" ) {
-    remove_tree("$rootdir/$outputdir");
+  #ORG my ( $rootdir, $outputdir ) = @_;
+  my ( $parent, $child ) = @_;
+  if ( -d "$parent/$child" ) {
+    remove_tree("$parent/$child");
   }
-  make_path("$rootdir/$outputdir");
+  make_path("$parent/$child");
 }
 
 sub get_start_page { #-------------------------------------------
@@ -437,7 +440,7 @@ sub get_start_page { #-------------------------------------------
 ## Write each letter to a separate file.
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
-  my $count = $letters_count;
+  my $count              = $letters_count;
 
   ## Add leading zeroes to get 2-character strings.
   for ($count) {
