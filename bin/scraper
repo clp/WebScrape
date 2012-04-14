@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 02:21:56 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 02:53:49 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -49,7 +49,7 @@ use feature qw( switch say );
 #TBD use Storable;
 #TBD use IO::Zlib;
 
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -286,14 +286,23 @@ LINE:
               { letter_content => $current_line->as_text };
 
           if ( $current_line->as_HTML =~ /<a/ ) {
+            ## TBF Sat2012_0414_14:36  No <a markers found for
+            ## end of letter for data of 2012_0413, printed
+            ## on 2012_0414.
             ## Found the end of a letter's author data where
             ## there are multiple letters per topic.
+
+            ## TBF, see above; remove if not needed.
+            ## Separate each topic in this array w/ newline.
+            push @all_letters_to_editor,
+                { letter_content => "\n###" };
 
             $letters_count++;
             save_letter_to_file( \%current_letter );
             next LINE;
           }
 
+          ##TBF Sat2012_0414_14:42  Chg to elsif?
           if ( $current_line->as_HTML =~ /<i>/ ) {
             push @{ $current_letter{author}{$current_author}
                   {details} },
@@ -359,7 +368,7 @@ LINE:
   say "\nLetters to the Editor from $source_name",
       " for web site date $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
-    say wrap ("\t", '  ', values %{$_});
+    say { $application->{output_fh} } wrap ("\t", '  ', values %{$_});
   }
 
 
