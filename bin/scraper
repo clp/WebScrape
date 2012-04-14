@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 12:16:06 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 01:40:13 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -231,6 +231,10 @@ TOPIC:
     my $prior_author = '';
     my $letter_line;
 
+    ## Separate each topic in this array w/ newline.
+    push @all_letters_to_editor,
+        { letter_content => "\n" };
+
     ## First loop for letters.
 LINE:
     while (@lines_under_a_topic) {
@@ -313,9 +317,10 @@ LINE:
           }
           else {
 
-   # In <b> loop, found line that does not match a, b, or i tags.
-   # Assume it marks the end of the letter.
-   # Save it, then start to read next letter.
+            ## In <b> loop, found line that does not match a, 
+            ## b, or i tags.
+            ## Assume it marks the end of the letter.
+            ## Save it, then start to read next letter.
             last;
           }
 
@@ -327,6 +332,10 @@ LINE:
         ## the end of a letter.
         $letters_count++;
         save_letter_to_file( \%current_letter );
+
+        ## Separate each letter in this array w/ newline.
+        push @all_letters_to_editor,
+            { letter_content => "\n" };
 
       }    # End of <b> loop.
     }    # End LINE loop.
@@ -342,11 +351,12 @@ LINE:
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
+  use Text::Wrap;
   ## Print all letters to screen.
   say "\nLetters to the Editor from $source_name",
       " for web site date $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
-    say values %$_;
+    say wrap ("\t", '  ', values %$_);
   }
 
 
