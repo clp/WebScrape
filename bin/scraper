@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 07:59:48 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 08:23:04 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -123,7 +123,6 @@ sub run { #------------------------------------------------------
   ## TBD Combine init_dirs & init*dir subs.
   ##OPT-DBG
   init_dirs( $rootdir, "/p/WebScrape/data/wsj/tmp" );
-  my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
 
   ##
   ## Get start page w/ data.  ------------------------------------
@@ -134,15 +133,15 @@ sub run { #------------------------------------------------------
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
 
-    # TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-    # TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-    #FULL
+    ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+    ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+    ##FULL
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw"
     );
 
-#OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
-#OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-#TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
+    ##OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
+    ##OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
+    ##TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
     $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
@@ -155,32 +154,32 @@ sub run { #------------------------------------------------------
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
   ##DBG:
+  my $raw_dir   = "$rootdir/p/WebScrape/data/wsj/tmp";
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   ##
-  ## Parse the response & extract desired data. ------------------
+  ## Parse the response & extract desired data. -----------------
   ##   Select the portion of the page that holds our data.
   ##   Extract each headline & store them in @topics.
   ##   Extract each sibling node from the tree.
-  ##   TBD: Parse the text for data: heading, article, letter body, etc.
+  ##   Extract the data: heading, article, letter body, etc.
 
-  ## TBF b.9. serverTime can be one day before printed date of wsj.
+  ## TBF b.9. serverTime may be 1-2 days before printed date of wsj.
   ## Get date of publication.
   ## var serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw)
       = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
-  say "DBG date: ,$pub_date_raw,";
+  say "DBG date from web server: ,$pub_date_raw,";
   my $parser = DateTime::Format::Natural->new();
   $dt = $parser->parse_datetime($pub_date_raw);
 
   ## TBD Move to where $dt is used?
   if ( $parser->success ) {
-
-    # operate on $dt.
     $daily_dir = initialize_output_dir();
   }
   else {
-    warn $parser->error;
+    #ORG warn $parser->error;
+    DEBUG $parser->error;
   }
 
   ## Get topic data.
@@ -206,7 +205,7 @@ TOPIC:
     ##TBD Make the sub a pattern match? Using the exact heading
     ## may cause a problem.
     ##
-    ## Use as_text() method instead of as_HTML(); the latter
+    ## Use the as_text() method instead of as_HTML(); the latter
     ## caused failures when $topic_start included an apostrophe
     ## that must be escaped (may fail w/ other symbols too).
     $topic_start = $topic_parent->look_down(
@@ -245,7 +244,7 @@ LINE:
         push @all_letters_to_editor,
             { letter_content => $letter_line->as_text };
 
-        ## Save objects for analysis:
+        ## Save items for analysis.
         $current_letter_text .= $letter_line->as_text;
       }
       else {
@@ -418,14 +417,16 @@ sub get_start_page { #-------------------------------------------
   catch {
     my $msg = "ERR: DIE: Caught error while getting web page: $_"
         . "  response->status_line: [$response->status_line].";
-    DEBUG( 'NoShow', $msg, $source_name );
+    ##ORG DEBUG( 'NoShow', $msg, $source_name );
+    DEBUG( $msg, $source_name );
     die "ERR: Cannot get web page [$start_url]; try later.";
   };
 
   if ( !$response->is_success ) {
     my $msg = "Bad response to request for [$start_url]: "
         . $response->status_line;
-    DEBUG( 'NoShow', $msg, $source_name );
+    ##ORG DEBUG( 'NoShow', $msg, $source_name );
+    DEBUG( $msg, $source_name );
     die
         "ERR: Got bad response to request for [$start_url]; try later.";
   }
