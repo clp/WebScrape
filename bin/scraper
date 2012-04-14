@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 01:40:13 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 02:21:56 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -333,13 +333,16 @@ LINE:
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
-        ## Separate each letter in this array w/ newline.
+        ## Separate each letter in this array w/ newline, for
+        ## better appearance on screen.
         push @all_letters_to_editor,
             { letter_content => "\n" };
 
       }    # End of <b> loop.
     }    # End LINE loop.
   }    # End TOPIC loop.
+
+  $tree->delete;
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
@@ -351,18 +354,17 @@ LINE:
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
-  use Text::Wrap;
   ## Print all letters to screen.
+  use Text::Wrap;
   say "\nLetters to the Editor from $source_name",
       " for web site date $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
-    say wrap ("\t", '  ', values %$_);
+    say wrap ("\t", '  ', values %{$_});
   }
 
 
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
-  $tree->delete;
 
   my $done_time = localtime();
   my ($end_msg1);
