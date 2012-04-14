@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 07:44:16 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 07:47:37 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -111,9 +111,9 @@ sub run { #------------------------------------------------------
   ##
   ## Initialize --------------------------------------------------
   $authors_count = 0;
-  $letters_count       = 0;
+  $letters_count = 0;
 
-  my $rootdir     = "/home/clpoda";  #CFG
+  my $rootdir   = "/home/clpoda";                #CFG
   my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
   init_dirs( $rootdir, $outputdir );
 
@@ -406,7 +406,6 @@ eousage
 }
 
 sub init_dirs { #------------------------------------------------
-  #ORG my ( $rootdir, $outputdir ) = @_;
   my ( $parent, $child ) = @_;
   if ( -d "$parent/$child" ) {
     remove_tree("$parent/$child");
