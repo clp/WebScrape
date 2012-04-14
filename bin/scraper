@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 07:35:55 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 07:44:16 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -63,7 +63,7 @@ my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
 my $now = localtime;
 my $dt;
-my $total_authors_count;
+my $authors_count;
 my $letters_count;
 my %current_letter = ();
 my $daily_dir;
@@ -110,10 +110,10 @@ sub run { #------------------------------------------------------
 
   ##
   ## Initialize --------------------------------------------------
-  $total_authors_count = 0;
+  $authors_count = 0;
   $letters_count       = 0;
 
-  my $rootdir     = "/home/clpoda";
+  my $rootdir     = "/home/clpoda";  #CFG
   my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
   init_dirs( $rootdir, $outputdir );
 
@@ -262,7 +262,7 @@ LINE:
 
         ## Now handle all following lines
         ## as author data, until end of current letter.
-        $total_authors_count++;
+        $authors_count++;
         $current_author = $letter_line->as_text;
         say
             "DBG if <b> block  \$current_author: ,$current_author,";
@@ -309,7 +309,7 @@ LINE:
                   {name} },
                 $current_author;
 
-            $total_authors_count++;
+            $authors_count++;
             next;    # Get data for this new author.
           }
           else {
@@ -353,7 +353,7 @@ LINE:
       = "$0\n"
       . "  Using data src ,$data_src, for letters to the editor"
       . " in $source_name.\n"
-      . "  Found $total_authors_count authors for"
+      . "  Found $authors_count authors for"
       . " $letters_count letters to the editor\n"
       . "  in $source_name, for web site date $pub_date_raw.\n";
 
