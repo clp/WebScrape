@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 08:23:04 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 11:58:44 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -220,7 +220,7 @@ TOPIC:
     }
     else {
       DEBUG
-          "\$topic_start not found for \$topic_number: ,$topic_number,";
+          "\$topic_start not found for number: ,$topic_number,";
       $topic_number++;
       next TOPIC;
     }
@@ -276,6 +276,10 @@ LINE:
         while (@lines_under_a_topic) {
           ## Remove lines from the array.
           $current_line = shift @lines_under_a_topic;
+
+          ## DBG Save each line for debug.
+          push @all_letters_to_editor,
+              { letter_content => $current_line->as_text };
 
           if ( $current_line->as_HTML =~ /<a/ ) {
             ## Found the end of a letter's author data where
