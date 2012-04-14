@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 07:47:37 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 07:59:48 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -121,13 +121,9 @@ sub run { #------------------------------------------------------
   ##TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
   ## TBD Combine init_dirs & init*dir subs.
-  ## TBD Use init*dir() sub?
   ##OPT-DBG
+  init_dirs( $rootdir, "/p/WebScrape/data/wsj/tmp" );
   my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
-  if ( -d $raw_dir ) {
-    remove_tree($raw_dir);
-  }
-  make_path($raw_dir);
 
   ##
   ## Get start page w/ data.  ------------------------------------
