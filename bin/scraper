@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 06:45:03 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 06:57:32 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -328,18 +328,12 @@ LINE:
 
         ## If no more lines are under the topic, save the letter
         ## to a file.  This saves letters under topics w/ only
-        ## one letter,
-        ## that do not have <a> tags that I use to mark the end
-        ## of a letter.
+        ## one letter, that do not have an <a> tag that marks 
+        ## the end of a letter.
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
-        next LINE;
       }    # End of <b> loop.
-      else {
-        next LINE;
-      }
-
     }    # End LINE loop.
   }    # End TOPIC loop.
 
@@ -449,12 +443,9 @@ sub get_start_page { #-------------------------------------------
 ## Write each letter to a separate file.
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
-
-  ## TBD Use $author_count until an accurate letter count is avbl.
   my $count = $letters_count;
 
-  ## Add leading zeroes to values used in path, including file name,
-  ## to get 2-digit strings.
+  ## Add leading zeroes to get 2-character strings.
   for ($count) {
     $_ = "0" . $_ if $_ <= 9;
   }
@@ -464,6 +455,7 @@ sub save_letter_to_file { #--------------------------------------
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
   ) or DEBUG( 'save_one_letter_data', $!, $source_name );
+
   %current_letter = ();
 }
 
