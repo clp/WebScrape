@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 13 05:35:55 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 13 06:45:03 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -68,7 +68,6 @@ my $dt;
 my $total_authors_count;
 my $letters_count;
 my %current_letter = ();
-my $author_count   = 0;
 my $daily_dir;
 
 #
@@ -284,7 +283,6 @@ LINE:
         $total_authors_count++;
 
         ## Loop to get all author data.
-        $author_count = 0;
         my $current_line;
         while (@lines_under_a_topic) {
           ## Remove lines from the array.
@@ -453,16 +451,16 @@ sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
 
   ## TBD Use $author_count until an accurate letter count is avbl.
-  $author_count = $letters_count;
+  my $count = $letters_count;
 
   ## Add leading zeroes to values used in path, including file name,
   ## to get 2-digit strings.
-  for ($author_count) {
+  for ($count) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
   write_file(
-    "./$daily_dir/$author_count",
+    "./$daily_dir/$count",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
   ) or DEBUG( 'save_one_letter_data', $!, $source_name );
