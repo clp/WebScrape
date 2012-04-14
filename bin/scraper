@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 11:58:44 AMAM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 12:16:06 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -342,6 +342,14 @@ LINE:
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
+  ## Print all letters to screen.
+  say "\nLetters to the Editor from $source_name",
+      " for web site date $pub_date_raw\n";
+  foreach (@all_letters_to_editor) {
+    say values %$_;
+  }
+
+
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
   $tree->delete;
@@ -349,7 +357,7 @@ LINE:
   my $done_time = localtime();
   my ($end_msg1);
   $end_msg1
-      = "$0\n"
+      = "\nSummary of $0:\n"
       . "  Using data src ,$data_src, for letters to the editor"
       . " in $source_name.\n"
       . "  Found $authors_count authors for"
