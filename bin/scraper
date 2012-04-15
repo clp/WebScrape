@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 07:18:13 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 07:35:55 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -29,7 +29,6 @@ use warnings;
 use Data::Dumper;
 use File::Path qw(remove_tree make_path);
 use File::Slurp;
-use Getopt::Long;
 use HTML::Element::Library;
 use HTML::TreeBuilder;
 use JSON;
@@ -70,9 +69,6 @@ Log::Log4perl->easy_init(
   }
 );
 
-unless ( GetOptions( 'start_url=s' => \$start_url, ) ) {
-  die usage();
-}
 unless ($start_url) {
   die
       "$program died: No url found in file or on command line.\n\n",
@@ -196,33 +192,27 @@ TOPIC:
     ## First loop for letters.
 LINE:
     while (@lines_under_a_topic) {
-      ## Remove lines from the array.
       $letter_line = shift @lines_under_a_topic;
 
-      ## DBG say "DBG LINE block: \$letter_line->as_HTML: ,", $letter_line->as_HTML;
       if ($letter_line) {
 
-        ## DBG Save each line for debug.
         push @all_letters_to_editor,
             { letter_content => $letter_line->as_text };
 
-        ## Save items for analysis.
         $current_letter_text .= $letter_line->as_text;
       }
       else {
         next LINE;
       }
 
-      ## Author loop: the second loop for letters.
+      ## Author handling code.
       ## Extract all author data, then return to LINE loop.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## Now handle all following lines
+        ## Handle all following lines
         ## as author data, until end of current letter.
         $authors_count++;
         $current_author = $letter_line->as_text;
-        say
-            "DBG if <b> block  \$current_author: ,$current_author,";
         $current_letter{author}{$current_author}{name}
             = $current_author;
 
@@ -242,7 +232,7 @@ LINE:
               { letter_content => $current_line->as_text };
 
           if ( $current_line->as_HTML =~ /<a/ ) {
-            ## Not reliable marker for end of letter.  See b.21.
+            ## b.21: Not reliable marker for end of letter.
 
             ## Add newline for better readability on screen.
             push @all_letters_to_editor,
@@ -283,14 +273,14 @@ LINE:
         ## If no more lines are under the topic, save the letter
         ## to a file.  This saves letters under topics w/ only
         ## one letter, that do not have an <a> tag that marks
-        ## the end of a letter.
+        ## the end of a letter (see b.21 also).
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
         ## Add newline for better readability on screen.
         push @all_letters_to_editor, { letter_content => "\n" };
 
-      }    # End of <b> loop.
+      }    # End of <b> loop for Authors.
     }    # End LINE loop.
   }    # End TOPIC loop.
 
@@ -364,19 +354,20 @@ sub output_fh { #------------------------------------------------
 sub usage { #----------------------------------------------------
   return <<"eousage";
 Usage:
-  $program -u url
+  $program [-u url]
 
-$program requests a web site to return a page, then extracts
-letters to the editor, and saves and displays them.
+$program requests the Wall Street Journal web site to
+return a page, then extracts letters to the editor,
+and saves them and displays them.
 
-See combined results at ./all_letters.
+See all letters for one day in the file all_letters.
 
-See JSON output files at ./wsj/yyyy/mmdd/NN.
+See JSON output files at wsj/yyyy/mmdd/NN.
 
 
 Options to control the query
 
--url string              The full http address to retrieve.
+-u string                The full http address to retrieve.
                          Required.
 eousage
 }
