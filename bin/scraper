@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 05:09:55 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 05:24:25 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -49,7 +49,7 @@ use feature qw( switch say );
 #TBD use Storable;
 #TBD use IO::Zlib;
 
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -136,7 +136,7 @@ sub run { #------------------------------------------------------
       ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
       ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
       ##FULL
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw"
+      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
     );
 
     ##OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
@@ -275,7 +275,7 @@ LINE:
         ## Clear the var to prepare for next letter.
         $current_letter_text = '';
 
-        ## Loop to get all author data.
+        ## Loop to get current author data.
         my $current_line;
         while (@lines_under_a_topic) {
           $current_line = shift @lines_under_a_topic;
@@ -284,16 +284,11 @@ LINE:
               { letter_content => $current_line->as_text };
 
           if ( $current_line->as_HTML =~ /<a/ ) {
-            ## TBF Sat2012_0414_14:36  No <a markers found for
-            ## end of letter for data of 2012_0413, printed
-            ## on 2012_0414.
-            ## Found the end of a letter's author data where
-            ## there are multiple letters per topic.
+            ## Not reliable marker for end of letter.  See b.21.
 
-            ## TBF, see above; remove if not needed.
             ## Separate each topic in this array w/ newline.
             push @all_letters_to_editor,
-                { letter_content => "\n###" };
+                { letter_content => "\n" };
 
             $letters_count++;
             save_letter_to_file( \%current_letter );
