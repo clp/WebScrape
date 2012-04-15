@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 09:19:01 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 09:32:53 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -187,7 +187,7 @@ TOPIC:
     my $letter_line;
 
     ## Add newline for better readability on screen.
-    push @all_letters_to_editor, { letter_content => "\n" };
+    push @all_letters_to_editor, "\n" ;
 
     ## First loop for letters.
 LINE:
@@ -197,7 +197,8 @@ LINE:
       if ($letter_line) {
 
         push @all_letters_to_editor,
-            { letter_content => $letter_line->as_text };
+        #TBR { letter_content => $letter_line->as_text };
+            $letter_line->as_text ;
 
         $current_letter_text .= $letter_line->as_text;
       }
@@ -229,14 +230,15 @@ LINE:
           $current_line = shift @lines_under_a_topic;
 
           push @all_letters_to_editor,
-              { letter_content => $current_line->as_text };
+        #TBR { letter_content => $letter_line->as_text };
+            $letter_line->as_text ;
 
           if ( $current_line->as_HTML =~ /<a/ ) {
             ## b.21: Not reliable marker for end of letter.
 
             ## Add newline for better readability on screen.
-            push @all_letters_to_editor,
-                { letter_content => "\n" };
+            #TBR? push @all_letters_to_editor, { letter_content => "\n" };
+    push @all_letters_to_editor, "\n" ;
 
             $letters_count++;
             save_letter_to_file( \%current_letter );
@@ -278,7 +280,8 @@ LINE:
         save_letter_to_file( \%current_letter );
 
         ## Add newline for better readability on screen.
-        push @all_letters_to_editor, { letter_content => "\n" };
+        #TBR? push @all_letters_to_editor, { letter_content => "\n" };
+    push @all_letters_to_editor, "\n" ;
 
       }    # End of <b> loop for Authors.
     }    # End LINE loop.
@@ -291,7 +294,8 @@ LINE:
   write_file( "all_letters", "" );
   foreach (@all_letters_to_editor) {
     append_file( "all_letters", { binmode => ':utf8' },
-      values %$_ )
+      #ORG values %$_ )
+      $_ )
         or DEBUG( "ERR Failed to write to all_letters: $!");
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
@@ -302,7 +306,8 @@ LINE:
       " for web site content dated $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} }
-        wrap( "\t", '  ', values %{$_} );
+        #ORG wrap( "\t", '  ', values %{$_} );
+        wrap( "\t", '  ', $_ );
   }
 
   ##---------------------------------------------------------------
