@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 05:24:25 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 06:14:45 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -69,8 +69,7 @@ my %current_letter = ();
 my $daily_dir;
 
 #
-#ORG my $log_dir = "./";
-my $log_dir  = "/home/clpoda/p/WebScrape/log/";
+my $log_dir = "./log";
 my $log_file = $log_dir . "$program.log";
 
 my $data_src = "unknown, maybe __DATA__";
@@ -113,16 +112,15 @@ sub run { #------------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
 
-  my $rootdir   = "/home/clpoda";                #CFG
-  my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
-  init_dirs( $rootdir, $outputdir );
+  #TBD my $rootdir   = $ENV{HOME};                #CFG
+  my $rootdir   = ".";                #CFG
+  #TBR my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
+  #TBR init_dirs( $rootdir, $outputdir );
 
-  ##TMP1 print "   $0: See results at $rootdir/$outputdir when done.\n";
-  ##TMP1 print "   $0: See log data at /home/clpoda/p/WebScrape/log/. \n\n";
 
-  ## TBD Combine init_dirs & init*dir subs.
   ##OPT-DBG
-  init_dirs( $rootdir, "/p/WebScrape/data/wsj/tmp" );
+  #ORG init_dirs( $rootdir, "/p/WebScrape/data/wsj/tmp" );
+  init_dirs( $rootdir, "/WebScrape/wsj/tmp" );
 
   ##
   ## Get start page w/ data.  ------------------------------------
@@ -132,16 +130,16 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-
-      ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-      ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-      ##FULL
-      "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
+      #TBD "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
+      "$rootdir/data/wsj/wsj.lte.full.2012_0408.raw"
     );
 
-    ##OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
-    ##OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-    ##TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
+    ## FULL "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
+    ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+    ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+    ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
+    ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
+    ## TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
     $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
@@ -153,16 +151,10 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  ##DBG:
-  my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
+  init_dirs( $rootdir, "/wsj/lte");
+  my $raw_dir = "$rootdir/wsj/lte";
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-  ##
-  ## Parse the response & extract desired data. -----------------
-  ##   Select the portion of the page that holds our data.
-  ##   Extract each headline & store them in @topics.
-  ##   Extract each sibling node from the tree.
-  ##   Extract the data: heading, article, letter body, etc.
 
   ## TBF b.9. serverTime may be 1-2 days before printed date of wsj.
   ## Get date of publication.
@@ -352,7 +344,7 @@ LINE:
   ## Print all letters to screen.
   use Text::Wrap;
   say "\nLetters to the Editor from $source_name",
-      " for web site date $pub_date_raw\n";
+      " for web site content dated $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} }
         wrap( "\t", '  ', values %{$_} );
@@ -409,8 +401,13 @@ sub usage { #----------------------------------------------------
 Usage:
   $program -u url
 
-$program requests a web site to return a page, and displays
-the HTML data found there.
+$program requests a web site to return a page, then extracts
+letters to the editor, and saves and displays them.
+
+See combined results at ./all_letters.
+
+See JSON output files at ./wsj/yyyy/mmdd/NN.
+
 
 Options to control the query
 
@@ -500,24 +497,20 @@ sub extract_topics { #-------------------------------------------
     '_tag'  => 'h1',
     'class' => 'boldEighteenTimes',
   );
-  ##DBG $Data::Dumper::Maxdepth = 2;    # Value of 2 shows content
-  ##DBG say "\nDBG \@topics:";
-
-  ##DBG say Dumper @topics;
   return @topics;
 }
 
-## Remove dir if it exists-erase old files so diff gives accurate results.
 sub initialize_output_dir {
   my $m = $dt->month;
   my $d = $dt->day;
 
-  ## Add leading zeroes to values used in path, including file name,
-  ## to get 2-digit strings.
+  ## Add leading zeroes to values used in path, including file
+  ## name, to get 2-digit strings.
   for ( $m, $d ) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
+  ## TBD Combine init_dirs & init*dir subs.
   my $daily_dir = "./wsj/" . $dt->year . "/" . $m . $d;
   if ( -d $daily_dir ) {
     remove_tree($daily_dir);
