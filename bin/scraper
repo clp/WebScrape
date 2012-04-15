@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 07:35:55 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 07:38:53 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -354,7 +354,7 @@ sub output_fh { #------------------------------------------------
 sub usage { #----------------------------------------------------
   return <<"eousage";
 Usage:
-  $program [-u url]
+  $program
 
 $program requests the Wall Street Journal web site to
 return a page, then extracts letters to the editor,
@@ -364,11 +364,6 @@ See all letters for one day in the file all_letters.
 
 See JSON output files at wsj/yyyy/mmdd/NN.
 
-
-Options to control the query
-
--u string                The full http address to retrieve.
-                         Required.
 eousage
 }
 
