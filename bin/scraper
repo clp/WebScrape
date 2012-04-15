@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 06:42:29 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 07:06:57 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -132,22 +132,19 @@ sub run { #------------------------------------------------------
 
 
   ## TBF b.9. serverTime may be 1-2 days before printed date of wsj.
-  ## Get date of publication.
-  ## var serverTime = new Date("April 06, 2012 00:45:28");
+  ## Format of serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw)
       = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
   say "DBG date from web server: ,$pub_date_raw,";
-  my $parser = DateTime::Format::Natural->new();
-  $dt = $parser->parse_datetime($pub_date_raw);
+  my $date_parser = DateTime::Format::Natural->new();
+  $dt = $date_parser->parse_datetime($pub_date_raw);
 
   ## TBD Move to where $dt is used?
-  if ( $parser->success ) {
+  if ( $date_parser->success ) {
     $daily_dir = initialize_output_dir();
   }
   else {
-
-    #ORG warn $parser->error;
-    DEBUG $parser->error;
+    DEBUG $date_parser->error;
   }
 
   ## Get topic data.
