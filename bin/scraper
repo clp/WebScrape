@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 09:32:53 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 09:57:20 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -38,7 +38,7 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -182,7 +182,6 @@ TOPIC:
 
     my $current_author      = '';
     my $current_letter_text = '';
-    my $details;
     my $prior_author = '';
     my $letter_line;
 
@@ -195,11 +194,7 @@ LINE:
       $letter_line = shift @lines_under_a_topic;
 
       if ($letter_line) {
-
-        push @all_letters_to_editor,
-        #TBR { letter_content => $letter_line->as_text };
-            $letter_line->as_text ;
-
+        push @all_letters_to_editor, $letter_line->as_text ;
         $current_letter_text .= $letter_line->as_text;
       }
       else {
@@ -229,16 +224,12 @@ LINE:
         while (@lines_under_a_topic) {
           $current_line = shift @lines_under_a_topic;
 
-          push @all_letters_to_editor,
-        #TBR { letter_content => $letter_line->as_text };
-            $letter_line->as_text ;
+          push @all_letters_to_editor, $current_line->as_text ;
 
           if ( $current_line->as_HTML =~ /<a/ ) {
             ## b.21: Not reliable marker for end of letter.
 
-            ## Add newline for better readability on screen.
-            #TBR? push @all_letters_to_editor, { letter_content => "\n" };
-    push @all_letters_to_editor, "\n" ;
+            push @all_letters_to_editor, "\n" ;
 
             $letters_count++;
             save_letter_to_file( \%current_letter );
@@ -250,6 +241,7 @@ LINE:
                   {details} },
                 $current_line->as_text;
           }
+
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
             if ( $current_line->as_text eq $current_author ) {
               ## Skip $current_author - already handled.
@@ -279,9 +271,7 @@ LINE:
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
-        ## Add newline for better readability on screen.
-        #TBR? push @all_letters_to_editor, { letter_content => "\n" };
-    push @all_letters_to_editor, "\n" ;
+        push @all_letters_to_editor, "\n" ;
 
       }    # End of <b> loop for Authors.
     }    # End LINE loop.
@@ -293,9 +283,7 @@ LINE:
   ## Save data from all letters found.
   write_file( "all_letters", "" );
   foreach (@all_letters_to_editor) {
-    append_file( "all_letters", { binmode => ':utf8' },
-      #ORG values %$_ )
-      $_ )
+    append_file( "all_letters", { binmode => ':utf8' }, $_ )
         or DEBUG( "ERR Failed to write to all_letters: $!");
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
@@ -305,9 +293,7 @@ LINE:
   say "\nLetters to the Editor from $source_name",
       " for web site content dated $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
-    say { $application->{output_fh} }
-        #ORG wrap( "\t", '  ', values %{$_} );
-        wrap( "\t", '  ', $_ );
+    say { $application->{output_fh} } wrap( "\t", '  ', $_ );
   }
 
   ##---------------------------------------------------------------
