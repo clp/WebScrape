@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 07:38:53 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 07:58:20 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -377,22 +377,19 @@ sub init_dirs { #------------------------------------------------
 
 sub get_start_page { #-------------------------------------------
   my ( $mech, $start_url ) = @_;
-  my $response;
+  my $response = '';
   try {
     $response = $mech->get($start_url);
   }
   catch {
-    my $msg = "ERR: DIE: Caught error while getting web page: $_"
-        . "  response->status_line: [$response->status_line].";
-    ##ORG DEBUG( 'NoShow', $msg, $source_name );
-    DEBUG( $msg, $source_name );
+    # Caught error while getting web page.
+    DEBUG( $_ );
     die "ERR: Cannot get web page [$start_url]; try later.";
   };
 
   if ( !$response->is_success ) {
     my $msg = "Bad response to request for [$start_url]: "
         . $response->status_line;
-    ##ORG DEBUG( 'NoShow', $msg, $source_name );
     DEBUG( $msg, $source_name );
     die
         "ERR: Got bad response to request for [$start_url]; try later.";
