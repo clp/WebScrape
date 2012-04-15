@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 09:12:02 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 09:19:01 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -292,7 +292,7 @@ LINE:
   foreach (@all_letters_to_editor) {
     append_file( "all_letters", { binmode => ':utf8' },
       values %$_ )
-        or DEBUG( 'save_letters_data', $!, $source_name );
+        or DEBUG( "ERR Failed to write to all_letters: $!");
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
@@ -390,7 +390,7 @@ sub get_start_page { #-------------------------------------------
   if ( !$response->is_success ) {
     my $msg = "Bad response to request for [$start_url]: "
         . $response->status_line;
-    DEBUG( $msg, $source_name );
+    DEBUG( $msg );
     die
         "ERR: Got bad response to request for [$start_url]; try later.";
   }
@@ -411,7 +411,7 @@ sub save_letter_to_file { #--------------------------------------
     "./$daily_dir/$count",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
-  ) or DEBUG( 'save_one_letter_data', $!, $source_name );
+  ) or DEBUG( "ERR Failed to write file at $daily_dir/$count: $!");
 
   %current_letter = ();
 }
@@ -430,13 +430,13 @@ sub save_raw_data { #--------------------------------------------
   my $page_file = "$source_name.lte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
-      or DEBUG( 'save_raw_data()', $!, $source_name );
+      or DEBUG( "ERR save_raw_data(): $!");
   write_file( "tree_builder_dump_as_html", $tree->as_HTML )
-      or DEBUG( 'save_raw_data()', $!, $source_name );
+      or DEBUG( "ERR save_raw_data(): $!");
   write_file( "tree_builder_dump_as_text",
     { binmode => ':utf8' },
     $tree->as_text )
-      or DEBUG( 'save_raw_data()', $!, $source_name );
+      or DEBUG( "ERR save_raw_data(): $!");
 }
 
 sub extract_topics { #-------------------------------------------
