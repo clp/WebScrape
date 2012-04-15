@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 09:57:20 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 10:17:33 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -26,6 +26,7 @@
 use strict;
 use warnings;
 
+use Carp;
 use Data::Dumper;
 use File::Path qw(remove_tree make_path);
 use File::Slurp;
@@ -56,7 +57,7 @@ my $data_src = "unknown, maybe __DATA__";
 my $dt;
 my $letters_count;
 
-my $log_dir = "./log";
+my $log_dir  = "./log";
 my $log_file = $log_dir . "$program.log";
 
 # Set up logging.  Specify level, eg:
@@ -75,7 +76,6 @@ unless ($start_url) {
       usage();
 }
 
-
 #TBD Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
 __PACKAGE__->new->run unless caller;
 
@@ -88,9 +88,8 @@ sub run { #------------------------------------------------------
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-  my $rootdir   = ".";                #CFG
+  my $rootdir = ".";    #CFG
 
-  ##OPT-DBG
   init_dir( $rootdir . "/WebScrape/wsj/tmp" );
 
   ## Get start page w/ data.  ------------------------------------
@@ -102,37 +101,27 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      #TBD "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
       "$rootdir/data/wsj/wsj.lte.full.2012_0408.raw"
     );
-
-    ## FULL "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2012_0408.raw"
-    ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-    ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-    ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
-    ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
-    ## TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
     $data_src = "local copy of web page";
   }
   else {
     $start_page = get_start_page( $mech, $start_url );
     $data_src = "web";
   }
-  $tree     = HTML::TreeBuilder->new_from_content($start_page);
+  $tree = HTML::TreeBuilder->new_from_content($start_page);
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  init_dir( $rootdir . "/wsj/lte");
+  init_dir( $rootdir . "/wsj/lte" );
   my $raw_dir = "$rootdir/wsj/lte";
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
-
   ## TBF b.9. serverTime may be different from the date when
-  ## the letters are printed in the wsj newspaper.
+  ## the letters are printed in the newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw)
       = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
-  say "DBG date from web server: ,$pub_date_raw,";
   my $date_parser = DateTime::Format::Natural->new();
   $dt = $date_parser->parse_datetime($pub_date_raw);
 
@@ -141,6 +130,7 @@ sub run { #------------------------------------------------------
     $daily_dir = initialize_output_dir();
   }
   else {
+    carp $date_parser->error;
     DEBUG $date_parser->error;
   }
 
@@ -162,7 +152,6 @@ TOPIC:
   foreach (@topics) {
     my $current_topic = $_->{_content}[0];
     $current_topic =~ s/\s+$//;
-    say "DBG topic: ", $current_topic;
 
     $topic_start = $topic_parent->look_down(
       _tag => 'h1',
@@ -182,11 +171,11 @@ TOPIC:
 
     my $current_author      = '';
     my $current_letter_text = '';
-    my $prior_author = '';
+    my $prior_author        = '';
     my $letter_line;
 
     ## Add newline for better readability on screen.
-    push @all_letters_to_editor, "\n" ;
+    push @all_letters_to_editor, "\n";
 
     ## First loop for letters.
 LINE:
@@ -194,7 +183,7 @@ LINE:
       $letter_line = shift @lines_under_a_topic;
 
       if ($letter_line) {
-        push @all_letters_to_editor, $letter_line->as_text ;
+        push @all_letters_to_editor, $letter_line->as_text;
         $current_letter_text .= $letter_line->as_text;
       }
       else {
@@ -202,11 +191,12 @@ LINE:
       }
 
       ## Author handling code.
-      ## Extract all author data, then return to LINE loop.
+      ## Extract all remaining data to end of letter as
+      ## author data, then return to LINE loop.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## Handle all following lines
-        ## as author data, until end of current letter.
+        ## Handle all following lines # as author data, 
+        ## until end of current letter.
         $authors_count++;
         $current_author = $letter_line->as_text;
         $current_letter{author}{$current_author}{name}
@@ -224,12 +214,12 @@ LINE:
         while (@lines_under_a_topic) {
           $current_line = shift @lines_under_a_topic;
 
-          push @all_letters_to_editor, $current_line->as_text ;
+          push @all_letters_to_editor, $current_line->as_text;
 
           if ( $current_line->as_HTML =~ /<a/ ) {
             ## b.21: Not reliable marker for end of letter.
 
-            push @all_letters_to_editor, "\n" ;
+            push @all_letters_to_editor, "\n";
 
             $letters_count++;
             save_letter_to_file( \%current_letter );
@@ -265,13 +255,12 @@ LINE:
         }    # End of while for author loop.
 
         ## If no more lines are under the topic, save the letter
-        ## to a file.  This saves letters under topics w/ only
-        ## one letter, that do not have an <a> tag that marks
-        ## the end of a letter (see b.21 also).
+        ## to a file.  This saves letters that do not have an
+        ## <a> tag that can mark the end of a letter (see b.21).
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
-        push @all_letters_to_editor, "\n" ;
+        push @all_letters_to_editor, "\n";
 
       }    # End of <b> loop for Authors.
     }    # End LINE loop.
@@ -284,14 +273,14 @@ LINE:
   write_file( "all_letters", "" );
   foreach (@all_letters_to_editor) {
     append_file( "all_letters", { binmode => ':utf8' }, $_ )
-        or DEBUG( "ERR Failed to write to all_letters: $!");
+        or DEBUG("ERR Failed to write to all_letters: $!");
     append_file( "all_letters", { binmode => ':utf8' }, "\n" );
   }
 
   ## Print all letters to screen.
   use Text::Wrap;
   say "\nLetters to the Editor from $source_name",
-      " for web site content dated $pub_date_raw\n";
+      " web site, dated $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} } wrap( "\t", '  ', $_ );
   }
@@ -358,8 +347,8 @@ See JSON output files at wsj/yyyy/mmdd/NN.
 eousage
 }
 
-sub init_dir { #------------------------------------------------
-  my ( $dir ) = @_;
+sub init_dir {  #------------------------------------------------
+  my ($dir) = @_;
   if ( -d $dir ) {
     remove_tree("$dir");
   }
@@ -373,15 +362,14 @@ sub get_start_page { #-------------------------------------------
     $response = $mech->get($start_url);
   }
   catch {
-    # Caught error while getting web page.
-    DEBUG( $_ );
+    DEBUG($_);
     die "ERR: Cannot get web page [$start_url]; try later.";
   };
 
   if ( !$response->is_success ) {
     my $msg = "Bad response to request for [$start_url]: "
         . $response->status_line;
-    DEBUG( $msg );
+    DEBUG($msg);
     die
         "ERR: Got bad response to request for [$start_url]; try later.";
   }
@@ -402,7 +390,9 @@ sub save_letter_to_file { #--------------------------------------
     "./$daily_dir/$count",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
-  ) or DEBUG( "ERR Failed to write file at $daily_dir/$count: $!");
+      )
+      or
+      DEBUG("ERR Failed to write to file $daily_dir/$count: $!");
 
   %current_letter = ();
 }
@@ -421,13 +411,13 @@ sub save_raw_data { #--------------------------------------------
   my $page_file = "$source_name.lte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
-      or DEBUG( "ERR save_raw_data(): $!");
+      or DEBUG("ERR save_raw_data(): $!");
   write_file( "tree_builder_dump_as_html", $tree->as_HTML )
-      or DEBUG( "ERR save_raw_data(): $!");
+      or DEBUG("ERR save_raw_data(): $!");
   write_file( "tree_builder_dump_as_text",
     { binmode => ':utf8' },
     $tree->as_text )
-      or DEBUG( "ERR save_raw_data(): $!");
+      or DEBUG("ERR save_raw_data(): $!");
 }
 
 sub extract_topics { #-------------------------------------------
@@ -450,7 +440,7 @@ sub initialize_output_dir {
   }
 
   my $daily_dir = "./wsj/" . $dt->year . "/" . $m . $d;
-  init_dir( $daily_dir);
+  init_dir($daily_dir);
   return $daily_dir;
 }
 
