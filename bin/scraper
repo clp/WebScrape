@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 04:59:32 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 05:09:55 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -133,9 +133,9 @@ sub run { #------------------------------------------------------
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
 
-    ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
-    ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
-    ##FULL
+      ## TST1 "$rootdir/p/WebScrape/data/wsj/wsj.lte.html");
+      ## TST2 "$rootdir/p/WebScrape/data/wsj/wsj.lte.2authors.raw");
+      ##FULL
       "$rootdir/p/WebScrape/data/wsj/wsj.lte.full.2011_0408.raw"
     );
 
@@ -154,7 +154,7 @@ sub run { #------------------------------------------------------
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
   ##DBG:
-  my $raw_dir   = "$rootdir/p/WebScrape/data/wsj/tmp";
+  my $raw_dir = "$rootdir/p/WebScrape/data/wsj/tmp";
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   ##
@@ -178,6 +178,7 @@ sub run { #------------------------------------------------------
     $daily_dir = initialize_output_dir();
   }
   else {
+
     #ORG warn $parser->error;
     DEBUG $parser->error;
   }
@@ -232,8 +233,7 @@ TOPIC:
     my $letter_line;
 
     ## Separate each topic in this array w/ newline.
-    push @all_letters_to_editor,
-        { letter_content => "\n" };
+    push @all_letters_to_editor, { letter_content => "\n" };
 
     ## First loop for letters.
 LINE:
@@ -278,10 +278,8 @@ LINE:
         ## Loop to get all author data.
         my $current_line;
         while (@lines_under_a_topic) {
-          ## Remove lines from the array.
           $current_line = shift @lines_under_a_topic;
 
-          ## DBG Save each line for debug.
           push @all_letters_to_editor,
               { letter_content => $current_line->as_text };
 
@@ -302,7 +300,6 @@ LINE:
             next LINE;
           }
 
-          ##TBF Sat2012_0414_14:42  Chg to elsif?
           elsif ( $current_line->as_HTML =~ /<i>/ ) {
             push @{ $current_letter{author}{$current_author}
                   {details} },
@@ -310,12 +307,11 @@ LINE:
           }
           elsif ( $current_line->as_HTML =~ /<b>/ ) {
             if ( $current_line->as_text eq $current_author ) {
-
-              # Ignore the author that was already handled.
+              ## Skip $current_author - already handled.
               next;
             }
 
-            # Handle the new author for an existing letter.
+            ## Handle the new author for an existing letter.
             $current_author = $current_line->as_text;
             push @{ $current_letter{author}{$current_author}
                   {name} },
@@ -325,11 +321,7 @@ LINE:
             next;    # Get data for this new author.
           }
           else {
-
-            ## In <b> loop, found line that does not match a, 
-            ## b, or i tags.
-            ## Assume it marks the end of the letter.
-            ## Save it, then start to read next letter.
+            ## Assume end of the letter found.
             last;
           }
 
@@ -344,8 +336,7 @@ LINE:
 
         ## Separate each letter in this array w/ newline, for
         ## better appearance on screen.
-        push @all_letters_to_editor,
-            { letter_content => "\n" };
+        push @all_letters_to_editor, { letter_content => "\n" };
 
       }    # End of <b> loop.
     }    # End LINE loop.
@@ -368,9 +359,9 @@ LINE:
   say "\nLetters to the Editor from $source_name",
       " for web site date $pub_date_raw\n";
   foreach (@all_letters_to_editor) {
-    say { $application->{output_fh} } wrap ("\t", '  ', values %{$_});
+    say { $application->{output_fh} }
+        wrap( "\t", '  ', values %{$_} );
   }
-
 
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
