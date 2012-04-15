@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 06:29:29 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 06:42:29 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -26,28 +26,18 @@
 use strict;
 use warnings;
 
-#TBD use Carp;
 use Data::Dumper;
 use File::Path qw(remove_tree make_path);
 use File::Slurp;
 use Getopt::Long;
 use HTML::Element::Library;
-
-#TBD use HTML::Entities;
 use HTML::TreeBuilder;
-
 use JSON;
 use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
-
-#TBD use DateTime;
 use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
-
-#TBD use autodie ;
-#TBD use Storable;
-#TBD use IO::Zlib;
 
 my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
@@ -55,21 +45,17 @@ our $VERSION = '0.10';
 # Initialize
 my $source_name = "wsj";
 my $domain_name = "wsj.com";
-
-my $msg;
-
-# Initialize
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
+
 my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
-my $now = localtime;
-my $dt;
 my $authors_count;
-my $letters_count;
 my %current_letter = ();
 my $daily_dir;
 my $data_src = "unknown, maybe __DATA__";
+my $dt;
+my $letters_count;
 
 my $log_dir = "./log";
 my $log_file = $log_dir . "$program.log";
@@ -84,7 +70,6 @@ Log::Log4perl->easy_init(
   }
 );
 
-
 unless ( GetOptions( 'start_url=s' => \$start_url, ) ) {
   die usage();
 }
@@ -94,8 +79,6 @@ unless ($start_url) {
       usage();
 }
 
-my $mech = WWW::Mechanize->new();
-$mech->agent_alias('Linux Mozilla');
 
 #TBD Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
 __PACKAGE__->new->run unless caller;
@@ -106,19 +89,17 @@ sub run { #------------------------------------------------------
 
   DEBUG("Started run() at $start_time");
 
-  ##
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-
   my $rootdir   = ".";                #CFG
-
 
   ##OPT-DBG
   init_dirs( $rootdir, "/WebScrape/wsj/tmp" );
 
-  ##
   ## Get start page w/ data.  ------------------------------------
+  my $mech = WWW::Mechanize->new();
+  $mech->agent_alias('Linux Mozilla');
   my $start_page;
   my $tree;
   if ($USE_LOCAL_DATA) {
@@ -355,7 +336,7 @@ LINE:
       . " in $source_name.\n"
       . "  Found $authors_count authors for"
       . " $letters_count letters to the editor\n"
-      . "  in $source_name, for web site date $pub_date_raw.\n";
+      . "  in $source_name, for web site content dated $pub_date_raw.\n";
 
   DEBUG($end_msg1);
   print { $application->{output_fh} } $end_msg1 . "\n";
