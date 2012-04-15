@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 06:14:45 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 06:29:29 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -59,6 +59,8 @@ my $domain_name = "wsj.com";
 my $msg;
 
 # Initialize
+my $start_url
+    = qq{http://online.wsj.com/public/page/letters.html};    #CFG
 my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
 my $now = localtime;
@@ -67,12 +69,10 @@ my $authors_count;
 my $letters_count;
 my %current_letter = ();
 my $daily_dir;
+my $data_src = "unknown, maybe __DATA__";
 
-#
 my $log_dir = "./log";
 my $log_file = $log_dir . "$program.log";
-
-my $data_src = "unknown, maybe __DATA__";
 
 # Set up logging.  Specify level, eg:
 # level => $DEBUG,
@@ -84,8 +84,7 @@ Log::Log4perl->easy_init(
   }
 );
 
-my $start_url
-    = qq{http://online.wsj.com/public/page/letters.html};    #CFG
+
 unless ( GetOptions( 'start_url=s' => \$start_url, ) ) {
   die usage();
 }
@@ -112,14 +111,10 @@ sub run { #------------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
 
-  #TBD my $rootdir   = $ENV{HOME};                #CFG
   my $rootdir   = ".";                #CFG
-  #TBR my $outputdir = "p/WebScrape/data/wsj/lte";    #CFG
-  #TBR init_dirs( $rootdir, $outputdir );
 
 
   ##OPT-DBG
-  #ORG init_dirs( $rootdir, "/p/WebScrape/data/wsj/tmp" );
   init_dirs( $rootdir, "/WebScrape/wsj/tmp" );
 
   ##
@@ -140,14 +135,13 @@ sub run { #------------------------------------------------------
     ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.1Letter.1author.data.raw");
     ## OK "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.raw");
     ## TST "$rootdir/p/WebScrape/data/wsj/wsj.lte.2letters.italics.inside.raw");
-    $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "local copy of web page";
   }
   else {
     $start_page = get_start_page( $mech, $start_url );
-    $tree     = HTML::TreeBuilder->new_from_content($start_page);
     $data_src = "web";
   }
+  $tree     = HTML::TreeBuilder->new_from_content($start_page);
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
