@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 02:53:49 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 04:59:32 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -303,7 +303,7 @@ LINE:
           }
 
           ##TBF Sat2012_0414_14:42  Chg to elsif?
-          if ( $current_line->as_HTML =~ /<i>/ ) {
+          elsif ( $current_line->as_HTML =~ /<i>/ ) {
             push @{ $current_letter{author}{$current_author}
                   {details} },
                 $current_line->as_text;
