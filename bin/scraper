@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 07:06:57 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 14 07:18:13 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -131,7 +131,8 @@ sub run { #------------------------------------------------------
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
 
-  ## TBF b.9. serverTime may be 1-2 days before printed date of wsj.
+  ## TBF b.9. serverTime may be different from the date when
+  ## the letters are printed in the wsj newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw)
       = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
@@ -167,18 +168,11 @@ TOPIC:
     $current_topic =~ s/\s+$//;
     say "DBG topic: ", $current_topic;
 
-    ##TBD Make the sub a pattern match? Using the exact heading
-    ## may cause a problem.
-    ##
-    ## Use the as_text() method instead of as_HTML(); the latter
-    ## caused failures when $topic_start included an apostrophe
-    ## that must be escaped (may fail w/ other symbols too).
     $topic_start = $topic_parent->look_down(
       _tag => 'h1',
       sub { $_[0]->as_text =~ qr{$current_topic}i }
     );
 
-    ## TBD Caught problems.  Used for debug; maybe rm it now.
     if ($topic_start) {
       @lines_under_a_topic = $topic_start->siblings;
       $topic_number++;
@@ -196,7 +190,7 @@ TOPIC:
     my $prior_author = '';
     my $letter_line;
 
-    ## Separate each topic in this array w/ newline.
+    ## Add newline for better readability on screen.
     push @all_letters_to_editor, { letter_content => "\n" };
 
     ## First loop for letters.
@@ -250,7 +244,7 @@ LINE:
           if ( $current_line->as_HTML =~ /<a/ ) {
             ## Not reliable marker for end of letter.  See b.21.
 
-            ## Separate each topic in this array w/ newline.
+            ## Add newline for better readability on screen.
             push @all_letters_to_editor,
                 { letter_content => "\n" };
 
@@ -293,8 +287,7 @@ LINE:
         $letters_count++;
         save_letter_to_file( \%current_letter );
 
-        ## Separate each letter in this array w/ newline, for
-        ## better appearance on screen.
+        ## Add newline for better readability on screen.
         push @all_letters_to_editor, { letter_content => "\n" };
 
       }    # End of <b> loop.
