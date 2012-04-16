@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 15 06:26:50 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 15 06:29:19 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -89,8 +89,6 @@ sub run { #------------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
   my $rootdir = ".";    #CFG
-
-  init_dir( $rootdir . "/WebScrape/wsj/tmp" );
 
   ## Get start page w/ data.  ------------------------------------
   my $mech = WWW::Mechanize->new();
