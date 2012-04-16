@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 14 10:17:33 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 15 06:26:50 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -336,13 +336,20 @@ sub usage { #----------------------------------------------------
 Usage:
   $program
 
-$program requests the Wall Street Journal web site to
-return a page, then extracts letters to the editor,
+$program requests a page from the Wall Street Journal web site,
+then extracts letters to the editor,
 and saves them and displays them.
 
-See all letters for one day in the file all_letters.
+Output data is stored by default in and below the dir
+where the program was run.
 
-See JSON output files at wsj/yyyy/mmdd/NN.
+See all letters for one day in the file ./all_letters.
+
+See the letters collected each day that the program was run
+in JSON formatted files at ./wsj/yyyy/mmdd/NN,
+where the path depends on year, month, and day on the
+web page, which can be different from the newspaper's 
+publication date.
 
 eousage
 }
@@ -443,4 +450,196 @@ sub initialize_output_dir {
   init_dir($daily_dir);
   return $daily_dir;
 }
+
+
+
+
+# Comment template 
+  #########################################################
+  # Usage      : n/a 
+  # Purpose    : Hold useful code & notes for Perl programs.
+  # Returns    : n/a
+  # Parameters : n/a
+  # Throws     : no exceptions
+  # Comments   : Copy this file into a new program file
+  #            : and remove what is not needed and customize
+  #            : what remains.
+  # See Also   : n/a
+  # Status     : Usable as-is, and needs clean-up.
+  #########################################################
+
+
+
+
+
+__END__
+
+=head1 scraper
+
+scraper - Get a web page, select data, show & save the results.
+
+
+=head1 DESCRIPTION
+
+A full description of the app & features.
+May include many subsections (ie, =head2, =head3, etc).
+
+This program is part of a project to test concepts and code
+that may be included in a Perl module and related software
+for web scraping, parsing, interpretation, and analysis.
+
+This program uses WWW::Mechanize to get the web page;
+HTML::TreeBuilder, HTML::Element, and regular expressions
+to organize, navigate, and extract desired content.
+Output data is shown on screen, and JSON formatted
+files are saved to disk for collection and analysis.
+
+The program is hard-coded to use The Wall Street Journal's
+web page that contains
+the letters to the editor.
+Those letters are extracted and saved,
+along with author name(s) and data.
+The headline for each letter is stored as its topic.
+
+
+
+=head1 DIAGNOSTICS
+
+A list of every error & warning msg that the app can
+generate (even the ones that will "never happen"), w/ a full
+explanation of each problem, one or more likely causes, and
+any suggested remedies.  If the app generates exit status
+codes (eg, under Unix), then list the exit status associated
+w/ each error.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+A full explanation of any config systems used by the app,
+including names & locations of any config files, & the
+meaning of any env vars or properties that can be set.
+These descriptions must also include details of any config
+language used.
+
+
+=head1 DEPENDENCIES
+
+A list of all the other programs & modules that this one
+relies on, including any restrictions on versions, & an
+indication of whether these required modules are part of the
+standard Perl distribution, part of the program's
+distribution, or must be installed separately.
+
+
+=head1 INCOMPATIBILITIES
+
+A list of any programs or modules that this program cannot
+be used in conjunction with.  This may be due to name
+conflicts in the i/f, or competition for system or program
+resources, or due to internal limitations of Perl (eg, many
+modules that use source code filters are mutually
+incompatible).
+
+
+=head1 BUGS AND LIMITATIONS
+
+A list of known problems, together w/ some indication of
+whether they are likely to be fixed in an upcoming release.
+
+Also a list of restrictions on the features the module does
+provide: data types that cannot be handled, performance
+issues and the circumstances in which they may arise,
+practical limitations on the size of data sets, special
+cases that are not (yet) handled, etc.
+
+There are no known bugs in this program.
+Please report problems to the maintainer,
+C. Poda, at
+clp78 at poda dot net
+Patches are welcome.
+
+
+=head1 EXAMPLES
+
+Provide a /demo dir w/ well-commented examples.
+Add examples in the documentation, because the demos might
+not always be avbl.
+
+
+=head1 FAQ: FREQUENTLY ASKED QUESTIONS
+
+Correct answers to common questions.
+
+
+=head1 COMMON USAGE MISTAKES
+
+List of common misunderstandings, misconceptions, & correct
+alternatives.  Eg, perltrap manpage.
+
+
+=head1 TODO
+
+Notes on bugs to be fixed, 
+features to be added,
+design issues to be considered.
+
+Bugs and features can be officially entered and tracked in
+the bug data base.
+
+
+=head1 HISTORY
+
+Some notes on changes made to the program design or code
+over time, before it was committed to the version control
+system, eg, CVS.
+
+
+=head1 SEE ALSO
+
+Other modules and apps to this program.
+Other documentation that can help users, including books,
+articles, web pages.
+
+Engineering Wiki at TBD.
+Search for TBD.
+
+Documents for the project at TBD server:
+http://TBD
+
+
+
+
+=head1 (DISCLAIMER OF) WARRANTY
+
+Provide real, legal notice for any s/w that might be used
+outside the organization.
+Maybe start w/ GPL clauses 11 & 12 at
+http://www.gnu.org/copyleft/gpl.html.
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Identify contributors, bug fixers, to encourage others.
+
+
+
+=head1 AUTHOR
+
+C. Poda  clp78 at poda dot net
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) C. Poda
+clp78 at poda dot net.  All rights reserved.
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.  See
+L<perlartistic>.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.
+
 
