@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 15 06:29:19 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 15 06:47:43 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -39,7 +39,7 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -111,8 +111,7 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  init_dir( $rootdir . "/wsj/lte" );
-  my $raw_dir = "$rootdir/wsj/lte";
+  my ($raw_dir) = init_dir( $rootdir . "/wsj/lte" );
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   ## TBF b.9. serverTime may be different from the date when
@@ -417,9 +416,9 @@ sub save_raw_data { #--------------------------------------------
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
-  write_file( "tree_builder_dump_as_html", $tree->as_HTML )
+  write_file( "$raw_dir/tree_builder_dump_as_html", $tree->as_HTML )
       or DEBUG("ERR save_raw_data(): $!");
-  write_file( "tree_builder_dump_as_text",
+  write_file( "$raw_dir/tree_builder_dump_as_text",
     { binmode => ':utf8' },
     $tree->as_text )
       or DEBUG("ERR save_raw_data(): $!");
