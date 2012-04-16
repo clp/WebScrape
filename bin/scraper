@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 15 06:47:43 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 15 06:52:58 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -357,6 +357,7 @@ sub init_dir {  #------------------------------------------------
     remove_tree("$dir");
   }
   make_path("$dir");
+  return $dir;
 }
 
 sub get_start_page { #-------------------------------------------
