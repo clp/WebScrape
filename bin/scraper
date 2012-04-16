@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 15 06:52:58 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 15 07:07:17 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -39,7 +39,7 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -58,7 +58,9 @@ my $dt;
 my $letters_count;
 
 my $log_dir  = "./log";
-my $log_file = $log_dir . "$program.log";
+if ( ! -d $log_dir ) {
+  make_path("$log_dir");
+}
 
 # Set up logging.  Specify level, eg:
 # level => $DEBUG,
@@ -66,7 +68,7 @@ my $log_file = $log_dir . "$program.log";
 # level  => $WARN,
 Log::Log4perl->easy_init(
   { level => $DEBUG,
-    file  => ">>$program.debug.log"
+    file  => ">>$log_dir/$program.debug.log"
   }
 );
 
@@ -83,7 +85,7 @@ sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime();
 
-  DEBUG("Started run() at $start_time");
+  DEBUG("$0: Started run() at $start_time");
 
   ## Initialize --------------------------------------------------
   $authors_count = 0;
