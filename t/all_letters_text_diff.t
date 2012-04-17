@@ -2,7 +2,9 @@
 
 use Test::More tests => 1;
 
-my $program_under_test = "perl " . "~/p/WebScrape/" . "bin/scraper.pm";
+# NOTE: Must be in the correct dir to run the program,
+# for this test to pass, eg, the install dir.
+my $program_under_test = "perl " . "./bin/scraper.pm";
 system $program_under_test;
 
 my $test_output_filename = "all_letters";
