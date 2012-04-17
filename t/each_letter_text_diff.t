@@ -1,37 +1,31 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 
-my $project_dir = "~/p/WebScrape/";
-my $program_under_test = "perl " . $project_dir . "bin/scraper";
-
-my $outdir = "wsj/2012/mmdd";
+my $program_under_test = "perl " . "~/p/WebScrape/" . "bin/scraper.pm";
+system $program_under_test;
 
 my $diff_out_saved 
-= qq{Files wsj/2012/mmdd/1 and refout/wsj/2012/0323/1 are identical
-Files wsj/2012/mmdd/10 and refout/wsj/2012/0323/10 are identical
-Files wsj/2012/mmdd/11 and refout/wsj/2012/0323/11 are identical
-Files wsj/2012/mmdd/12 and refout/wsj/2012/0323/12 are identical
-Files wsj/2012/mmdd/13 and refout/wsj/2012/0323/13 are identical
-Files wsj/2012/mmdd/2 and refout/wsj/2012/0323/2 are identical
-Files wsj/2012/mmdd/3 and refout/wsj/2012/0323/3 are identical
-Files wsj/2012/mmdd/4 and refout/wsj/2012/0323/4 are identical
-Files wsj/2012/mmdd/5 and refout/wsj/2012/0323/5 are identical
-Files wsj/2012/mmdd/6 and refout/wsj/2012/0323/6 are identical
-Files wsj/2012/mmdd/7 and refout/wsj/2012/0323/7 are identical
-Files wsj/2012/mmdd/8 and refout/wsj/2012/0323/8 are identical
-Files wsj/2012/mmdd/9 and refout/wsj/2012/0323/9 are identical
+= qq{Files wsj/2012/0408/01 and refout/wsj/2012/0408/01 are identical
+Files wsj/2012/0408/02 and refout/wsj/2012/0408/02 are identical
+Files wsj/2012/0408/03 and refout/wsj/2012/0408/03 are identical
+Files wsj/2012/0408/04 and refout/wsj/2012/0408/04 are identical
+Files wsj/2012/0408/05 and refout/wsj/2012/0408/05 are identical
+Files wsj/2012/0408/06 and refout/wsj/2012/0408/06 are identical
+Files wsj/2012/0408/07 and refout/wsj/2012/0408/07 are identical
+Files wsj/2012/0408/08 and refout/wsj/2012/0408/08 are identical
+Files wsj/2012/0408/09 and refout/wsj/2012/0408/09 are identical
+Files wsj/2012/0408/10 and refout/wsj/2012/0408/10 are identical
+Files wsj/2012/0408/11 and refout/wsj/2012/0408/11 are identical
+Files wsj/2012/0408/12 and refout/wsj/2012/0408/12 are identical
 };
 
 # Compare two files on disk: reference o/p to program under test o/p.
-my $ref_out = "refout/wsj/2012/0323";
+my $outdir = "wsj/2012/0408";
+my $ref_out = "refout/wsj/2012/0408";
 my $diff_out = `diff -s  $outdir $ref_out`;
 like( $diff_out, qr{Files wsj.*and refout/wsj.*are.identical.*}, "Some letter files are identical.");
 
-# Compare two dirs on disk: reference o/p to program under test o/p.
-my $diff_count = `diff -s  $outdir $ref_out|wc`;
-like( $diff_count, qr{.*13.*78.*827.*}, "Found 13 o/p files.");
-
 # Compare entire o/p from diff cmd.
-is( $diff_out, $diff_out_saved, "diff output is identical for 13 files.");
+is( $diff_out, $diff_out_saved, "diff output is identical for 12 files.");
 
