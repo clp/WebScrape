@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 17 11:13:43 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 17 11:14:56 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -59,8 +59,8 @@ my $data_src = "unknown, maybe __DATA__";
 my $dt;
 my $letters_count;
 
-my $log_dir  = "./log";
-if ( ! -d $log_dir ) {
+my $log_dir = "./log";
+if ( !-d $log_dir ) {
   make_path("$log_dir");
 }
 
@@ -103,8 +103,7 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      "$rootdir/data/wsj/wsj.lte.full.2012_0408.raw"
-    );
+      "$rootdir/data/wsj/wsj.lte.full.2012_0408.raw" );
     $data_src = "local copy of web page";
   }
   else {
@@ -196,7 +195,7 @@ LINE:
       ## author data, then return to LINE loop.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## Handle all following lines # as author data, 
+        ## Handle all following lines # as author data,
         ## until end of current letter.
         $authors_count++;
         $current_author = $letter_line->as_text;
@@ -282,7 +281,7 @@ LINE:
   use Text::Wrap;
   say "\nLetters to the Editor from $source_name",
       " web site, dated $pub_date_raw\n";
-  binmode $application->{output_fh} , ':utf8';
+  binmode $application->{output_fh}, ':utf8';
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} } wrap( "\t", '  ', $_ );
   }
@@ -424,12 +423,14 @@ sub save_raw_data { #--------------------------------------------
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
-  write_file( "$raw_dir/tree_builder_dump_as_html", $tree->as_HTML )
+  write_file( "$raw_dir/tree_builder_dump_as_html",
+    $tree->as_HTML )
       or DEBUG("ERR save_raw_data(): $!");
-  write_file( "$raw_dir/tree_builder_dump_as_text",
+  write_file(
+    "$raw_dir/tree_builder_dump_as_text",
     { binmode => ':utf8' },
-    $tree->as_text )
-      or DEBUG("ERR save_raw_data(): $!");
+    $tree->as_text
+  ) or DEBUG("ERR save_raw_data(): $!");
 }
 
 sub extract_topics { #-------------------------------------------
@@ -456,26 +457,19 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
-
-
-
-# Comment template 
-  #########################################################
-  # Usage      : n/a 
-  # Purpose    : Hold useful code & notes for Perl programs.
-  # Returns    : n/a
-  # Parameters : n/a
-  # Throws     : no exceptions
-  # Comments   : Copy this file into a new program file
-  #            : and remove what is not needed and customize
-  #            : what remains.
-  # See Also   : n/a
-  # Status     : Usable as-is, and needs clean-up.
-  #########################################################
-
-
-
-
+# Comment template
+#########################################################
+# Usage      : n/a
+# Purpose    : Hold useful code & notes for Perl programs.
+# Returns    : n/a
+# Parameters : n/a
+# Throws     : no exceptions
+# Comments   : Copy this file into a new program file
+#            : and remove what is not needed and customize
+#            : what remains.
+# See Also   : n/a
+# Status     : Usable as-is, and needs clean-up.
+#########################################################
 
 __END__
 
