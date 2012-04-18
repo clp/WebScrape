@@ -7,6 +7,8 @@ use Test::More tests => 2;
 my $program_under_test = "perl " . "./bin/scraper.pm";
 system $program_under_test;
 
+#TBD Must use o/p of PUT in the diff operation for useful results.
+
 my $diff_out_saved 
 = qq{Files wsj/2012/0408/01 and refout/wsj/2012/0408/01 are identical
 Files wsj/2012/0408/02 and refout/wsj/2012/0408/02 are identical
