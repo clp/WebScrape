@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 17 03:38:20 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 17 11:13:43 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -282,6 +282,7 @@ LINE:
   use Text::Wrap;
   say "\nLetters to the Editor from $source_name",
       " web site, dated $pub_date_raw\n";
+  binmode $application->{output_fh} , ':utf8';
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} } wrap( "\t", '  ', $_ );
   }
@@ -489,19 +490,21 @@ A full description of the app & features.
 May include many subsections (ie, =head2, =head3, etc).
 
 This program is part of a project to test concepts and code
-that may be included in a Perl module and related software
+for a Perl module
 for web scraping, parsing, interpretation, and analysis.
 
 This program uses WWW::Mechanize to get the web page;
-HTML::TreeBuilder, HTML::Element, and regular expressions
+HTML::TreeBuilder, HTML::Element::Library, and regular expressions
 to organize, navigate, and extract desired content.
-Output data is shown on screen, and JSON formatted
-files are saved to disk for collection and analysis.
+Output data is shown on screen, and
+is saved to disk
+in JSON formatted files
+for analysis.
 
-The program is hard-coded to use The Wall Street Journal's
+This test code is hard-coded to use The Wall Street Journal's
 web page that contains
 the letters to the editor.
-Those letters are extracted and saved,
+Those letters are extracted,
 along with author name(s) and data.
 The headline for each letter is stored as its topic.
 
