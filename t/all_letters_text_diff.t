@@ -2,7 +2,7 @@
 
 use Test::More tests => 1;
 
-# NOTE: Must be in the correct dir to run the program,
+# TBD: Must be in the correct dir to run the program,
 # for this test to pass, eg, the install dir.
 my $program_under_test = "perl " . "./bin/scraper.pm";
 system $program_under_test;
