@@ -22,7 +22,7 @@ Files out/wsj/2012/0408/11 and refout/wsj/2012/0408/11 are identical
 Files out/wsj/2012/0408/12 and refout/wsj/2012/0408/12 are identical
 };
 
-# Compare two dirs on disk: reference o/p to program under test o/p.
+# Compare two dirs on disk: reference o/p and program under test o/p.
 my $outdir = "out/wsj/2012/0408";
 my $ref_out = "refout/wsj/2012/0408";
 my $diff_out = `diff -s  $outdir $ref_out`;

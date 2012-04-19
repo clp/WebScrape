@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 19 09:12:55 AMAM clpoda>
+# Time-stamp: <Thu 2012 Apr 19 03:54:02 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -41,7 +41,7 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
