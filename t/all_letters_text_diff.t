@@ -7,7 +7,8 @@ use Test::More tests => 1;
 my $program_under_test = "perl " . "./bin/scraper.pm";
 system $program_under_test;
 
-my $test_output_filename = "all_letters";
+my $raw_dir = "raw/wsj/ltte";
+my $test_output_filename = "$raw_dir/all_letters";
 my $ref_output_filename = "all_letters_text_2012_0408";
 
 # Compare two files on disk: reference o/p to program under test o/p.

@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 18 02:55:37 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 18 06:54:39 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -103,7 +103,7 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      "$rootdir/data/wsj/wsj.lte.full.2012_0408.raw" );
+      "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw" );
     $data_src = "local copy of web page";
   }
   else {
@@ -114,7 +114,7 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  my ($raw_dir) = init_dir( $rootdir . "/wsj/lte" );
+  my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
   save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   ## TBF b.9. serverTime may be different from the date when
@@ -270,11 +270,11 @@ LINE:
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
-  write_file( "all_letters", "" );
+  write_file( "$raw_dir/all_letters", "" );
   foreach (@all_letters_to_editor) {
-    append_file( "all_letters", { binmode => ':utf8' }, $_ )
-        or DEBUG("ERR Failed to write to all_letters: $!");
-    append_file( "all_letters", { binmode => ':utf8' }, "\n" );
+    append_file( "$raw_dir/all_letters", { binmode => ':utf8' }, $_ )
+        or DEBUG("ERR Failed to write to $raw_dir/all_letters: $!");
+    append_file( "$raw_dir/all_letters", { binmode => ':utf8' }, "\n" );
   }
 
   ## Print all letters to screen.
@@ -345,7 +345,9 @@ and saves them and displays them.
 Output data is stored by default in and below the dir
 where the program was run.
 
-See all letters for one day in the file ./all_letters.
+See all letters for one day in the file ./<raw_dir>/all_letters,
+where <raw_dir> is source/category, eg, wsj/ltte.  The program
+overwrites this file every time it runs.
 
 See the letters collected each day that the program was run
 in JSON formatted files at ./wsj/yyyy/mmdd/NN,
@@ -413,13 +415,13 @@ sub save_raw_data { #--------------------------------------------
 
   ## Save structured view of web page.
   my $treeout;
-  open( $treeout, '>', "$raw_dir/wsj.lte.treedump" );
+  open( $treeout, '>', "$raw_dir/wsj.ltte.treedump" );
   binmode $treeout, ':utf8';
   $tree->dump($treeout);
   close($treeout);
 
   ## Save raw downloaded page & decoded content for debugging.
-  my $page_file = "$source_name.lte.raw";
+  my $page_file = "$source_name.ltte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
@@ -452,7 +454,7 @@ sub initialize_output_dir {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir = "./wsj/" . $dt->year . "/" . $m . $d;
+  my $daily_dir = "./out/wsj/" . $dt->year . "/" . $m . $d ;
   init_dir($daily_dir);
   return $daily_dir;
 }
