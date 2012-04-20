@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 12:46:42 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 02:43:33 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -107,7 +107,7 @@ sub run { #------------------------------------------------------
     $data_src = "local copy of web page";
   }
   else {
-    $start_page = get_start_page( $mech, $start_url );
+    $start_page = get_start_page( $mech );
     $data_src = "web";
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
@@ -132,7 +132,7 @@ sub run { #------------------------------------------------------
 
   ## This save step uses $dt during debug.
   my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
-  save_raw_data( $source_id, $raw_dir, $start_page, $tree );
+  save_raw_data( $raw_dir, $start_page, $tree );
 
   ## Get topic data.
   my @all_letters_to_editor;
@@ -370,7 +370,7 @@ sub init_dir {  #------------------------------------------------
 }
 
 sub get_start_page { #-------------------------------------------
-  my ( $mech, $start_url ) = @_;
+  my ( $mech ) = @_;
   my $response = '';
   try {
     $response = $mech->get($start_url);
@@ -413,7 +413,7 @@ sub save_letter_to_file { #--------------------------------------
 }
 
 sub save_raw_data { #--------------------------------------------
-  my ( $source_id, $raw_dir, $start_page, $tree ) = @_;
+  my ( $raw_dir, $start_page, $tree ) = @_;
 
   ## Save structured view of web page.
   my $treeout;
@@ -444,6 +444,7 @@ sub save_raw_data { #--------------------------------------------
       $start_page )
         or DEBUG("ERR save_raw_data(): $!");
   }
+  return;
 }
 
 sub extract_topics { #-------------------------------------------
