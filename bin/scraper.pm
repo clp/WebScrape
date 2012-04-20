@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 19 09:31:27 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 19 10:00:13 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -46,7 +46,7 @@ my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
-my $source_name = "wsj";
+my $source_id = "wsj";
 my $domain_name = "wsj.com";
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
@@ -134,7 +134,7 @@ sub run { #------------------------------------------------------
 
   ## This save step uses $dt during debug.
   my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
-  save_raw_data( $source_name, $raw_dir, $start_page, $tree );
+  save_raw_data( $source_id, $raw_dir, $start_page, $tree );
 
   ## Get topic data.
   my @all_letters_to_editor;
@@ -281,7 +281,7 @@ LINE:
 
   ## Print all letters to screen.
   use Text::Wrap;
-  say "\nLetters to the Editor from $source_name",
+  say "\nLetters to the Editor from $source_id",
       " web site, dated $pub_date_raw\n";
   binmode $application->{output_fh}, ':utf8';
   foreach (@all_letters_to_editor) {
@@ -296,10 +296,10 @@ LINE:
   $end_msg1
       = "\nSummary of $0:\n"
       . "  Using data src ,$data_src, for letters to the editor"
-      . " in $source_name.\n"
+      . " in $source_id.\n"
       . "  Found $authors_count authors for"
       . " $letters_count letters to the editor\n"
-      . "  in $source_name, for web site content dated $pub_date_raw.\n";
+      . "  in $source_id, for web site content dated $pub_date_raw.\n";
 
   DEBUG($end_msg1);
   print { $application->{output_fh} } $end_msg1 . "\n";
@@ -413,7 +413,7 @@ sub save_letter_to_file { #--------------------------------------
 }
 
 sub save_raw_data { #--------------------------------------------
-  my ( $source_name, $raw_dir, $start_page, $tree ) = @_;
+  my ( $source_id, $raw_dir, $start_page, $tree ) = @_;
 
   ## Save structured view of web page.
   my $treeout;
@@ -425,7 +425,7 @@ sub save_raw_data { #--------------------------------------------
   ## Save temporary copy of raw downloaded page & decoded 
   ## content for debugging.  These files are overwritten each
   ## time the program is run.
-  my $page_file = "$source_name.ltte.raw";
+  my $page_file = "$source_id.ltte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
