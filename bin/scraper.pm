@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 19 10:03:46 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 09:37:41 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -42,7 +42,7 @@ use Try::Tiny;
 use feature qw( switch say );
 
 my $DEBUGMODE = 1;
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -207,6 +207,10 @@ LINE:
         ## Assume the <b> tag marks end of letter body.
         $current_letter{body}  = $current_letter_text;
         $current_letter{topic} = $current_topic;
+        my $current_category = "LTTE";
+        $current_letter{category} = $current_category;
+        $current_letter{source_id} = $source_id;
+        $current_letter{web_page_date} = $pub_date_raw;
 
         ## Clear the var to prepare for next letter.
         $current_letter_text = '';
