@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 02:43:33 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 02:58:36 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -28,6 +28,7 @@ package scraper;
 use strict;
 use warnings;
 
+use autodie;
 use Carp;
 use Data::Dumper;
 use File::Path qw(remove_tree make_path);
@@ -75,9 +76,8 @@ Log::Log4perl->easy_init(
 );
 
 unless ($start_url) {
-  die
-      "$program died: No url found in file or on command line.\n\n",
-      usage();
+  croak "No url found in file or on command line.",
+  usage();
 }
 
 #TBD Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
@@ -378,14 +378,14 @@ sub get_start_page { #-------------------------------------------
   catch {
     ## TBD Use $! or $_ or $response?
     DEBUG($_);
-    die "ERR: Cannot get web page [$start_url]; try later.";
+    croak "ERR: Cannot get web page [$start_url]; try later.";
   };
 
   if ( !$response->is_success ) {
     my $msg = "Bad response to request for [$start_url]: "
         . $response->status_line;
     DEBUG($msg);
-    die
+    croak
         "ERR: Got bad response to request for [$start_url]; try later.";
   }
   return $mech->content();
@@ -410,6 +410,7 @@ sub save_letter_to_file { #--------------------------------------
       DEBUG("ERR Failed to write to file $daily_dir/$count: $!");
 
   %current_letter = ();
+  return;
 }
 
 sub save_raw_data { #--------------------------------------------
@@ -468,7 +469,7 @@ sub initialize_output_dir {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir
+  $daily_dir
       = "./out/wsj/" . $dt->year . "/" . $m . $d . "_" . $H . $M;
   init_dir($daily_dir);
   return $daily_dir;
