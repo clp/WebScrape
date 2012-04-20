@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 11:57:50 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 12:27:05 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -172,7 +172,7 @@ TOPIC:
     my $current_author      = '';
     my $current_letter_text = '';
     my $prior_author        = '';
-    my $letter_line;
+    my $current_line;
 
     ## Add newline for better readability on screen.
     push @all_letters_to_editor, "\n";
@@ -180,23 +180,23 @@ TOPIC:
     ## First loop for letters.
 LINE:
     while (@lines_under_a_topic) {
-      $letter_line = shift @lines_under_a_topic;
+      $current_line = shift @lines_under_a_topic;
 
-      if ($letter_line) {
-        push @all_letters_to_editor, $letter_line->as_text;
-        $current_letter_text .= $letter_line->as_text;
+      if ($current_line) {
+        push @all_letters_to_editor, $current_line->as_text;
+        $current_letter_text .= $current_line->as_text;
       }
       else {
         next LINE;
       }
 
       ## AUTHOR handling code.
-      if ( $letter_line->as_HTML =~ /<b>/ ) {
+      if ( $current_line->as_HTML =~ /<b>/ ) {
 
         ## Extract all remaining data to end of letter as
         ## author data, then return to LINE loop.
         $authors_count++;
-        $current_author = $letter_line->as_text;
+        $current_author = $current_line->as_text;
         $current_letter{author}{$current_author}{name}
             = $current_author;
 
@@ -211,7 +211,7 @@ LINE:
         $current_letter_text = '';
 
         ## Loop to get current author data.
-        my $current_line;
+        #TBR my $current_line;
         while (@lines_under_a_topic) {
           $current_line = shift @lines_under_a_topic;
 
