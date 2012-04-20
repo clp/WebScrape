@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 02:58:36 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 03:07:10 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -304,6 +304,7 @@ LINE:
 
   DEBUG($end_msg1);
   print { $application->{output_fh} } $end_msg1 . "\n";
+  return;
 
 }    # End of run().
 
@@ -417,8 +418,7 @@ sub save_raw_data { #--------------------------------------------
   my ( $raw_dir, $start_page, $tree ) = @_;
 
   ## Save structured view of web page.
-  my $treeout;
-  open( $treeout, '>', "$raw_dir/wsj.ltte.treedump" );
+  open( my $treeout, '>', "$raw_dir/wsj.ltte.treedump" );
   binmode $treeout, ':utf8';
   $tree->dump($treeout);
   close($treeout);
