@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 19 03:54:02 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 19 09:31:27 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -41,7 +41,8 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $DEBUGMODE = 1;
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -114,9 +115,6 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
-  save_raw_data( $source_name, $raw_dir, $start_page, $tree );
-
   ## TBF b.9. serverTime may be different from the date when
   ## the letters are printed in the newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
@@ -133,6 +131,10 @@ sub run { #------------------------------------------------------
     carp $date_parser->error;
     DEBUG $date_parser->error;
   }
+
+  ## This save step uses $dt during debug.
+  my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
+  save_raw_data( $source_name, $raw_dir, $start_page, $tree );
 
   ## Get topic data.
   my @all_letters_to_editor;
@@ -420,7 +422,9 @@ sub save_raw_data { #--------------------------------------------
   $tree->dump($treeout);
   close($treeout);
 
-  ## Save raw downloaded page & decoded content for debugging.
+  ## Save temporary copy of raw downloaded page & decoded 
+  ## content for debugging.  These files are overwritten each
+  ## time the program is run.
   my $page_file = "$source_name.ltte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
@@ -433,6 +437,13 @@ sub save_raw_data { #--------------------------------------------
     { binmode => ':utf8' },
     $tree->as_text
   ) or DEBUG("ERR save_raw_data(): $!");
+
+  ## Save a permanent copy while debugging.
+  if ($DEBUGMODE) {
+    write_file( "$daily_dir/$page_file", { binmode => ':utf8' },
+      $start_page )
+        or DEBUG("ERR save_raw_data(): $!");
+  }
 }
 
 sub extract_topics { #-------------------------------------------
@@ -447,14 +458,16 @@ sub extract_topics { #-------------------------------------------
 sub initialize_output_dir {
   my $m = $dt->month;
   my $d = $dt->day;
+  my $H = $dt->hour;
+  my $M = $dt->minute;
 
   ## Add leading zeroes to values used in path, including file
   ## name, to get 2-digit strings.
-  for ( $m, $d ) {
+  for ( $m, $d, $H, $M ) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir = "./out/wsj/" . $dt->year . "/" . $m . $d ;
+  my $daily_dir = "./out/wsj/" . $dt->year . "/" . $m . $d. "_". $H.$M ;
   init_dir($daily_dir);
   return $daily_dir;
 }
