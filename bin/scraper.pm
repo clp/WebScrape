@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 09:37:41 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 11:34:51 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -41,12 +41,12 @@ use DateTime::Format::Natural;
 use Try::Tiny;
 use feature qw( switch say );
 
-my $DEBUGMODE = 1;
+my $DEBUGMODE      = 1;
 my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
-my $source_id = "wsj";
+my $source_id   = "wsj";
 my $domain_name = "wsj.com";
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
@@ -104,7 +104,7 @@ sub run { #------------------------------------------------------
     ## Read the local file into $start_page for correct handling
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
-      "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw" );
+      "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw");
     $data_src = "local copy of web page";
   }
   else {
@@ -208,8 +208,8 @@ LINE:
         $current_letter{body}  = $current_letter_text;
         $current_letter{topic} = $current_topic;
         my $current_category = "LTTE";
-        $current_letter{category} = $current_category;
-        $current_letter{source_id} = $source_id;
+        $current_letter{category}      = $current_category;
+        $current_letter{source_id}     = $source_id;
         $current_letter{web_page_date} = $pub_date_raw;
 
         ## Clear the var to prepare for next letter.
@@ -278,9 +278,12 @@ LINE:
   ## Save data from all letters found.
   write_file( "$raw_dir/all_letters", "" );
   foreach (@all_letters_to_editor) {
-    append_file( "$raw_dir/all_letters", { binmode => ':utf8' }, $_ )
-        or DEBUG("ERR Failed to write to $raw_dir/all_letters: $!");
-    append_file( "$raw_dir/all_letters", { binmode => ':utf8' }, "\n" );
+    append_file( "$raw_dir/all_letters", { binmode => ':utf8' },
+      $_ )
+        or
+        DEBUG("ERR Failed to write to $raw_dir/all_letters: $!");
+    append_file( "$raw_dir/all_letters", { binmode => ':utf8' },
+      "\n" );
   }
 
   ## Print all letters to screen.
@@ -426,7 +429,7 @@ sub save_raw_data { #--------------------------------------------
   $tree->dump($treeout);
   close($treeout);
 
-  ## Save temporary copy of raw downloaded page & decoded 
+  ## Save temporary copy of raw downloaded page & decoded
   ## content for debugging.  These files are overwritten each
   ## time the program is run.
   my $page_file = "$source_id.ltte.raw";
@@ -471,7 +474,8 @@ sub initialize_output_dir {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  my $daily_dir = "./out/wsj/" . $dt->year . "/" . $m . $d. "_". $H.$M ;
+  my $daily_dir
+      = "./out/wsj/" . $dt->year . "/" . $m . $d . "_" . $H . $M;
   init_dir($daily_dir);
   return $daily_dir;
 }
