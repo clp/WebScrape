@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 03:13:25 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 04:30:14 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -545,7 +545,49 @@ author block,
 .  If a line with no <b>, <i>, or <a> tag is found,
 the end of the author data and the letter has been reached.
 
+=head2 TBD Description of sub C<extract_topics()>
 
+TBD
+
+=head2 TBD Description of sub C<get_start_page()>
+
+TBD
+
+=head2 TBD Description of sub C<init()>
+
+TBD
+
+=head2 TBD Description of sub C<init_dir()>
+
+TBD
+
+=head2 TBD Description of sub C<initialize_output_dir()>
+
+TBD
+
+=head2 TBD Description of sub C<new()>
+
+TBD
+
+=head2 TBD Description of sub C<output_fh()>
+
+TBD
+
+=head2 TBD Description of sub C<run()>
+
+TBD
+
+=head2 TBD Description of sub C<save_letter_to_file()>
+
+TBD
+
+=head2 TBD Description of sub C<save_raw_data()>
+
+TBD
+
+=head2 TBD Description of sub C<usage()>
+
+TBD
 
 
 
