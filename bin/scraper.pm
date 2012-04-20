@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 12:27:05 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 12:46:42 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -177,7 +177,7 @@ TOPIC:
     ## Add newline for better readability on screen.
     push @all_letters_to_editor, "\n";
 
-    ## First loop for letters.
+    ## Loop to get letter data under a topic.
 LINE:
     while (@lines_under_a_topic) {
       $current_line = shift @lines_under_a_topic;
@@ -211,7 +211,6 @@ LINE:
         $current_letter_text = '';
 
         ## Loop to get current author data.
-        #TBR my $current_line;
         while (@lines_under_a_topic) {
           $current_line = shift @lines_under_a_topic;
 
@@ -308,7 +307,6 @@ LINE:
 
 }    # End of run().
 
-#TBR exit 1;
 1;
 
 #
@@ -523,6 +521,12 @@ The headline for each letter is stored as its topic.
 
 =head2 ASSUMPTIONS
 
+These assumptions are based on viewing the HTML
+code on the web pages of interest over some time.
+The HTML can change and make these assumptions false.
+At that point,
+the code might need to be modified to handle the new data format.
+
 One major assumption when handling the text of a letter
 is that the first <b> tag identifies the first author's name,
 and marks end of that letter's body.
@@ -530,6 +534,15 @@ All text from that tag to the end of the current letter
 is the name of an author and any related data,
 such as title, affiliation,
 location, or comment about the author.
+
+The end of a letter is determined in these ways.
+
+.  If an anchor tag is found while reading lines from the
+author block,
+
+.  If a line with no <b>, <i>, or <a> tag is found,
+the end of the author data and the letter has been reached.
+
 
 
 
