@@ -3,7 +3,7 @@
 
 use Test::More tests => 3;
 
-my $class = 'scraper';
+my $class = 'Scraper';
   use_ok( $class ) || print "Bail out! 
   ";
 
@@ -20,4 +20,4 @@ like( $output_string,
   qr/Using data src ,local copy of web page, for letters to the editor in wsj./ ,
   "Got WSJ letters summary line when using local i/p data.");
 
-diag( "Testing scraper $scraper::VERSION, Perl $], $^X" );
+diag( "Testing Scraper $Scraper::VERSION, Perl $], $^X" );
