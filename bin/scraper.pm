@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 11:34:51 AMAM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 11:57:50 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -42,12 +42,11 @@ use Try::Tiny;
 use feature qw( switch say );
 
 my $DEBUGMODE      = 1;
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
 my $source_id   = "wsj";
-my $domain_name = "wsj.com";
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
 
@@ -123,7 +122,6 @@ sub run { #------------------------------------------------------
   my $date_parser = DateTime::Format::Natural->new();
   $dt = $date_parser->parse_datetime($pub_date_raw);
 
-  ## TBD Move to where $dt is used?
   if ( $date_parser->success ) {
     $daily_dir = initialize_output_dir();
   }
@@ -192,23 +190,20 @@ LINE:
         next LINE;
       }
 
-      ## Author handling code.
-      ## Extract all remaining data to end of letter as
-      ## author data, then return to LINE loop.
+      ## AUTHOR handling code.
       if ( $letter_line->as_HTML =~ /<b>/ ) {
 
-        ## Handle all following lines # as author data,
-        ## until end of current letter.
+        ## Extract all remaining data to end of letter as
+        ## author data, then return to LINE loop.
         $authors_count++;
         $current_author = $letter_line->as_text;
         $current_letter{author}{$current_author}{name}
             = $current_author;
 
-        ## Assume the <b> tag marks end of letter body.
-        $current_letter{body}  = $current_letter_text;
-        $current_letter{topic} = $current_topic;
-        my $current_category = "LTTE";
-        $current_letter{category}      = $current_category;
+        ## Assume the first <b> tag marks end of letter body.
+        $current_letter{body}          = $current_letter_text;
+        $current_letter{topic}         = $current_topic;
+        $current_letter{category}      = "LTTE";  # Letters to the Editor
         $current_letter{source_id}     = $source_id;
         $current_letter{web_page_date} = $pub_date_raw;
 
@@ -524,6 +519,18 @@ the letters to the editor.
 Those letters are extracted,
 along with author name(s) and data.
 The headline for each letter is stored as its topic.
+
+
+=head2 ASSUMPTIONS
+
+One major assumption when handling the text of a letter
+is that the first <b> tag identifies the first author's name,
+and marks end of that letter's body.
+All text from that tag to the end of the current letter
+is the name of an author and any related data,
+such as title, affiliation,
+location, or comment about the author.
+
 
 
 
