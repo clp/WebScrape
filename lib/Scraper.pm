@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 05:17:44 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 11:55:46 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -43,7 +43,7 @@ use Try::Tiny;
 use feature qw( switch say );
 
 my $DEBUGMODE      = 1;
-my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -75,7 +75,7 @@ Log::Log4perl->easy_init(
   }
 );
 
-$start_url = '';
+#TBD $start_url = '';
 unless ($start_url) {
   croak "Die: No URL found in file or on command line.\n",
   usage();
@@ -320,13 +320,14 @@ sub new { #------------------------------------------------------
   my ($class) = @_;
   my $application = bless {}, $class;
   $application->init;
-  $application;
+  return $application;
 }
 
 sub init { #-----------------------------------------------------
   ## TBD Add some or all init code here later.
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
+  return;
 }
 
 sub output_fh { #------------------------------------------------
@@ -334,7 +335,7 @@ sub output_fh { #------------------------------------------------
   if ($fh) {
     $application->{output_fh} = $fh;
   }
-  $application->{output_fh};
+  return $application->{output_fh};
 }
 
 sub usage { #----------------------------------------------------
