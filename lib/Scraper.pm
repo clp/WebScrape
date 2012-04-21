@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 12:51:37 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 01:38:13 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -49,7 +49,7 @@ our $VERSION = '0.10';
 # Initialize
 my $source_id   = 'wsj';
 my $start_url
-    = qq{http://online.wsj.com/public/page/letters.html};    #CFG
+    = q{http://online.wsj.com/public/page/letters.html};    #CFG
 
 my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
@@ -76,24 +76,25 @@ Log::Log4perl->easy_init(
 );
 
 #TBD $start_url = '';
-unless ($start_url) {
+if (!$start_url) {
   croak "Die: No URL found in file or on command line.\n",
   usage();
 }
 
-#TBD Based on Index.pm modulino code, Sun2012_0318_16:46: keep or toss?
-__PACKAGE__->new->run unless caller;
+# Modulino: use as a module if a caller exists; otherwise run as a program.
+#ORG __PACKAGE__->new->run unless caller;
+__PACKAGE__->new->run if ! caller;
 
 sub run { #------------------------------------------------------
   my ($application) = @_;
-  my $start_time = localtime();
+  my $start_time = localtime;
 
   DEBUG("$0: Started run() at $start_time");
 
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-  my $rootdir = '.';    #CFG
+  my $rootdir = q{.};    #CFG
 
   ## Get start page w/ data.  ------------------------------------
   my $mech = WWW::Mechanize->new();
@@ -364,7 +365,7 @@ TBD:
 See the letters collected each day that the program was run
 in JSON formatted files at .out/wsj/ltte/yyyy/mmdd/NN.
 The path depends on year, month, and day specified in the
-web page, which can be different from day that those letters
+web page, which can be different from the day that those letters
 were published in the newspaper.
 
 EOUSAGE
