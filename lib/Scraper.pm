@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 20 04:30:14 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 20 05:17:44 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -43,11 +43,11 @@ use Try::Tiny;
 use feature qw( switch say );
 
 my $DEBUGMODE      = 1;
-my $USE_LOCAL_DATA = 1;    # 1=Do not query web site.
+my $USE_LOCAL_DATA = 0;    # 1=Do not query web site.
 our $VERSION = '0.10';
 
 # Initialize
-my $source_id   = "wsj";
+my $source_id   = 'wsj';
 my $start_url
     = qq{http://online.wsj.com/public/page/letters.html};    #CFG
 
@@ -56,11 +56,11 @@ $program =~ s{\A.*/}{};    # strip leading path, if any
 my $authors_count;
 my %current_letter = ();
 my $daily_dir;
-my $data_src = "unknown, maybe __DATA__";
+my $data_src = 'unknown, maybe __DATA__';
 my $dt;
 my $letters_count;
 
-my $log_dir = "./log";
+my $log_dir = './log';
 if ( !-d $log_dir ) {
   make_path("$log_dir");
 }
@@ -75,8 +75,9 @@ Log::Log4perl->easy_init(
   }
 );
 
+$start_url = '';
 unless ($start_url) {
-  croak "No url found in file or on command line.",
+  croak "Die: No URL found in file or on command line.\n",
   usage();
 }
 
@@ -92,7 +93,7 @@ sub run { #------------------------------------------------------
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-  my $rootdir = ".";    #CFG
+  my $rootdir = '.';    #CFG
 
   ## Get start page w/ data.  ------------------------------------
   my $mech = WWW::Mechanize->new();
@@ -104,11 +105,11 @@ sub run { #------------------------------------------------------
     ## of raw data, regardless of which branch is taken.
     $start_page = read_file(
       "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw");
-    $data_src = "local copy of web page";
+    $data_src = 'local copy of web page';
   }
   else {
     $start_page = get_start_page( $mech );
-    $data_src = "web";
+    $data_src = 'web';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
 
@@ -131,7 +132,7 @@ sub run { #------------------------------------------------------
   }
 
   ## This save step uses $dt during debug.
-  my ($raw_dir) = init_dir( $rootdir . "/raw/wsj/ltte" );
+  my ($raw_dir) = init_dir( $rootdir . '/raw/wsj/ltte' );
   save_raw_data( $raw_dir, $start_page, $tree );
 
   ## Get topic data.
@@ -140,7 +141,7 @@ sub run { #------------------------------------------------------
 
   my $topic_parent = $tree->look_down(
     _tag  => 'div',
-    class => "",
+    class => '',
   );
 
   my @lines_under_a_topic;
@@ -203,7 +204,7 @@ LINE:
         ## Assume the first <b> tag marks end of letter body.
         $current_letter{body}          = $current_letter_text;
         $current_letter{topic}         = $current_topic;
-        $current_letter{category}      = "LTTE";  # Letters to the Editor
+        $current_letter{category}      = 'LTTE';  # Letters to the Editor
         $current_letter{source_id}     = $source_id;
         $current_letter{web_page_date} = $pub_date_raw;
 
@@ -270,7 +271,7 @@ LINE:
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
-  write_file( "$raw_dir/all_letters", "" );
+  write_file( "$raw_dir/all_letters", '' );
   foreach (@all_letters_to_editor) {
     append_file( "$raw_dir/all_letters", { binmode => ':utf8' },
       $_ )
@@ -337,28 +338,31 @@ sub output_fh { #------------------------------------------------
 }
 
 sub usage { #----------------------------------------------------
-  return <<"eousage";
+  return <<EOUSAGE;
 Usage:
-  $program
+  perl $program
 
 $program requests a page from the Wall Street Journal web site,
 then extracts letters to the editor,
 and saves them and displays them.
 
-Output data is stored by default in and below the dir
-where the program was run.
+$program is a modulino, and can be executed as an application
+or used as a module.
 
-See all letters for one day in the file ./<raw_dir>/all_letters,
-where <raw_dir> is source/category, eg, wsj/ltte.  The program
-overwrites this file every time it runs.
+Output data is stored in the ./raw/ and ./out/ dir trees.
 
+TBD:
+See all letters for one day in the file ./raw/wsj/all_letters.
+The program overwrites this file every time it runs.
+
+TBD:
 See the letters collected each day that the program was run
-in JSON formatted files at ./wsj/yyyy/mmdd/NN,
+in JSON formatted files at .out/wsj/ltte/yyyy/mmdd/NN,
 where the path depends on year, month, and day on the
 web page, which can be different from the newspaper's 
 publication date.
 
-eousage
+EOUSAGE
 }
 
 sub init_dir {  #------------------------------------------------
