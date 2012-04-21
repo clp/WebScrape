@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 01:49:54 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 02:51:23 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -76,7 +76,8 @@ Log::Log4perl->easy_init(
   }
 );
 
-#TBD $start_url = '';
+#TBD 
+$start_url = q{};  # Empty string; to test usage().
 if (!$start_url) {
   croak "Die: No URL found in file or on command line.\n",
   usage();
@@ -148,7 +149,7 @@ sub run { #------------------------------------------------------
 
   my $topic_parent = $tree->look_down(
     _tag  => 'div',
-    class => '',
+    class => q{},  # Empty string
   );
 
   my @lines_under_a_topic;
@@ -177,9 +178,9 @@ TOPIC:
       next TOPIC;
     }
 
-    my $current_author      = '';
-    my $current_letter_text = '';
-    my $prior_author        = '';
+    my $current_author      = q{};  # Empty string
+    my $current_letter_text = q{};  # Empty string
+    my $prior_author        = q{};  # Empty string
     my $current_line;
 
     ## Add newline for better readability on screen.
@@ -216,7 +217,7 @@ LINE:
         $current_letter{web_page_date} = $pub_date_raw;
 
         ## Clear the var to prepare for next letter.
-        $current_letter_text = '';
+        $current_letter_text = q{}; # Empty string
 
         ## Loop to get current author data.
         while (@lines_under_a_topic) {
@@ -278,7 +279,7 @@ LINE:
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
-  write_file( "$raw_dir/all_letters", '' );
+  write_file( "$raw_dir/all_letters", q{} );  # Init to empty string
   foreach (@all_letters_to_editor) {
     append_file( "$raw_dir/all_letters", { binmode => ':utf8' },
       $_ )
@@ -294,7 +295,7 @@ LINE:
       " web site, dated $pub_date_raw\n";
   binmode $application->{output_fh}, ':utf8';
   foreach (@all_letters_to_editor) {
-    say { $application->{output_fh} } wrap( "\t", '  ', $_ );
+    say { $application->{output_fh} } wrap( "\t", q{  }, $_ );
   }
 
   ##---------------------------------------------------------------
@@ -346,7 +347,7 @@ sub output_fh { #------------------------------------------------
 }
 
 sub usage { #----------------------------------------------------
-  return <<EOUSAGE;
+  return <<"END_USAGE";
 Usage:
   perl $program
 
@@ -374,7 +375,7 @@ The path depends on year, month, and day specified in the
 web page, which can be different from the day that those letters
 were published in the newspaper.
 
-EOUSAGE
+END_USAGE
 }
 
 sub init_dir {  #------------------------------------------------
@@ -413,7 +414,7 @@ sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
   my $count              = $letters_count;
 
-  ## Add leading zeroes to get 2-character strings.
+  ## Add leading zeroes to get 2-character strings, eg, 01-09.
   for ($count) {
     $_ = '0' . $_ if $_ <= 9;
   }
@@ -434,10 +435,10 @@ sub save_raw_data { #--------------------------------------------
   my ( $raw_dir, $start_page, $tree ) = @_;
 
   ## Save structured view of web page.
-  open( my $treeout, '>', "$raw_dir/wsj.ltte.treedump" );
+  open my $treeout, '>', "$raw_dir/wsj.ltte.treedump" ;
   binmode $treeout, ':utf8';
   $tree->dump($treeout);
-  close($treeout);
+  close $treeout;
 
   ## Save temporary copy of raw downloaded page & decoded
   ## content for debugging.  These files are overwritten each
@@ -446,9 +447,11 @@ sub save_raw_data { #--------------------------------------------
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
+
   write_file( "$raw_dir/tree_builder_dump_as_html",
     $tree->as_HTML )
       or DEBUG("ERR save_raw_data(): $!");
+
   write_file(
     "$raw_dir/tree_builder_dump_as_text",
     { binmode => ':utf8' },
@@ -480,13 +483,13 @@ sub initialize_output_dir {
   my $M = $dt->minute;
 
   ## Add leading zeroes to values used in path, including file
-  ## name, to get 2-digit strings.
+  ## name, to get 2-digit strings, eg, 01-09.
   for ( $m, $d, $H, $M ) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
   $daily_dir
-      = "./out/wsj/" . $dt->year . "/" . $m . $d . "_" . $H . $M;
+      = './out/wsj/' . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
   init_dir($daily_dir);
   return $daily_dir;
 }
@@ -739,7 +742,7 @@ clp78 at poda dot net.  All rights reserved.
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.  See
-L<perlartistic>.
+L<Perl Artistic License|perlartistic>.
 
 This program is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied
