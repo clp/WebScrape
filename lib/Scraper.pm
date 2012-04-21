@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 11:55:46 AMAM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 12:51:37 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -293,7 +293,7 @@ LINE:
   ##---------------------------------------------------------------
   ## Print summary stats at end of the program.
 
-  my $done_time = localtime();
+  my $done_time = localtime;
   my ($end_msg1);
   $end_msg1
       = "\nSummary of $0:\n"
@@ -343,25 +343,29 @@ sub usage { #----------------------------------------------------
 Usage:
   perl $program
 
-$program requests a page from the Wall Street Journal web site,
-then extracts letters to the editor,
-and saves them and displays them.
+$program requests a page from a web site,
+extracts the specified content,
+and saves it and displays it.
+
+This version is hard-coded to get letters to the editor, ltte,
+from the Wall Street Journal newspaper web site.
 
 $program is a modulino, and can be executed as an application
 or used as a module.
 
-Output data is stored in the ./raw/ and ./out/ dir trees.
+Output data is stored in the ./raw and ./out dir trees.
 
 TBD:
-See all letters for one day in the file ./raw/wsj/all_letters.
+See all the letters for one day, in the file 
+./raw/wsj/all_letters.
 The program overwrites this file every time it runs.
 
 TBD:
 See the letters collected each day that the program was run
-in JSON formatted files at .out/wsj/ltte/yyyy/mmdd/NN,
-where the path depends on year, month, and day on the
-web page, which can be different from the newspaper's 
-publication date.
+in JSON formatted files at .out/wsj/ltte/yyyy/mmdd/NN.
+The path depends on year, month, and day specified in the
+web page, which can be different from day that those letters
+were published in the newspaper.
 
 EOUSAGE
 }
@@ -377,7 +381,7 @@ sub init_dir {  #------------------------------------------------
 
 sub get_start_page { #-------------------------------------------
   my ( $mech ) = @_;
-  my $response = '';
+  my $response = q{};  # Empty string
   try {
     $response = $mech->get($start_url);
   }
@@ -404,7 +408,7 @@ sub save_letter_to_file { #--------------------------------------
 
   ## Add leading zeroes to get 2-character strings.
   for ($count) {
-    $_ = "0" . $_ if $_ <= 9;
+    $_ = '0' . $_ if $_ <= 9;
   }
 
   write_file(
