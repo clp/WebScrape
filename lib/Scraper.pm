@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 01:38:13 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 01:49:54 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -40,6 +40,7 @@ use Log::Log4perl qw(:easy);
 use WWW::Mechanize;
 use DateTime::Format::Natural;
 use Try::Tiny;
+use charnames qw( :full );
 use feature qw( switch say );
 
 my $DEBUGMODE      = 1;
@@ -120,7 +121,12 @@ sub run { #------------------------------------------------------
   ## the letters are printed in the newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw)
-      = $tree->as_HTML =~ qr{serverTime = new Date\("(.*?)"\)};
+      = $tree->as_HTML =~ qr{
+        serverTime \s+ = \s+ new \s+ Date
+        \N{LEFT PARENTHESIS}
+        "(.*?)"                 # Date & time in quotes
+        \N{RIGHT PARENTHESIS}
+      }msx;
   my $date_parser = DateTime::Format::Natural->new();
   $dt = $date_parser->parse_datetime($pub_date_raw);
 
