@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 08:33:38 AMAM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 12:33:54 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -44,7 +44,7 @@ use Try::Tiny;
 use charnames qw( :full );
 use feature qw( switch say );
 
-my $DEBUGMODE      = 1;
+my $DEBUGMODE      = 4;  # 1: don't print everything; 2: print more; 5: print most
 my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
 
@@ -79,8 +79,9 @@ Log::Log4perl->easy_init(
 
 #TBD $start_url = q{};  # Empty string; to test usage().
 if (!$start_url) {
-  croak "Die: No URL found in file or on command line.\n",
+  carp "Die: No URL found in file or on command line.";
   usage();
+  exit;
 }
 
 
@@ -91,7 +92,6 @@ parse_cmd_line ();
 
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
-#ORG __PACKAGE__->new->run unless caller;
 __PACKAGE__->new->run if ! caller;
 
 sub run { #------------------------------------------------------
@@ -297,12 +297,16 @@ LINE:
   }
 
   ## Print all letters to screen.
+
+  if ($DEBUGMODE > 3) {
   use Text::Wrap;
-  say "\nLetters to the Editor from $source_id",
+  say { $application->{output_fh} }
+      "\nLetters to the Editor from $source_id",
       " web site, dated $pub_date_raw\n";
   binmode $application->{output_fh}, ':utf8';
   foreach (@all_letters_to_editor) {
     say { $application->{output_fh} } wrap( "\t", q{  }, $_ );
+  }
   }
 
   ##---------------------------------------------------------------
@@ -354,7 +358,7 @@ sub output_fh { #------------------------------------------------
 }
 
 sub usage { #----------------------------------------------------
-  return <<"END_USAGE";
+  print <<"END_USAGE";
 Usage:
   perl $program
 
@@ -513,8 +517,8 @@ sub parse_cmd_line {
                  'verbose'        => \$verbose,
                  'test'           => \$test,
   );
-  #
-  if ($help) { usage; exit 2; }
+
+  if ($help) { usage; exit; }
   #
   #TBR if not needed: 
   if ($directory) {
@@ -524,12 +528,11 @@ sub parse_cmd_line {
   }
   else {
     usage();
-    #ORG print "Error: No dir seen at cmd line; specify absolute path, eg, /home/cpoda/p/lawful_intercept.\n###\n";
     print "ERR parse_cmd_line(): Missing directory string.";
-    #ORG exit 3;
+    exit;
   }
   #
-  if ($verbose) { $verbose = 1 }
+  if ($verbose) { $verbose = 1 ; }
   #
   if ($test) { $USE_LOCAL_DATA = 1 }
   #
