@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 11:02:40 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 11:18:38 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -426,7 +426,7 @@ sub save_letter_to_file { #--------------------------------------
   }
 
   write_file(
-    "./$daily_dir/$count",
+    "./$daily_dir/ltte_$count.json",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
       )
@@ -454,12 +454,12 @@ sub save_raw_data { #--------------------------------------------
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
 
-  write_file( "$raw_dir/tree_builder_dump_as_html",
+  write_file( "$raw_dir/wsj.ltte.dump.html",
     $tree->as_HTML )
       or DEBUG("ERR save_raw_data(): $!");
 
   write_file(
-    "$raw_dir/tree_builder_dump_as_text",
+    "$raw_dir/wsj.ltte.dump.txt",
     { binmode => ':utf8' },
     $tree->as_text
   ) or DEBUG("ERR save_raw_data(): $!");

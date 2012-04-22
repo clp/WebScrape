@@ -8,18 +8,18 @@ my $program_under_test = "perl " . "./lib/Scraper.pm";
 system $program_under_test;
 
 my $diff_out_saved 
-= qq{Files out/wsj/2012/0408_1903/01 and refout/wsj/2012/0408_1903/01 are identical
-Files out/wsj/2012/0408_1903/02 and refout/wsj/2012/0408_1903/02 are identical
-Files out/wsj/2012/0408_1903/03 and refout/wsj/2012/0408_1903/03 are identical
-Files out/wsj/2012/0408_1903/04 and refout/wsj/2012/0408_1903/04 are identical
-Files out/wsj/2012/0408_1903/05 and refout/wsj/2012/0408_1903/05 are identical
-Files out/wsj/2012/0408_1903/06 and refout/wsj/2012/0408_1903/06 are identical
-Files out/wsj/2012/0408_1903/07 and refout/wsj/2012/0408_1903/07 are identical
-Files out/wsj/2012/0408_1903/08 and refout/wsj/2012/0408_1903/08 are identical
-Files out/wsj/2012/0408_1903/09 and refout/wsj/2012/0408_1903/09 are identical
-Files out/wsj/2012/0408_1903/10 and refout/wsj/2012/0408_1903/10 are identical
-Files out/wsj/2012/0408_1903/11 and refout/wsj/2012/0408_1903/11 are identical
-Files out/wsj/2012/0408_1903/12 and refout/wsj/2012/0408_1903/12 are identical
+= qq{Files out/wsj/2012/0408_1903/ltte_01.json and refout/wsj/2012/0408_1903/ltte_01.json are identical
+Files out/wsj/2012/0408_1903/ltte_02.json and refout/wsj/2012/0408_1903/ltte_02.json are identical
+Files out/wsj/2012/0408_1903/ltte_03.json and refout/wsj/2012/0408_1903/ltte_03.json are identical
+Files out/wsj/2012/0408_1903/ltte_04.json and refout/wsj/2012/0408_1903/ltte_04.json are identical
+Files out/wsj/2012/0408_1903/ltte_05.json and refout/wsj/2012/0408_1903/ltte_05.json are identical
+Files out/wsj/2012/0408_1903/ltte_06.json and refout/wsj/2012/0408_1903/ltte_06.json are identical
+Files out/wsj/2012/0408_1903/ltte_07.json and refout/wsj/2012/0408_1903/ltte_07.json are identical
+Files out/wsj/2012/0408_1903/ltte_08.json and refout/wsj/2012/0408_1903/ltte_08.json are identical
+Files out/wsj/2012/0408_1903/ltte_09.json and refout/wsj/2012/0408_1903/ltte_09.json are identical
+Files out/wsj/2012/0408_1903/ltte_10.json and refout/wsj/2012/0408_1903/ltte_10.json are identical
+Files out/wsj/2012/0408_1903/ltte_11.json and refout/wsj/2012/0408_1903/ltte_11.json are identical
+Files out/wsj/2012/0408_1903/ltte_12.json and refout/wsj/2012/0408_1903/ltte_12.json are identical
 Files out/wsj/2012/0408_1903/wsj.ltte.raw and refout/wsj/2012/0408_1903/wsj.ltte.raw are identical
 };
 
