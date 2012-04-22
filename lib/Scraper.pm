@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 12:33:54 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 03:32:00 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -85,10 +85,12 @@ if (!$start_url) {
 }
 
 
+my $directory;
 my $verbose;
 parse_cmd_line ();
     # Assign $test, $verbose;
-    say "Version: $VERSION" if ($verbose);
+    say "DBG Version: $VERSION" if ($verbose);
+    say "DBG directory: $directory" if ($directory);
 
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
@@ -103,7 +105,9 @@ sub run { #------------------------------------------------------
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-  my $rootdir = q{.};    #CFG
+  ## TBD: Maybe don't use CLI -d arg for $rootdir?-rename it to $input_dir.
+  my $rootdir = $directory ? $directory : q{.};    #CFG
+  my $input_dir = q{.};    #CFG
 
   ## Get start page w/ data.  ------------------------------------
   my $mech = WWW::Mechanize->new();
@@ -113,8 +117,11 @@ sub run { #------------------------------------------------------
   if ($USE_LOCAL_DATA) {
     ## Read the local file into $start_page for correct handling
     ## of raw data by TreeBuilder.
+    ##
+    ## TBD Sun2012_0422_15:20  Keep this path or move?  Is this the only type of i/p file I need?
+    ##
     $start_page = read_file(
-      "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw");
+      "$input_dir/data/wsj/wsj.ltte.full.2012_0408.raw");
     $data_src = 'local copy of web page';
   }
   else {
@@ -508,7 +515,7 @@ sub initialize_output_dir {
 sub parse_cmd_line {
   # Parse cmd line args and handle some now.
   my $dir;
-  my $directory = "bogus_dir";
+  $directory = "bogus_dir";
   my $help;
   my $test;
   my $result = GetOptions (
@@ -529,7 +536,7 @@ sub parse_cmd_line {
   else {
     usage();
     print "ERR parse_cmd_line(): Missing directory string.";
-    exit;
+    #TBR exit;
   }
   #
   if ($verbose) { $verbose = 1 ; }
@@ -660,6 +667,30 @@ TBD
 =head2 TBD Description of sub C<parse_cmd_line()>
 
 TBD
+
+
+=head2 TBD Description of configuration settings required.
+
+TBD
+
+=head2 TBD Description of inputs required.
+
+This i/p file is needed for certain tests to run:
+  C<$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw>
+
+The tests are not required for the program to operate,
+and they can help to ensure it has been installed
+properly and is working in your environment.
+
+The default value of C<$rootdir> is the current dir
+in which the program is run.
+
+If you specify a directory on the cmd line,
+that is assigned to C<$rootdir>,
+which will affect where the program looks for this file.
+
+TBD: Maybe don't use CLI -d arg for $rootdir?
+
 
 
 =head1 DIAGNOSTICS
