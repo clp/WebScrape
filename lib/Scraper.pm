@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 02:51:23 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 05:20:37 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -33,6 +33,7 @@ use Carp;
 use Data::Dumper;
 use File::Path qw(remove_tree make_path);
 use File::Slurp;
+use Getopt::Long;
 use HTML::Element::Library;
 use HTML::TreeBuilder;
 use JSON;
@@ -76,12 +77,18 @@ Log::Log4perl->easy_init(
   }
 );
 
-#TBD 
-$start_url = q{};  # Empty string; to test usage().
+#TBD $start_url = q{};  # Empty string; to test usage().
 if (!$start_url) {
   croak "Die: No URL found in file or on command line.\n",
   usage();
 }
+
+
+my $verbose;
+parse_cmd_line ();
+    # Assign $test, $verbose;
+    say "Version: $VERSION" if ($verbose);
+
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 #ORG __PACKAGE__->new->run unless caller;
@@ -105,7 +112,7 @@ sub run { #------------------------------------------------------
   my $tree;
   if ($USE_LOCAL_DATA) {
     ## Read the local file into $start_page for correct handling
-    ## of raw data, regardless of which branch is taken.
+    ## of raw data by TreeBuilder.
     $start_page = read_file(
       "$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw");
     $data_src = 'local copy of web page';
@@ -321,7 +328,7 @@ LINE:
 
 #
 #
-# Subroutines ---------------------------------------------------
+# Other Subroutines ---------------------------------------------------
 #
 #
 sub new { #------------------------------------------------------
@@ -494,6 +501,48 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
+
+
+
+sub parse_cmd_line {
+  # Parse cmd line args and handle some now.
+  my $dir;
+  my $directory = "bogus_dir";
+  my $help;
+  my $test;
+  my $result = GetOptions (
+                 'help'           => \$help,
+                 'directory=s'    => \$directory,
+                 'verbose'        => \$verbose,
+                 'test'           => \$test,
+  );
+  #
+  if ($help) { usage; exit 2; }
+  #
+  #TBR if not needed: 
+  if ($directory) {
+    $dir = $directory;
+    print "Cmd line values: ";
+    print "  dir:\n  [$dir]\n";
+  }
+  else {
+    usage();
+    #ORG print "Error: No dir seen at cmd line; specify absolute path, eg, /home/cpoda/p/lawful_intercept.\n###\n";
+    print "ERR parse_cmd_line(): Missing directory string.";
+    #ORG exit 3;
+  }
+  #
+  if ($verbose) { $verbose = 1 }
+  #
+  if ($test) { $USE_LOCAL_DATA = 1 }
+  #
+}
+
+
+
+
+
+
 # Comment template
 #########################################################
 # Usage      : n/a
@@ -608,6 +657,9 @@ TBD
 
 TBD
 
+=head2 TBD Description of sub C<parse_cmd_line()>
+
+TBD
 
 
 =head1 DIAGNOSTICS
