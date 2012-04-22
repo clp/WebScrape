@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 05:20:37 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 10:50:50 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -132,7 +132,7 @@ sub run { #------------------------------------------------------
       = $tree->as_HTML =~ qr{
         serverTime \s+ = \s+ new \s+ Date
         \N{LEFT PARENTHESIS}
-        "(.*?)"                 # Date & time in quotes
+        "(.*?)"                 # Date & time inside quotes
         \N{RIGHT PARENTHESIS}
       }msx;
   my $date_parser = DateTime::Format::Natural->new();
@@ -147,7 +147,7 @@ sub run { #------------------------------------------------------
   }
 
   ## This save step uses $dt during debug.
-  my ($raw_dir) = init_dir( $rootdir . '/raw/wsj/ltte' );
+  my ($raw_dir) = init_dir( $rootdir . '/raw/wsj' );
   save_raw_data( $raw_dir, $start_page, $tree );
 
   ## Get topic data.
