@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 03:32:00 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 04:04:07 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -146,7 +146,7 @@ sub run { #------------------------------------------------------
   $dt = $date_parser->parse_datetime($pub_date_raw);
 
   if ( $date_parser->success ) {
-    $daily_dir = initialize_output_dir();
+    $daily_dir = initialize_output_dir($rootdir);
   }
   else {
     carp $date_parser->error;
@@ -436,7 +436,8 @@ sub save_letter_to_file { #--------------------------------------
   }
 
   write_file(
-    "./$daily_dir/ltte_$count.json",
+    #TBR "./$daily_dir/ltte_$count.json",
+    "$daily_dir/ltte_$count.json",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
       )
@@ -492,6 +493,7 @@ sub extract_topics { #-------------------------------------------
 }
 
 sub initialize_output_dir {
+  my $rootdir = shift;
   my $m = $dt->month;
   my $d = $dt->day;
   my $H = $dt->hour;
@@ -504,7 +506,10 @@ sub initialize_output_dir {
   }
 
   $daily_dir
-      = './out/wsj/' . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
+  #ORG = './out/wsj/' . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
+  #F = "$rootdir/out/wsj/$dt->year/$m$d" . q{_} . $H.$M; #   $H$M";
+      = "$rootdir/out/wsj/" . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
+  ## TBD Check for success here & in init_dir?:
   init_dir($daily_dir);
   return $daily_dir;
 }
