@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 21 10:50:50 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 21 11:02:40 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -147,7 +147,7 @@ sub run { #------------------------------------------------------
   }
 
   ## This save step uses $dt during debug.
-  my ($raw_dir) = init_dir( $rootdir . '/raw/wsj' );
+  my ($raw_dir) = init_dir( $rootdir . '/out/wsj/raw' );
   save_raw_data( $raw_dir, $start_page, $tree );
 
   ## Get topic data.
@@ -370,14 +370,13 @@ or used as a module.
 
 Output data is stored in the ./raw and ./out dir trees.
 
-TBD:
-See all the letters for one day, in the file 
+See all the letters for one day, in the file
 ./raw/wsj/all_letters.
 The program overwrites this file every time it runs.
 
 TBD:
 See the letters collected each day that the program was run
-in JSON formatted files at .out/wsj/ltte/yyyy/mmdd/NN.
+in JSON formatted files at .out/wsj/yyyy/mmdd/ltte_NN.json.
 The path depends on year, month, and day specified in the
 web page, which can be different from the day that those letters
 were published in the newspaper.
