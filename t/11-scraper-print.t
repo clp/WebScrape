@@ -17,7 +17,7 @@ $application->output_fh($fh);
 
 $application->run;
 like( $output_string, 
-  qr/Using data src ,local copy of web page, for letters to the editor in wsj./ ,
-  "Got WSJ letters summary line when using local i/p data.");
+  qr{Using data src ,.*, for letters to the editor in wsj.} ,
+  "Got WSJ letters summary line.");
 
 diag( "Testing Scraper $Scraper::VERSION, Perl $], $^X" );
