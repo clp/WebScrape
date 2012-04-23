@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:19:58 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 06:32:34 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -506,9 +506,8 @@ sub initialize_output_dir {
   }
 
   $daily_dir
-  #ORG = './out/wsj/' . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
-      = "$rootdir/out/wsj/" . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
-  ## TBD Check for success here & in init_dir?:
+      = "$rootdir/out/wsj/" . $dt->year . "/$m$d" . "_$H$M";
+  ## TBD Check for success of init_dir here & in init_dir?:
   init_dir($daily_dir);
   return $daily_dir;
 }
