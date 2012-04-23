@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:10:06 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 06:19:58 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -305,7 +305,7 @@ LINE:
 
   ## Print all letters to screen.
 
-  if ($DEBUGMODE > 3) {
+  if ($verbose) {
   use Text::Wrap;
   say { $application->{output_fh} }
       "\nLetters to the Editor from $source_id",
@@ -507,7 +507,6 @@ sub initialize_output_dir {
 
   $daily_dir
   #ORG = './out/wsj/' . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
-  #F = "$rootdir/out/wsj/$dt->year/$m$d" . q{_} . $H.$M; #   $H$M";
       = "$rootdir/out/wsj/" . $dt->year . q{/} . $m.$d . q{_} . $H.$M;
   ## TBD Check for success here & in init_dir?:
   init_dir($daily_dir);
@@ -519,8 +518,6 @@ sub initialize_output_dir {
 
 sub parse_cmd_line {
   # Parse cmd line args and handle some now.
-  my $dir;
-  $directory = "bogus_dir";
   my $help;
   my $test;
   my $result = GetOptions (
@@ -531,21 +528,7 @@ sub parse_cmd_line {
   );
 
   if ($help) { usage; exit; }
-  #
-  #TBR if not needed: 
-  if ($directory) {
-    $dir = $directory;
-    print "Cmd line values: ";
-    print "  dir:\n  [$dir]\n";
-  }
-  else {
-    usage();
-    print "ERR parse_cmd_line(): Missing directory string.";
-    #TBR exit;
-  }
-  #
   if ($verbose) { $verbose = 1 ; }
-  #
   if ($test) { $USE_LOCAL_DATA = 1 }
   #
 }
