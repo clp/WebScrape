@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 23 10:48:29 AMAM clpoda>
+# Time-stamp: <Mon 2012 Apr 23 04:38:07 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -47,7 +47,7 @@ use WWW::Mechanize;
 
 my $DEBUGMODE = 1
     ;   # 1: don't print everything; 2: print more; 5: print most
-my $USE_LOCAL_DATA = 0;    # 0=Query the web site.
+my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -363,7 +363,13 @@ sub output_fh { #------------------------------------------------
 sub usage { #----------------------------------------------------
   print <<"END_USAGE";
 Usage:
-  perl $program
+  perl [options] $program
+
+  Options:
+    --help: Show this usage message.
+    --verbose: Show the output on the screen.
+    --directory <path>: Specify the parent path for o/p data.
+      Default is '.', the current dir.
 
 $program requests a page from a web site,
 extracts the specified content,
@@ -375,7 +381,7 @@ from the Wall Street Journal newspaper web site.
 $program is a modulino, and can be executed as an application
 or used as a module.
 
-Output data is stored in the ./out dir tree.
+Output data is stored in the ./out dir tree by default.
 
 See all the letters for one day, in the file
 ./out/wsj/raw/all_letters.
@@ -386,7 +392,6 @@ in JSON formatted files at ./out/wsj/yyyy/mmdd/ltte_NN.json.
 The path depends on year, month, and day specified in the
 web page, which can be different from the day that those letters
 were published in the newspaper.
-
 END_USAGE
 }
 
