@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:42:37 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 06:49:10 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -44,12 +44,13 @@ use Try::Tiny;
 use charnames qw( :full );
 use feature qw( switch say );
 
-my $DEBUGMODE      = 4;  # 1: don't print everything; 2: print more; 5: print most
+my $DEBUGMODE = 4
+    ;   # 1: don't print everything; 2: print more; 5: print most
 my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
 
 # Initialize
-my $source_id   = 'wsj';
+my $source_id = 'wsj';
 my $start_url
     = q{http://online.wsj.com/public/page/letters.html};    #CFG
 
@@ -78,23 +79,22 @@ Log::Log4perl->easy_init(
 );
 
 #TBD $start_url = q{};  # Empty string; to test usage().
-if (!$start_url) {
+if ( !$start_url ) {
   carp "Die: No URL found in file or on command line.";
   usage();
   exit;
 }
 
-
 my $directory;
 my $verbose;
-parse_cmd_line ();
-    # Assign $test, $verbose;
-    say "DBG Version: $VERSION" if ($verbose);
-    say "DBG directory: $directory" if ($directory);
+parse_cmd_line();
 
+# Assign $test, $verbose;
+say "DBG Version: $VERSION"     if ($verbose);
+say "DBG directory: $directory" if ($directory);
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
-__PACKAGE__->new->run if ! caller;
+__PACKAGE__->new->run if !caller;
 
 sub run { #------------------------------------------------------
   my ($application) = @_;
@@ -106,7 +106,7 @@ sub run { #------------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
   my $rootdir = $directory ? $directory : q{.};    #CFG
-  my $input_dir = q{.};    #CFG
+  my $input_dir = q{.};                            #CFG
 
   ## Get start page w/ data.  ------------------------------------
   my $mech = WWW::Mechanize->new();
@@ -124,8 +124,8 @@ sub run { #------------------------------------------------------
     $data_src = 'local copy of web page';
   }
   else {
-    $start_page = get_start_page( $mech );
-    $data_src = 'web';
+    $start_page = get_start_page($mech);
+    $data_src   = 'web';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
 
@@ -134,8 +134,7 @@ sub run { #------------------------------------------------------
   ## TBF b.9. serverTime may be different from the date when
   ## the letters are printed in the newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
-  my ($pub_date_raw)
-      = $tree->as_HTML =~ qr{
+  my ($pub_date_raw) = $tree->as_HTML =~ qr{
         serverTime \s+ = \s+ new \s+ Date
         \N{LEFT PARENTHESIS}
         "(.*?)"                 # Date & time inside quotes
@@ -162,7 +161,7 @@ sub run { #------------------------------------------------------
 
   my $topic_parent = $tree->look_down(
     _tag  => 'div',
-    class => q{},  # Empty string
+    class => q{},     # Empty string
   );
 
   my @lines_under_a_topic;
@@ -191,9 +190,9 @@ TOPIC:
       next TOPIC;
     }
 
-    my $current_author      = q{};  # Empty string
-    my $current_letter_text = q{};  # Empty string
-    my $prior_author        = q{};  # Empty string
+    my $current_author      = q{};    # Empty string
+    my $current_letter_text = q{};    # Empty string
+    my $prior_author        = q{};    # Empty string
     my $current_line;
 
     ## Add newline for better readability on screen.
@@ -223,14 +222,15 @@ LINE:
             = $current_author;
 
         ## Assume the first <b> tag marks end of letter body.
-        $current_letter{body}          = $current_letter_text;
-        $current_letter{topic}         = $current_topic;
-        $current_letter{category}      = 'LTTE';  # Letters to the Editor
+        $current_letter{body}  = $current_letter_text;
+        $current_letter{topic} = $current_topic;
+        $current_letter{category}
+            = 'LTTE';    # Letters to the Editor
         $current_letter{source_id}     = $source_id;
         $current_letter{web_page_date} = $pub_date_raw;
 
         ## Clear the var to prepare for next letter.
-        $current_letter_text = q{}; # Empty string
+        $current_letter_text = q{};    # Empty string
 
         ## Loop to get current author data.
         while (@lines_under_a_topic) {
@@ -292,7 +292,8 @@ LINE:
 
   ##---------------------------------------------------------------
   ## Save data from all letters found.
-  write_file( "$raw_dir/all_letters", q{} );  # Init to empty string
+  write_file( "$raw_dir/all_letters", q{} )
+      ;    # Init to empty string
   foreach (@all_letters_to_editor) {
     append_file( "$raw_dir/all_letters", { binmode => ':utf8' },
       $_ )
@@ -305,14 +306,14 @@ LINE:
   ## Print all letters to screen.
 
   if ($verbose) {
-  use Text::Wrap;
-  say { $application->{output_fh} }
-      "\nLetters to the Editor from $source_id",
-      " web site, dated $pub_date_raw\n";
-  binmode $application->{output_fh}, ':utf8';
-  foreach (@all_letters_to_editor) {
-    say { $application->{output_fh} } wrap( "\t", q{  }, $_ );
-  }
+    use Text::Wrap;
+    say { $application->{output_fh} }
+        "\nLetters to the Editor from $source_id",
+        " web site, dated $pub_date_raw\n";
+    binmode $application->{output_fh}, ':utf8';
+    foreach (@all_letters_to_editor) {
+      say { $application->{output_fh} } wrap( "\t", q{  }, $_ );
+    }
   }
 
   ##---------------------------------------------------------------
@@ -403,8 +404,8 @@ sub init_dir {  #------------------------------------------------
 }
 
 sub get_start_page { #-------------------------------------------
-  my ( $mech ) = @_;
-  my $response = q{};  # Empty string
+  my ($mech)   = @_;
+  my $response = q{};    # Empty string
   try {
     $response = $mech->get($start_url);
   }
@@ -435,6 +436,7 @@ sub save_letter_to_file { #--------------------------------------
   }
 
   write_file(
+
     #TBR "./$daily_dir/ltte_$count.json",
     "$daily_dir/ltte_$count.json",
     { binmode => ':utf8' },
@@ -451,7 +453,7 @@ sub save_raw_data { #--------------------------------------------
   my ( $raw_dir, $start_page, $tree ) = @_;
 
   ## Save structured view of web page.
-  open my $treeout, '>', "$raw_dir/wsj.ltte.treedump" ;
+  open my $treeout, '>', "$raw_dir/wsj.ltte.treedump";
   binmode $treeout, ':utf8';
   $tree->dump($treeout);
   close $treeout;
@@ -467,11 +469,10 @@ sub save_raw_data { #--------------------------------------------
   write_file( "$raw_dir/wsj.ltte.dump.html", $tree->as_HTML )
       or DEBUG("ERR save_raw_data(): $!");
 
-  write_file(
-    "$raw_dir/wsj.ltte.dump.txt",
+  write_file( "$raw_dir/wsj.ltte.dump.txt",
     { binmode => ':utf8' },
-    $tree->as_text
-  ) or DEBUG("ERR save_raw_data(): $!");
+    $tree->as_text )
+      or DEBUG("ERR save_raw_data(): $!");
 
   ## Save a permanent copy while debugging.
   if ($DEBUGMODE) {
@@ -493,10 +494,10 @@ sub extract_topics { #-------------------------------------------
 
 sub initialize_output_dir {
   my $rootdir = shift;
-  my $m = $dt->month;
-  my $d = $dt->day;
-  my $hh = $dt->hour;
-  my $mm = $dt->minute;
+  my $m       = $dt->month;
+  my $d       = $dt->day;
+  my $hh      = $dt->hour;
+  my $mm      = $dt->minute;
 
   ## Add leading zeroes to values used in path, including file
   ## name, to get 2-digit strings, eg, 01-09.
@@ -511,30 +512,24 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
-
-
-
 sub parse_cmd_line {
+
   # Parse cmd line args and handle some now.
   my $help;
   my $test;
-  my $result = GetOptions (
-                 'help'           => \$help,
-                 'directory=s'    => \$directory,
-                 'verbose'        => \$verbose,
-                 'test'           => \$test,
+  my $result = GetOptions(
+    'help'        => \$help,
+    'directory=s' => \$directory,
+    'verbose'     => \$verbose,
+    'test'        => \$test,
   );
 
   if ($help) { usage; exit; }
-  if ($verbose) { $verbose = 1 ; }
-  if ($test) { $USE_LOCAL_DATA = 1 }
+  if ($verbose) { $verbose        = 1; }
+  if ($test)    { $USE_LOCAL_DATA = 1 }
+
   #
 }
-
-
-
-
-
 
 # Comment template
 #########################################################
