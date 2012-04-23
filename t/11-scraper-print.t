@@ -3,9 +3,12 @@
 
 use Test::More tests => 3;
 
-my $class = 'Scraper';
-  use_ok( $class ) || print "Bail out! 
-  ";
+my $class;
+BEGIN {
+  $class = 'Scraper';
+    use_ok( $class ) || print "Bail out! 
+    ";
+}
 
 my $application = $class->new;
 isa_ok( $application , $class );
