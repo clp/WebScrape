@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 07:04:00 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 07:16:30 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -59,7 +59,6 @@ my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
 my %current_letter = ();
 my $daily_dir;
-my $data_src = 'unknown, maybe __DATA__';
 my $dt;
 my $letters_count;
 
@@ -78,7 +77,6 @@ Log::Log4perl->easy_init(
   }
 );
 
-#TBD $start_url = q{};  # Empty string; to test usage().
 if ( !$start_url ) {
   carp "Die: No URL found in file or on command line.";
   usage();
@@ -89,9 +87,6 @@ my $directory;
 my $verbose;
 parse_cmd_line();
 
-# Assign $test, $verbose;
-say "DBG Version: $VERSION"     if ($verbose);
-say "DBG directory: $directory" if ($directory);
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 __PACKAGE__->new->run if !caller;
@@ -104,6 +99,7 @@ sub run { #------------------------------------------------------
 
   ## Initialize --------------------------------------------------
   my $authors_count = 0;
+  my $data_src = 'unknown, maybe __DATA__';
   $letters_count = 0;
   my $rootdir = $directory ? $directory : q{.};    #CFG
   my $input_dir = q{.};                            #CFG
