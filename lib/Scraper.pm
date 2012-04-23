@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:49:10 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 06:51:15 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -404,7 +404,7 @@ sub init_dir {  #------------------------------------------------
 }
 
 sub get_start_page { #-------------------------------------------
-  my ($mech)   = @_;
+  my ($mech) = @_;
   my $response = q{};    # Empty string
   try {
     $response = $mech->get($start_url);
