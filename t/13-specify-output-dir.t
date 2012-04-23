@@ -13,7 +13,7 @@ if ( -d $d ) {
 }
 make_path($d);
 
-my $program_under_test = "perl " . "./lib/Scraper.pm --directory ./tmp/test";
+my $program_under_test = "perl " . "./lib/Scraper.pm --test --directory ./tmp/test";
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.
