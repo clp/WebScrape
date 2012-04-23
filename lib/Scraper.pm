@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:51:15 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 07:04:00 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -29,8 +29,12 @@ use strict;
 use warnings;
 
 use autodie;
+use charnames qw( :full );
+use feature qw( switch say );
+
 use Carp;
 use Data::Dumper;
+use DateTime::Format::Natural;
 use File::Path qw(remove_tree make_path);
 use File::Slurp;
 use Getopt::Long;
@@ -38,13 +42,10 @@ use HTML::Element::Library;
 use HTML::TreeBuilder;
 use JSON;
 use Log::Log4perl qw(:easy);
-use WWW::Mechanize;
-use DateTime::Format::Natural;
 use Try::Tiny;
-use charnames qw( :full );
-use feature qw( switch say );
+use WWW::Mechanize;
 
-my $DEBUGMODE = 4
+my $DEBUGMODE = 1
     ;   # 1: don't print everything; 2: print more; 5: print most
 my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
@@ -56,7 +57,6 @@ my $start_url
 
 my $program = $0;
 $program =~ s{\A.*/}{};    # strip leading path, if any
-my $authors_count;
 my %current_letter = ();
 my $daily_dir;
 my $data_src = 'unknown, maybe __DATA__';
@@ -103,7 +103,7 @@ sub run { #------------------------------------------------------
   DEBUG("$0: Started run() at $start_time");
 
   ## Initialize --------------------------------------------------
-  $authors_count = 0;
+  my $authors_count = 0;
   $letters_count = 0;
   my $rootdir = $directory ? $directory : q{.};    #CFG
   my $input_dir = q{.};                            #CFG
@@ -431,13 +431,13 @@ sub save_letter_to_file { #--------------------------------------
   my $count              = $letters_count;
 
   ## Add leading zeroes to get 2-character strings, eg, 01-09.
+  ## Must use a temp var here instead of $letters_count.
   for ($count) {
     $_ = '0' . $_ if $_ <= 9;
   }
 
   write_file(
 
-    #TBR "./$daily_dir/ltte_$count.json",
     "$daily_dir/ltte_$count.json",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
