@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 22 06:32:34 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 22 06:42:37 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -105,7 +105,6 @@ sub run { #------------------------------------------------------
   ## Initialize --------------------------------------------------
   $authors_count = 0;
   $letters_count = 0;
-  ## TBD: Maybe don't use CLI -d arg for $rootdir?-rename it to $input_dir.
   my $rootdir = $directory ? $directory : q{.};    #CFG
   my $input_dir = q{.};    #CFG
 
@@ -496,17 +495,17 @@ sub initialize_output_dir {
   my $rootdir = shift;
   my $m = $dt->month;
   my $d = $dt->day;
-  my $H = $dt->hour;
-  my $M = $dt->minute;
+  my $hh = $dt->hour;
+  my $mm = $dt->minute;
 
   ## Add leading zeroes to values used in path, including file
   ## name, to get 2-digit strings, eg, 01-09.
-  for ( $m, $d, $H, $M ) {
+  for ( $m, $d, $hh, $mm ) {
     $_ = "0" . $_ if $_ <= 9;
   }
 
   $daily_dir
-      = "$rootdir/out/wsj/" . $dt->year . "/$m$d" . "_$H$M";
+      = "$rootdir/out/wsj/" . $dt->year . "/$m$d" . "_$hh$mm";
   ## TBD Check for success of init_dir here & in init_dir?:
   init_dir($daily_dir);
   return $daily_dir;
