@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 23 10:05:12 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 24 03:00:47 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -299,10 +299,22 @@ LINE:
       "\n" );
   }
 
-  ## Print all letters to screen.
+  use Text::Wrap qw(wrap);
+  ##---------------------------------------------------------------
+  ## Save formatted letters.
+  write_file( "$raw_dir/all_letters.fmt", q{} )
+      ;    # Init to empty string
+  foreach (@all_letters_to_editor) {
+    append_file( "$raw_dir/all_letters.fmt", { binmode => ':utf8' },
+      wrap( "\t", q{  }, $_ ) )
+        or
+        DEBUG("ERR Failed to write to $raw_dir/all_letters.fmt: $!");
+    append_file( "$raw_dir/all_letters.fmt", { binmode => ':utf8' },
+      "\n" );
+  }
 
+  ## Print all letters to screen.
   if ($verbose) {
-    use Text::Wrap;
     say { $application->{output_fh} }
         "\nLetters to the Editor from $source_id",
         " web site, dated $pub_date_raw\n";
