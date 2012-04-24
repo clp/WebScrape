@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 23 04:38:07 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 23 10:05:12 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -528,8 +528,6 @@ sub parse_cmd_line {
   if ($help) { usage; exit; }
   if ($verbose) { $verbose        = 1; }
   if ($test)    { $USE_LOCAL_DATA = 1 }
-
-  #
 }
 
 # Comment template
