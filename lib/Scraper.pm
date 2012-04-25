@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 25 03:18:57 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 25 03:29:46 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -132,14 +132,14 @@ sub run { #------------------------------------------------------
 
   DEBUG("$0: Started run() at $start_time");
 
-  ## Initialize --------------------------------------------------
+  ## Initialize -------------------------------------------------
   my $authors_count = 0;
   my $data_src      = 'unknown, maybe __DATA__';
   $letters_count = 0;
   my $rootdir = $directory ? $directory : q{.};    #CFG
   my $input_dir = q{.};                            #CFG
 
-  ## Get start page w/ data.  ------------------------------------
+  ## Prepare to get data from local file or web -----------------
   my $mech = WWW::Mechanize->new();
   $mech->agent_alias('Linux Mozilla');
   my $start_page;
@@ -526,7 +526,7 @@ sub init_dir {  #------------------------------------------------
 
 =head2 C<get_start_page( $mech )>
 
-This sub includes a try+catch exception handler
+This sub includes a try+catch block
 around the request to the web server for the desired page.
 A failure is caught and logged,
 so the program does not crash or die silently.
