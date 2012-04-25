@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 24 05:56:12 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 25 01:51:15 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -22,6 +22,42 @@
 # ---------------------------------------------------------------
 
 # For format of the web page: see codenotes.otl file.
+
+=head1 scraper
+
+scraper - Get a web page, select data, show & save the results.
+
+
+=head1 DESCRIPTION
+
+This program is part of a project to test concepts and
+Perl code
+for web scraping, parsing, and analysis.
+
+It uses WWW::Mechanize to get the web page;
+HTML::TreeBuilder, HTML::Element::Library, and regular expressions
+to organize, navigate, and extract desired content.
+A formatted copy of the content is saved and
+shown on screen;
+and each letter can be saved to disk
+in a JSON file
+for more detailed analysis.
+
+This version is hard-coded to use The Wall Street Journal
+newspaper's web page that contains
+the letters to the editor.
+Those letters are extracted,
+along with author name(s) and data.
+The headline for each letter is stored as its topic.
+Some of this documentation is specific to the WSJ web site
+and its pages.
+
+For casual use,
+the program can be used simply to show the retrieved content
+without using a web browser.
+
+=cut
+
 
 package Scraper;
 print "DBG starting package ", __PACKAGE__, "\n";
@@ -113,8 +149,6 @@ sub run { #------------------------------------------------------
   if ($USE_LOCAL_DATA) {
     ## Read the local file into $start_page for correct handling
     ## of raw data by TreeBuilder.
-    ##
-    ## TBD Sun2012_0422_15:20  Keep this path or move?  Is this the only type of i/p file I need?
     ##
     $start_page = read_file(
       "$input_dir/data/wsj/wsj.ltte.full.2012_0408.raw");
@@ -208,6 +242,59 @@ LINE:
         next LINE;
       }
 
+=head2 Letter-to-the-Editor Structure
+
+=over 4
+
+=item Content of a Letter-to-the-Editor
+
+Each letter to the editor comprises these parts:
+body text,
+author name,
+author data
+(eg, title, affiliation, location, comment).
+
+Also,
+each letter can have other metadata associated with it,
+including:
+source,
+topic,
+date.
+
+
+=item HTML Structure of a Letter-to-the-Editor
+
+A topic is marked by <h1> tags.
+
+The first line of text after a topic is the start of a letter's
+body text.
+
+The first line with a <b> tag
+marks the end of the body text,
+and the start of the first author's name.
+
+The following lines with <i> tags are data about the first
+author.
+
+Any additional lines with <b> then <i> tags
+describe additional authors.
+
+
+The end of the author block and the current letter
+is marked by one of these constructs.
+
+- The first anchor tag found while reading lines from the
+author block.
+
+- The first line with no <b>, <i>, or <a> tag found
+while reading lines from the
+author block.
+
+=back
+
+=cut
+
+
       ## AUTHOR handling code.
       if ( $current_line->as_HTML =~ /<b>/ ) {
 
@@ -257,13 +344,14 @@ LINE:
               next;
             }
 
-            ## Handle the new author for an existing letter.
+            ## Handle the new author for the current letter.
             $current_author = $current_line->as_text;
             push @{ $current_letter{author}{$current_author}
                   {name} },
                 $current_author;
 
             $authors_count++;
+            #TBD Add label for this next to jump to.
             next;    # Get data for this new author.
           }
           else {
@@ -339,8 +427,8 @@ LINE:
       . "  in $source_id, for web site content dated $pub_date_raw.\n";
 
   DEBUG($end_msg1);
-  no strict 'refs';  #TBD module calling bug
-  say "DBG application: ,$application,";
+  #TBD no strict 'refs';  #TBD module calling bug
+  say "DBG $0 \$application: ,$application,";
   print { $application->{output_fh} } $end_msg1 . "\n";
   return;
 
@@ -353,10 +441,18 @@ LINE:
 # Other Subroutines ---------------------------------------------------
 #
 #
+
+=head1 FUNCTIONS
+
+TBD.
+
+=cut
+
 sub new { #------------------------------------------------------
   my ($class) = @_;
   my $application = bless {}, $class;
   $application->init;
+  #TBD Include return for PBP?
   return $application;
 }
 
@@ -364,6 +460,7 @@ sub init { #-----------------------------------------------------
   ## TBD Add some or all init code here later.
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
+  #TBD Include return for PBP?
   return;
 }
 
@@ -372,6 +469,7 @@ sub output_fh { #------------------------------------------------
   if ($fh) {
     $application->{output_fh} = $fh;
   }
+  #TBD Include return for PBP?
   return $application->{output_fh};
 }
 
@@ -381,30 +479,25 @@ Usage:
   perl [options] $program
 
   Options:
-    --help: Show this usage message.
-    --verbose: Show the output on the screen.
     --directory <outpath>: Specify the parent path for o/p data.
       Default is '.', the current dir.
+    --help: Show this usage message.
+    --test: Read a file for i/p data, and do not query a web server.
+    --verbose: Show the output on the screen.
 
-$program requests a page from a web site,
-extracts the specified content,
-and saves it and displays it.
+$program requests a page from a web site, extracts the 
+specified content, saves it, and displays it.
 
 This version is hard-coded to get letters to the editor, ltte,
 from the Wall Street Journal newspaper web site.
-
-$program is a modulino, and can be executed as an application
-or used as a module.
 
 Output data is stored temporarily under the raw dir,
 <outpath>/out/wsj/raw/.  The program overwrites all files
 in this dir every time it runs.
 
-  all_letters.fmt holds a simply-formatted version.
-    See the same content on screen if the --verbose option is
-    used.
+  all_letters.fmt holds formatted text.
 
-  all_letters holds an unformatted version.
+  all_letters holds unformatted text.
 
 Output data is stored permanently under the <outpath>/out/ dir
 tree when the --directory option is specified.
@@ -425,6 +518,18 @@ sub init_dir {  #------------------------------------------------
   make_path("$dir");
   return $dir;
 }
+
+
+=head2 C<get_start_page( $mech )>
+
+This sub includes a try+catch exception handler
+around the request to the web server for the desired page.
+A failure is caught and logged,
+so the program does not crash or die silently.
+
+The $mech parameter is a WWW::Mechanize object.
+
+=cut
 
 sub get_start_page { #-------------------------------------------
   my ($mech) = @_;
@@ -506,6 +611,22 @@ sub save_raw_data { #--------------------------------------------
   return;
 }
 
+
+=head2 TBD Description of sub C<extract_topics()>
+
+A headline, or topic,
+can have one or more letters below it.
+Each topic is inside a set of h1 tags,
+with the specified attribute.
+
+All topics are gathered into an array and returned
+to the caller.
+
+The letters under a topic are examined as a group
+in the main routine.
+
+=cut
+
 sub extract_topics { #-------------------------------------------
   my $tree   = shift;
   my @topics = $tree->look_down(
@@ -552,83 +673,23 @@ sub parse_cmd_line {
   if ($test)    { $USE_LOCAL_DATA = 1 }
 }
 
-# Comment template
-#########################################################
-# Usage      : n/a
-# Purpose    : Hold useful code & notes for Perl programs.
-# Returns    : n/a
-# Parameters : n/a
-# Throws     : no exceptions
-# Comments   : Copy this file into a new program file
-#            : and remove what is not needed and customize
-#            : what remains.
-# See Also   : n/a
-# Status     : Usable as-is, and needs clean-up.
-#########################################################
 
 __END__
 
-=head1 scraper
-
-scraper - Get a web page, select data, show & save the results.
-
-
-=head1 DESCRIPTION
-
-A full description of the app & features.
-May include many subsections (ie, =head2, =head3, etc).
-
-This program is part of a project to test concepts and code
-for a Perl module
-for web scraping, parsing, interpretation, and analysis.
-
-This program uses WWW::Mechanize to get the web page;
-HTML::TreeBuilder, HTML::Element::Library, and regular expressions
-to organize, navigate, and extract desired content.
-Output data is shown on screen, and
-is saved to disk
-in JSON formatted files
-for analysis.
-
-This test code is hard-coded to use The Wall Street Journal's
-web page that contains
-the letters to the editor.
-Those letters are extracted,
-along with author name(s) and data.
-The headline for each letter is stored as its topic.
 
 
 =head2 ASSUMPTIONS
 
-These assumptions are based on viewing the HTML
+The assumptions about the web site content
+are based on reading the
 code on the web pages of interest over some time.
-The HTML can change and make these assumptions false.
+The site can change and make these assumptions false.
 At that point,
 the code might need to be modified to handle the new data format.
 
-One major assumption when handling the text of a letter
-is that the first <b> tag identifies the first author's name,
-and marks end of that letter's body.
-All text from that tag to the end of the current letter
-is the name of an author and any related data,
-such as title, affiliation,
-location, or comment about the author.
+TBD Document any major assumptions not already listed.
 
-The end of a letter is determined in these ways.
 
-.  If an anchor tag is found while reading lines from the
-author block,
-
-.  If a line with no <b>, <i>, or <a> tag is found,
-the end of the author data and the letter has been reached.
-
-=head2 TBD Description of sub C<extract_topics()>
-
-TBD
-
-=head2 TBD Description of sub C<get_start_page()>
-
-TBD
 
 =head2 TBD Description of sub C<init()>
 
