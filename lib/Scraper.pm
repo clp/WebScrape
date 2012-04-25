@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Tue 2012 Apr 24 03:00:47 PMPM clpoda>
+# Time-stamp: <Tue 2012 Apr 24 05:56:12 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -24,6 +24,7 @@
 # For format of the web page: see codenotes.otl file.
 
 package Scraper;
+print "DBG starting package ", __PACKAGE__, "\n";
 
 use strict;
 use warnings;
@@ -338,6 +339,8 @@ LINE:
       . "  in $source_id, for web site content dated $pub_date_raw.\n";
 
   DEBUG($end_msg1);
+  no strict 'refs';  #TBD module calling bug
+  say "DBG application: ,$application,";
   print { $application->{output_fh} } $end_msg1 . "\n";
   return;
 
@@ -380,7 +383,7 @@ Usage:
   Options:
     --help: Show this usage message.
     --verbose: Show the output on the screen.
-    --directory <path>: Specify the parent path for o/p data.
+    --directory <outpath>: Specify the parent path for o/p data.
       Default is '.', the current dir.
 
 $program requests a page from a web site,
@@ -393,11 +396,18 @@ from the Wall Street Journal newspaper web site.
 $program is a modulino, and can be executed as an application
 or used as a module.
 
-Output data is stored in the ./out dir tree by default.
+Output data is stored temporarily under the raw dir,
+<outpath>/out/wsj/raw/.  The program overwrites all files
+in this dir every time it runs.
 
-See all the letters for one day, in the file
-./out/wsj/raw/all_letters.
-The program overwrites this file every time it runs.
+  all_letters.fmt holds a simply-formatted version.
+    See the same content on screen if the --verbose option is
+    used.
+
+  all_letters holds an unformatted version.
+
+Output data is stored permanently under the <outpath>/out/ dir
+tree when the --directory option is specified.
 
 See the letters collected each day that the program was run
 in JSON formatted files at ./out/wsj/yyyy/mmdd/ltte_NN.json.
