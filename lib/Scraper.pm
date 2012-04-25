@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 25 01:51:15 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 25 03:18:57 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -57,7 +57,6 @@ the program can be used simply to show the retrieved content
 without using a web browser.
 
 =cut
-
 
 package Scraper;
 print "DBG starting package ", __PACKAGE__, "\n";
@@ -124,7 +123,6 @@ my $directory;
 my $verbose;
 parse_cmd_line();
 
-
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 __PACKAGE__->new->run if !caller;
 
@@ -136,7 +134,7 @@ sub run { #------------------------------------------------------
 
   ## Initialize --------------------------------------------------
   my $authors_count = 0;
-  my $data_src = 'unknown, maybe __DATA__';
+  my $data_src      = 'unknown, maybe __DATA__';
   $letters_count = 0;
   my $rootdir = $directory ? $directory : q{.};    #CFG
   my $input_dir = q{.};                            #CFG
@@ -294,7 +292,6 @@ author block.
 
 =cut
 
-
       ## AUTHOR handling code.
       if ( $current_line->as_HTML =~ /<b>/ ) {
 
@@ -351,6 +348,7 @@ author block.
                 $current_author;
 
             $authors_count++;
+
             #TBD Add label for this next to jump to.
             next;    # Get data for this new author.
           }
@@ -394,12 +392,15 @@ author block.
   write_file( "$raw_dir/all_letters.fmt", q{} )
       ;    # Init to empty string
   foreach (@all_letters_to_editor) {
-    append_file( "$raw_dir/all_letters.fmt", { binmode => ':utf8' },
-      wrap( "\t", q{  }, $_ ) )
-        or
-        DEBUG("ERR Failed to write to $raw_dir/all_letters.fmt: $!");
-    append_file( "$raw_dir/all_letters.fmt", { binmode => ':utf8' },
-      "\n" );
+    append_file(
+      "$raw_dir/all_letters.fmt",
+      { binmode => ':utf8' },
+      wrap( "\t", q{  }, $_ )
+        )
+        or DEBUG(
+      "ERR Failed to write to $raw_dir/all_letters.fmt: $!");
+    append_file( "$raw_dir/all_letters.fmt",
+      { binmode => ':utf8' }, "\n" );
   }
 
   ## Print all letters to screen.
@@ -427,6 +428,7 @@ author block.
       . "  in $source_id, for web site content dated $pub_date_raw.\n";
 
   DEBUG($end_msg1);
+
   #TBD no strict 'refs';  #TBD module calling bug
   say "DBG $0 \$application: ,$application,";
   print { $application->{output_fh} } $end_msg1 . "\n";
@@ -452,6 +454,7 @@ sub new { #------------------------------------------------------
   my ($class) = @_;
   my $application = bless {}, $class;
   $application->init;
+
   #TBD Include return for PBP?
   return $application;
 }
@@ -460,6 +463,7 @@ sub init { #-----------------------------------------------------
   ## TBD Add some or all init code here later.
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
+
   #TBD Include return for PBP?
   return;
 }
@@ -469,6 +473,7 @@ sub output_fh { #------------------------------------------------
   if ($fh) {
     $application->{output_fh} = $fh;
   }
+
   #TBD Include return for PBP?
   return $application->{output_fh};
 }
@@ -518,7 +523,6 @@ sub init_dir {  #------------------------------------------------
   make_path("$dir");
   return $dir;
 }
-
 
 =head2 C<get_start_page( $mech )>
 
@@ -611,7 +615,6 @@ sub save_raw_data { #--------------------------------------------
   return;
 }
 
-
 =head2 TBD Description of sub C<extract_topics()>
 
 A headline, or topic,
@@ -672,7 +675,6 @@ sub parse_cmd_line {
   if ($verbose) { $verbose        = 1; }
   if ($test)    { $USE_LOCAL_DATA = 1 }
 }
-
 
 __END__
 
