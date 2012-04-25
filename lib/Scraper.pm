@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 25 03:29:46 PMPM clpoda>
+# Time-stamp: <Wed 2012 Apr 25 03:43:26 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -83,7 +83,7 @@ use WWW::Mechanize;
 
 my $DEBUGMODE = 1
     ;   # 1: don't print everything; 2: print more; 5: print most
-my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
+my $USE_LOCAL_DATA = 0;    # 0=Query the web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -153,7 +153,7 @@ sub run { #------------------------------------------------------
     $data_src = 'local copy of web page';
   }
   else {
-    $start_page = get_start_page($mech);
+    $start_page = get_web_page($mech, $start_url);
     $data_src   = 'web';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
@@ -524,7 +524,7 @@ sub init_dir {  #------------------------------------------------
   return $dir;
 }
 
-=head2 C<get_start_page( $mech )>
+=head2 C<get_web_page( $mech )>
 
 This sub includes a try+catch block
 around the request to the web server for the desired page.
@@ -535,24 +535,24 @@ The $mech parameter is a WWW::Mechanize object.
 
 =cut
 
-sub get_start_page { #-------------------------------------------
-  my ($mech) = @_;
+sub get_web_page { #-------------------------------------------
+  my ($mech, $url) = @_;
   my $response = q{};    # Empty string
   try {
-    $response = $mech->get($start_url);
+    $response = $mech->get($url);
   }
   catch {
     ## TBD Use $! or $_ or $response?
     DEBUG($_);
-    croak "ERR: Cannot get web page [$start_url]; try later.";
+    croak "ERR: Cannot get web page [$url]; try later.";
   };
 
   if ( !$response->is_success ) {
-    my $msg = "Bad response to request for [$start_url]: "
+    my $msg = "Bad response to request for [$url]: "
         . $response->status_line;
     DEBUG($msg);
     croak
-        "ERR: Got bad response to request for [$start_url]; try later.";
+        "ERR: Got bad response to request for [$url]; try later.";
   }
   return $mech->content();
 }
