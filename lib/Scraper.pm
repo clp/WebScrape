@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Wed 2012 Apr 25 03:43:26 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 09:56:01 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -83,7 +83,7 @@ use WWW::Mechanize;
 
 my $DEBUGMODE = 1
     ;   # 1: don't print everything; 2: print more; 5: print most
-my $USE_LOCAL_DATA = 0;    # 0=Query the web site.
+my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
 our $VERSION = '0.10';
 
 # Initialize
@@ -120,6 +120,7 @@ if ( !$start_url ) {
 }
 
 my $directory;
+my $quiet;
 my $verbose;
 parse_cmd_line();
 
@@ -404,7 +405,7 @@ author block.
   }
 
   ## Print all letters to screen.
-  if ($verbose) {
+  if (!$quiet) {
     say { $application->{output_fh} }
         "\nLetters to the Editor from $source_id",
         " web site, dated $pub_date_raw\n";
@@ -488,7 +489,9 @@ Usage:
       Default is '.', the current dir.
     --help: Show this usage message.
     --test: Read a file for i/p data, and do not query a web server.
-    --verbose: Show the output on the screen.
+    --quiet: Do not show the detailed output on the screen;
+      only show summary.
+      Default is 'not quiet'.
 
 $program requests a page from a web site, extracts the 
 specified content, saves it, and displays it.
@@ -667,11 +670,13 @@ sub parse_cmd_line {
   my $result = GetOptions(
     'help'        => \$help,
     'directory=s' => \$directory,
+    'quiet'       => \$quiet,
     'verbose'     => \$verbose,
     'test'        => \$test,
   );
 
-  if ($help) { usage; exit; }
+  if ($help)    { usage; exit; }
+  if ($quiet)   { $quiet        = 1; }
   if ($verbose) { $verbose        = 1; }
   if ($test)    { $USE_LOCAL_DATA = 1 }
 }
