@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 09:56:01 AMAM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 10:25:37 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -121,7 +121,6 @@ if ( !$start_url ) {
 
 my $directory;
 my $quiet;
-my $verbose;
 parse_cmd_line();
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
@@ -671,13 +670,11 @@ sub parse_cmd_line {
     'help'        => \$help,
     'directory=s' => \$directory,
     'quiet'       => \$quiet,
-    'verbose'     => \$verbose,
     'test'        => \$test,
   );
 
   if ($help)    { usage; exit; }
   if ($quiet)   { $quiet        = 1; }
-  if ($verbose) { $verbose        = 1; }
   if ($test)    { $USE_LOCAL_DATA = 1 }
 }
 
