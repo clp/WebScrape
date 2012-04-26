@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 10:25:37 AMAM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 03:26:55 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -149,7 +149,7 @@ sub run { #------------------------------------------------------
     ## of raw data by TreeBuilder.
     ##
     $start_page = read_file(
-      "$input_dir/data/wsj/wsj.ltte.full.2012_0408.raw");
+      "$input_dir/test/in/wsj/wsj.ltte.full.2012_0408.raw");
     $data_src = 'local copy of web page';
   }
   else {
@@ -325,7 +325,10 @@ author block.
             push @all_letters_to_editor, "\n";
 
             $letters_count++;
-            save_letter_to_file( \%current_letter );
+            if ( $directory) {
+              save_letter_to_file( \%current_letter );
+            }
+            %current_letter = ();
             next LINE;
           }
 
@@ -363,7 +366,10 @@ author block.
         ## to a file.  This saves letters that do not have an
         ## <a> tag that can mark the end of a letter (see b.21).
         $letters_count++;
-        save_letter_to_file( \%current_letter );
+        if ( $directory) {
+          save_letter_to_file( \%current_letter );
+        }
+        %current_letter = ();
 
         push @all_letters_to_editor, "\n";
 
@@ -374,7 +380,7 @@ author block.
   $tree->delete;
 
   ##---------------------------------------------------------------
-  ## Save data from all letters found.
+  ## Save data from all letters found and overwrite any prior file.
   write_file( "$raw_dir/all_letters", q{} )
       ;    # Init to empty string
   foreach (@all_letters_to_editor) {
@@ -388,7 +394,7 @@ author block.
 
   use Text::Wrap qw(wrap);
   ##---------------------------------------------------------------
-  ## Save formatted letters.
+  ## Save formatted letters and overwrite any prior file.
   write_file( "$raw_dir/all_letters.fmt", q{} )
       ;    # Init to empty string
   foreach (@all_letters_to_editor) {
@@ -510,10 +516,11 @@ Output data is stored permanently under the <outpath>/out/ dir
 tree when the --directory option is specified.
 
 See the letters collected each day that the program was run
-in JSON formatted files at ./out/wsj/yyyy/mmdd/ltte_NN.json.
+in JSON formatted files at
+<outpath>/out/wsj/yyyy/mmdd/ltte_NN.json.
 The path depends on year, month, and day specified in the
 web page, which can be different from the day that those letters
-were published in the newspaper.
+were published in the printed newspaper.
 END_USAGE
 }
 
@@ -571,7 +578,6 @@ sub save_letter_to_file { #--------------------------------------
   }
 
   write_file(
-
     "$daily_dir/ltte_$count.json",
     { binmode => ':utf8' },
     encode_json($ref_current_letter)
@@ -579,7 +585,6 @@ sub save_letter_to_file { #--------------------------------------
       or
       DEBUG("ERR Failed to write to file $daily_dir/$count: $!");
 
-  %current_letter = ();
   return;
 }
 
@@ -593,8 +598,8 @@ sub save_raw_data { #--------------------------------------------
   close $treeout;
 
   ## Save temporary copy of raw downloaded page & decoded
-  ## content for debugging.  These files are overwritten each
-  ## time the program is run.
+  ## content for debugging.  Overwrite these files each
+  ## time the program runs.
   my $page_file = "$source_id.ltte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
