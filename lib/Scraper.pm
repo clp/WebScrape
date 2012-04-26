@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 03:26:55 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 03:56:27 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -180,7 +180,6 @@ sub run { #------------------------------------------------------
     DEBUG $date_parser->error;
   }
 
-  ## This save step uses $dt during debug.
   my ($raw_dir) = init_dir( $rootdir . '/out/wsj/raw' );
   save_raw_data( $raw_dir, $start_page, $tree );
 

@@ -10,6 +10,6 @@ my $program_under_test = "perl " . "./lib/Scraper.pm --help > ./tmp/usage_msg";
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.
-my $diff_out = `diff -s  "./tmp/usage_msg" "./refout/usage_msg"`;
+my $diff_out = `diff -s  "./tmp/usage_msg" "./test/out/usage_msg"`;
 like( $diff_out, qr{Files.*are.identical}, "Get usage note w/ --help option.");
 

@@ -17,6 +17,6 @@ my $program_under_test = "perl " . "./lib/Scraper.pm --test --directory ./tmp/te
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.
-my $diff_out = `diff -sr  "./tmp/test/out" "./refout/test/out"`;
+my $diff_out = `diff -sr  "./tmp/test/out" "./test/out"`;
 like( $diff_out, qr{Files.*are.identical$}, "Output files saved in specified directory.");
 
