@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 09:15:14 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 10:01:52 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -483,25 +483,29 @@ sub output_fh { #------------------------------------------------
 sub usage { #----------------------------------------------------
   print <<"END_USAGE";
 Usage:
-  perl [options] $program
+  perl [options] Scraper.pm
 
   Options:
-    --directory <outpath>: Specify the parent path for o/p data.
-      Default is '.', the current dir.
+    --directory <outpath>: Specify the parent path for o/p data,
+      and write o/p data to disk files.
+      Default is 'no directory'.
     --getwebpage: Query web server for i/p data.
-    --help: Show this usage message.
-    --test: Read a file for i/p data, and do not query a web server.
+      Default is 'do not getwebpage'.
+    --help: Show the brief usage message, then exit.
+    --test: Read i/p data from a file, instead of querying a web
+      server.
+      Default is 'test'.
     --quiet: Do not show the detailed output on the screen;
-      only show summary.
+      only show summary data.
       Default is 'not quiet'.
 
-$program requests a page from a web site, extracts the 
+The program requests a page from a web site, extracts the
 specified content, saves it, and displays it.
 
 This version is hard-coded to get letters to the editor, ltte,
 from the Wall Street Journal newspaper web site.
 
-Output data is stored temporarily under the raw dir,
+Temporary output files are stored under the raw dir,
 <outpath>/out/wsj/raw/.  The program overwrites all files
 in this dir every time it runs.
 
@@ -509,15 +513,16 @@ in this dir every time it runs.
 
   all_letters holds unformatted text.
 
-Output data is stored permanently under the <outpath>/out/ dir
-tree when the --directory option is specified.
+Permanent output files are stored under the <outpath>/out/ dir
+tree, but only when the --directory option is specified, eg,
+  perl ./lib/Scraper.pm --directory /tmp/Scraper
 
 See the letters collected each day that the program was run
 in JSON formatted files at
 <outpath>/out/wsj/yyyy/mmdd/ltte_NN.json.
 The path depends on year, month, and day specified in the
-web page, which can be different from the day that those letters
-were published in the printed newspaper.
+web page.  That date can be different from the date that those
+letters were published in the printed newspaper.
 END_USAGE
 }
 
