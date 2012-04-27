@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 04:52:49 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 09:15:14 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -59,7 +59,6 @@ without using a web browser.
 =cut
 
 package Scraper;
-print "DBG starting package ", __PACKAGE__, "\n";
 
 use strict;
 use warnings;
@@ -434,8 +433,6 @@ author block.
 
   DEBUG($end_msg1);
 
-  #TBD no strict 'refs';  #TBD module calling bug
-  say "DBG $0 \$application: ,$application,";
   print { $application->{output_fh} } $end_msg1 . "\n";
   return;
 
