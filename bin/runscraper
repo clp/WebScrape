@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use diagnostics;
+use feature qw{ say };
+use lib::Scraper;
+
+my $scraper = Scraper->new;
+
+$scraper->run();
