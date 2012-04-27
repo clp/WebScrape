@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 03:56:27 PMPM clpoda>
+# Time-stamp: <Thu 2012 Apr 26 04:52:49 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -491,6 +491,7 @@ Usage:
   Options:
     --directory <outpath>: Specify the parent path for o/p data.
       Default is '.', the current dir.
+    --getwebpage: Query web server for i/p data.
     --help: Show this usage message.
     --test: Read a file for i/p data, and do not query a web server.
     --quiet: Do not show the detailed output on the screen;
@@ -668,18 +669,21 @@ sub initialize_output_dir {
 sub parse_cmd_line {
 
   # Parse cmd line args and handle some now.
+  my $getwebpage;
   my $help;
   my $test;
   my $result = GetOptions(
     'help'        => \$help,
     'directory=s' => \$directory,
+    'getwebpage'  => \$getwebpage,
     'quiet'       => \$quiet,
     'test'        => \$test,
   );
 
-  if ($help)    { usage; exit; }
-  if ($quiet)   { $quiet        = 1; }
-  if ($test)    { $USE_LOCAL_DATA = 1 }
+  if ($help)       { usage; exit; }
+  if ($quiet)      { $quiet        = 1; }
+  if ($test)       { $USE_LOCAL_DATA = 1; }
+  if ($getwebpage) { $USE_LOCAL_DATA = 0; }
 }
 
 __END__
