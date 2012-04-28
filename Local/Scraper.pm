@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 03:30:36 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 03:33:40 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -245,7 +245,6 @@ LINE:
         next LINE;
       }
 
-      #TBR =back
 
 =head2 Letter-to-the-Editor Structure
 
@@ -574,7 +573,6 @@ sub init_dir {  #------------------------------------------------
   return $dir;
 }
 
-#TBR =back
 
 =item C<get_web_page( $mech )>
 
