@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 27 11:53:10 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 11:44:58 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -51,9 +51,16 @@ along with author name(s) and data.
 The headline for each letter is stored as its topic.
 Some of this documentation is specific to the WSJ web site
 and its pages.
+Future versions might get other data from the WSJ,
+and might get data from other sites.
+At that point,
+the code might be divided into a core component
+holding the main functionality,
+that is used by modules customized for the various
+data sources.
 
 For casual use,
-the program can be used simply to show the retrieved content
+the program can simply show the retrieved content
 without using a web browser.
 
 =cut
@@ -238,11 +245,12 @@ LINE:
         next LINE;
       }
 
+
+#TBR =back
+
 =head2 Letter-to-the-Editor Structure
 
-=over 4
-
-=item Content of a Letter-to-the-Editor
+=head3 Content of a Letter-to-the-Editor
 
 Each letter to the editor comprises these parts:
 body text,
@@ -258,7 +266,7 @@ topic,
 date.
 
 
-=item HTML Structure of a Letter-to-the-Editor
+=head3 HTML Structure of a Letter-to-the-Editor
 
 A topic is marked by <h1> tags.
 
@@ -285,8 +293,6 @@ author block.
 - The first line with no <b>, <i>, or <a> tag found
 while reading lines from the
 author block.
-
-=back
 
 =cut
 
@@ -448,7 +454,26 @@ author block.
 
 =head1 FUNCTIONS
 
-TBD.
+=over 4
+
+=item run()
+
+The main routine for the program or module.
+The main routine for the program or module.
+The main routine for the program or module.
+The main routine for the program or module.
+
+=back
+
+=cut
+
+
+=over 4
+
+=item new()
+
+Make an object,
+which is only used to call methods for now.
 
 =cut
 
@@ -461,6 +486,14 @@ sub new { #------------------------------------------------------
   return $application;
 }
 
+
+=item init()
+
+Initialize the object.
+
+=cut
+
+
 sub init { #-----------------------------------------------------
   ## TBD Add some or all init code here later.
   my ($application) = @_;
@@ -469,6 +502,13 @@ sub init { #-----------------------------------------------------
   #TBD Include return for PBP?
   return;
 }
+
+
+=item output_fh()
+
+TBDsubdescription.
+
+=cut
 
 sub output_fh { #------------------------------------------------
   my ( $application, $fh ) = @_;
@@ -479,6 +519,13 @@ sub output_fh { #------------------------------------------------
   #TBD Include return for PBP?
   return $application->{output_fh};
 }
+
+
+=item usage()
+
+TBDsubdescription.
+
+=cut
 
 sub usage { #----------------------------------------------------
   print <<"END_USAGE";
@@ -522,6 +569,13 @@ letters were published in the printed newspaper.
 END_USAGE
 }
 
+
+=item init_dir()
+
+TBDsubdescription.
+
+=cut
+
 sub init_dir {  #------------------------------------------------
   my ($dir) = @_;
   if ( -d $dir ) {
@@ -531,7 +585,10 @@ sub init_dir {  #------------------------------------------------
   return $dir;
 }
 
-=head2 C<get_web_page( $mech )>
+
+#TBR =back
+
+=item C<get_web_page( $mech )>
 
 This sub includes a try+catch block
 around the request to the web server for the desired page.
@@ -539,6 +596,13 @@ A failure is caught and logged,
 so the program does not crash or die silently.
 
 The $mech parameter is a WWW::Mechanize object.
+
+=cut
+
+
+=item get_web_page()
+
+TBDsubdescription.
 
 =cut
 
@@ -564,6 +628,13 @@ sub get_web_page { #-------------------------------------------
   return $mech->content();
 }
 
+
+=item save_letter_to_file()
+
+TBDsubdescription.
+
+=cut
+
 ## Write each letter to a separate file.
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
@@ -585,6 +656,13 @@ sub save_letter_to_file { #--------------------------------------
 
   return;
 }
+
+
+=item save_raw_data()
+
+TBDsubdescription.
+
+=cut
 
 sub save_raw_data { #--------------------------------------------
   my ( $raw_dir, $start_page, $tree ) = @_;
@@ -620,7 +698,7 @@ sub save_raw_data { #--------------------------------------------
   return;
 }
 
-=head2 TBD Description of sub C<extract_topics()>
+=item TBD Description of sub C<extract_topics()>
 
 A headline, or topic,
 can have one or more letters below it.
@@ -635,6 +713,7 @@ in the main routine.
 
 =cut
 
+
 sub extract_topics { #-------------------------------------------
   my $tree   = shift;
   my @topics = $tree->look_down(
@@ -643,6 +722,13 @@ sub extract_topics { #-------------------------------------------
   );
   return @topics;
 }
+
+
+=item initialize_output_dir()
+
+TBDsubdescription.
+
+=cut
 
 sub initialize_output_dir {
   my $rootdir = shift;
@@ -664,9 +750,19 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
+
+=item parse_cmd_line()
+
+Use C<GetOptions> to specify command line arguments
+and what to do with them.
+
+You can specify the minimal unique text to specify any
+argument to invoke it.
+
+=cut
+
 sub parse_cmd_line {
 
-  # Parse cmd line args and handle some now.
   my $getwebpage;
   my $help;
   my $test;
@@ -684,9 +780,11 @@ sub parse_cmd_line {
   if ($getwebpage) { $USE_LOCAL_DATA = 0; }
 }
 
+
+
 __END__
 
-
+=back
 
 =head2 ASSUMPTIONS
 
@@ -701,45 +799,6 @@ TBD Document any major assumptions not already listed.
 
 
 
-=head2 TBD Description of sub C<init()>
-
-TBD
-
-=head2 TBD Description of sub C<init_dir()>
-
-TBD
-
-=head2 TBD Description of sub C<initialize_output_dir()>
-
-TBD
-
-=head2 TBD Description of sub C<new()>
-
-TBD
-
-=head2 TBD Description of sub C<output_fh()>
-
-TBD
-
-=head2 TBD Description of sub C<run()>
-
-TBD
-
-=head2 TBD Description of sub C<save_letter_to_file()>
-
-TBD
-
-=head2 TBD Description of sub C<save_raw_data()>
-
-TBD
-
-=head2 TBD Description of sub C<usage()>
-
-TBD
-
-=head2 TBD Description of sub C<parse_cmd_line()>
-
-TBD
 
 
 =head2 TBD Description of configuration settings required.
