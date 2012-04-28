@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 11:44:58 AMAM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 02:26:47 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
