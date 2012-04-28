@@ -1,5 +1,7 @@
 #!perl -T
+#OK w/ taint b/c no real code exists in the program yet.
 
+use lib qw(Local);
 use Test::More tests => 1;
 
 BEGIN {
@@ -7,4 +9,4 @@ BEGIN {
 ";
 }
 
-diag( "Testing WebScrape $WebScrape::VERSION, Perl $], $^X" );
+diag( "Testing WebScrape $Local::WebScrape::VERSION, Perl $], $^X" );
