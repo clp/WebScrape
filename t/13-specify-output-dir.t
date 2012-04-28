@@ -13,10 +13,12 @@ if ( -d $d ) {
 }
 make_path($d);
 
-my $program_under_test = "perl " . "./lib/Scraper.pm --test --directory ./tmp/test";
+#ORG.OK my $program_under_test = "perl " . "./lib/Scraper.pm --test --directory ./tmp/test";
+my $program_under_test = "perl ./Local/Scraper.pm --test --directory ./tmp/test";
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.
 my $diff_out = `diff -sr  "./tmp/test/out" "./test/out"`;
-like( $diff_out, qr{Files.*are.identical$}, "Output files saved in specified directory.");
+like( $diff_out, qr{Files.*ltte_01.json.*ltte_12.json.are.identical$}msx,
+    "Output files saved in specified directory.");
 

@@ -4,7 +4,7 @@ use Test::More tests => 1;
 
 # NOTE: Must be in the correct dir to run the program,
 # for this test to pass, eg, the install dir.
-my $program_under_test = "perl ./lib/Scraper.pm --test --directory .";
+my $program_under_test = "perl ./Local/Scraper.pm --test --directory .";
 system $program_under_test;
 
 my $diff_out_saved 

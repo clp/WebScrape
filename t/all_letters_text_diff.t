@@ -9,7 +9,7 @@ use Test::More tests => 1;
 
 # TBD: Must be in the correct dir to run the program,
 # for this test to pass, eg, the install dir.
-my $program_under_test = "perl " . "./lib/Scraper.pm --test";
+my $program_under_test = "perl " . "./Local/Scraper.pm --test";
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.

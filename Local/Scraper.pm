@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Fri 2012 Apr 27 05:35:58 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 27 11:33:16 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -58,7 +58,7 @@ without using a web browser.
 
 =cut
 
-package Scraper;
+package Local::Scraper;
 
 use strict;
 use warnings;

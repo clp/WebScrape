@@ -6,7 +6,7 @@ use Test::More tests => 1;
 # for this test to pass, eg, the install dir.
 # TBD: Erase ./tmp/usage_msg before running this test, to avoid using stale data.
 unlink "./tmp/usage_msg" ;
-my $program_under_test = "perl " . "./lib/Scraper.pm --help > ./tmp/usage_msg";
+my $program_under_test = "perl ./Local/Scraper.pm --help > ./tmp/usage_msg";
 system $program_under_test;
 
 # Compare two files on disk: program under test o/p and reference o/p.
