@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 03:30:02 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 03:30:36 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -159,8 +159,8 @@ sub run { #------------------------------------------------------
     $data_src = 'local copy of web page';
   }
   else {
-    $start_page = get_web_page($mech, $start_url);
-    $data_src   = 'web';
+    $start_page = get_web_page( $mech, $start_url );
+    $data_src = 'web';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
 
@@ -245,8 +245,7 @@ LINE:
         next LINE;
       }
 
-
-#TBR =back
+      #TBR =back
 
 =head2 Letter-to-the-Editor Structure
 
@@ -329,7 +328,7 @@ author block.
             push @all_letters_to_editor, "\n";
 
             $letters_count++;
-            if ( $directory) {
+            if ($directory) {
               save_letter_to_file( \%current_letter );
             }
             %current_letter = ();
@@ -370,7 +369,7 @@ author block.
         ## to a file.  This saves letters that do not have an
         ## <a> tag that can mark the end of a letter (see b.21).
         $letters_count++;
-        if ( $directory) {
+        if ($directory) {
           save_letter_to_file( \%current_letter );
         }
         %current_letter = ();
@@ -414,7 +413,7 @@ author block.
   }
 
   ## Print all letters to screen.
-  if (!$quiet) {
+  if ( !$quiet ) {
     say { $application->{output_fh} }
         "\nLetters to the Editor from $source_id",
         " web site, dated $pub_date_raw\n";
@@ -464,7 +463,6 @@ The main routine for the program.
 
 =cut
 
-
 =over 4
 
 =item new()
@@ -482,13 +480,11 @@ sub new { #------------------------------------------------------
   return $application;
 }
 
-
 =item init()
 
 Initialize the object.
 
 =cut
-
 
 sub init { #-----------------------------------------------------
   ## TBD Add some or all init code here later.
@@ -498,7 +494,6 @@ sub init { #-----------------------------------------------------
   #TBD Include return for PBP?
   return;
 }
-
 
 =item output_fh()
 
@@ -515,7 +510,6 @@ sub output_fh { #------------------------------------------------
   #TBD Include return for PBP?
   return $application->{output_fh};
 }
-
 
 =item usage()
 
@@ -565,7 +559,6 @@ letters were published in the printed newspaper.
 END_USAGE
 }
 
-
 =item init_dir()
 
 TBDsubdescription.
@@ -581,7 +574,6 @@ sub init_dir {  #------------------------------------------------
   return $dir;
 }
 
-
 #TBR =back
 
 =item C<get_web_page( $mech )>
@@ -595,15 +587,14 @@ The $mech parameter is a WWW::Mechanize object.
 
 =cut
 
-
 =item get_web_page()
 
 TBDsubdescription.
 
 =cut
 
-sub get_web_page { #-------------------------------------------
-  my ($mech, $url) = @_;
+sub get_web_page {   #-------------------------------------------
+  my ( $mech, $url ) = @_;
   my $response = q{};    # Empty string
   try {
     $response = $mech->get($url);
@@ -623,7 +614,6 @@ sub get_web_page { #-------------------------------------------
   }
   return $mech->content();
 }
-
 
 =item save_letter_to_file()
 
@@ -652,7 +642,6 @@ sub save_letter_to_file { #--------------------------------------
 
   return;
 }
-
 
 =item save_raw_data()
 
@@ -709,7 +698,6 @@ in the main routine.
 
 =cut
 
-
 sub extract_topics { #-------------------------------------------
   my $tree   = shift;
   my @topics = $tree->look_down(
@@ -718,7 +706,6 @@ sub extract_topics { #-------------------------------------------
   );
   return @topics;
 }
-
 
 =item initialize_output_dir()
 
@@ -746,7 +733,6 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
-
 =item parse_cmd_line()
 
 Use C<GetOptions> to specify command line arguments
@@ -770,13 +756,11 @@ sub parse_cmd_line {
     'test'        => \$test,
   );
 
-  if ($help)       { usage; exit; }
-  if ($quiet)      { $quiet        = 1; }
+  if ($help) { usage; exit; }
+  if ($quiet)      { $quiet          = 1; }
   if ($test)       { $USE_LOCAL_DATA = 1; }
   if ($getwebpage) { $USE_LOCAL_DATA = 0; }
 }
-
-
 
 __END__
 
