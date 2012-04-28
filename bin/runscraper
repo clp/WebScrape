@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use diagnostics;
 use feature qw{ say };
-use lib::Scraper;
+use lib qw ( Local );
+use Local::Scraper;
 
-my $scraper = Scraper->new;
+my $scraper = Local::Scraper->new();
 
 $scraper->run();
