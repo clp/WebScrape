@@ -1,10 +1,11 @@
 #!perl
-# Was #!perl -T
+#F Was #!perl -T
 
+use lib qw( Local);
 use Test::More tests => 1;
 
 BEGIN {
-  my $class = 'Local::Scraper';
+  my $class = 'Scraper';
     use_ok( $class ) || print "Bail out!
 ";
 }
