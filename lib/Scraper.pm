@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Thu 2012 Apr 26 10:01:52 PMPM clpoda>
+# Time-stamp: <Fri 2012 Apr 27 05:35:58 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -483,21 +483,21 @@ sub output_fh { #------------------------------------------------
 sub usage { #----------------------------------------------------
   print <<"END_USAGE";
 Usage:
-  perl [options] Scraper.pm
+  perl Scraper.pm [options]
 
   Options:
     --directory <outpath>: Specify the parent path for o/p data,
       and write o/p data to disk files.
       Default is 'no directory'.
     --getwebpage: Query web server for i/p data.
-      Default is 'do not getwebpage'.
+      Default is 'no getwebpage'.
     --help: Show the brief usage message, then exit.
     --test: Read i/p data from a file, instead of querying a web
       server.
       Default is 'test'.
-    --quiet: Do not show the detailed output on the screen;
+    --quiet: Do not show the fetched data on the screen;
       only show summary data.
-      Default is 'not quiet'.
+      Default is 'no quiet'.
 
 The program requests a page from a web site, extracts the
 specified content, saves it, and displays it.
@@ -509,15 +509,11 @@ Temporary output files are stored under the raw dir,
 <outpath>/out/wsj/raw/.  The program overwrites all files
 in this dir every time it runs.
 
-  all_letters.fmt holds formatted text.
-
-  all_letters holds unformatted text.
-
 Permanent output files are stored under the <outpath>/out/ dir
 tree, but only when the --directory option is specified, eg,
   perl ./lib/Scraper.pm --directory /tmp/Scraper
 
-See the letters collected each day that the program was run
+See the content collected each day that the program was run
 in JSON formatted files at
 <outpath>/out/wsj/yyyy/mmdd/ltte_NN.json.
 The path depends on year, month, and day specified in the
