@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 03:20:15 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 03:30:02 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -458,10 +458,7 @@ author block.
 
 =item run()
 
-The main routine for the program or module.
-The main routine for the program or module.
-The main routine for the program or module.
-The main routine for the program or module.
+The main routine for the program.
 
 =back
 
@@ -472,8 +469,7 @@ The main routine for the program or module.
 
 =item new()
 
-Make an object,
-which is only used to call methods for now.
+Make an object.
 
 =cut
 
