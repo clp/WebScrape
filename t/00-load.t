@@ -9,4 +9,4 @@ BEGIN {
 ";
 }
 
-diag( "Testing WebScrape $Local::WebScrape::VERSION, Perl $], $^X" );
+diag( "Testing WebScrape $WebScrape::VERSION, Perl $], $^X" );
