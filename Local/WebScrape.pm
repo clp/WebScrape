@@ -1,4 +1,4 @@
-package WebScrape;
+package Local::WebScrape;
 
 use warnings;
 use strict;
