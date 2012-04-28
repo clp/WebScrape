@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 02:26:47 PMPM clpoda>
+# Time-stamp: <Sat 2012 Apr 28 03:20:15 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -534,17 +534,17 @@ Usage:
 
   Options:
     --directory <outpath>: Specify the parent path for o/p data,
-      and write o/p data to disk files.
-      Default is 'no directory'.
+        and write o/p data to disk files.
+        Default is 'no directory'.
     --getwebpage: Query web server for i/p data.
-      Default is 'no getwebpage'.
+        Default is 'no getwebpage'.
     --help: Show the brief usage message, then exit.
     --test: Read i/p data from a file, instead of querying a web
-      server.
-      Default is 'test'.
+        server.
+        Default is 'test'.
     --quiet: Do not show the fetched data on the screen;
-      only show summary data.
-      Default is 'no quiet'.
+        only show summary data.
+        Default is 'no quiet'.
 
 The program requests a page from a web site, extracts the
 specified content, saves it, and displays it.
@@ -562,7 +562,7 @@ tree, but only when the --directory option is specified, eg,
 
 See the content collected each day that the program was run
 in JSON formatted files at
-<outpath>/out/wsj/yyyy/mmdd/ltte_NN.json.
+<outpath>/out/wsj/YYYY/MMDD/ltte_NN.json.
 The path depends on year, month, and day specified in the
 web page.  That date can be different from the date that those
 letters were published in the printed newspaper.
