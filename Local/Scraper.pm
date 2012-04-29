@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 11:24:15 AMAM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 11:59:42 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -426,7 +426,7 @@ author block.
   my ($end_msg1);
   $end_msg1
       = "\nSummary of $program:\n"
-      . "  Using data src ,$data_src, for letters to the editor"
+      . "  Using data src [$data_src] for letters to the editor"
       . " in $source_id.\n"
       . "  Found $authors_count authors for"
       . " $letters_count letters to the editor\n"
@@ -492,7 +492,9 @@ sub init { #-----------------------------------------------------
 
 =item output_fh()
 
-TBDsubdescription.
+Use application object and set output filehandle as an
+attribute,
+for easier module testing.
 
 =cut
 
