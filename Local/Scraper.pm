@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sat 2012 Apr 28 03:33:40 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 10:40:54 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -97,8 +97,7 @@ my $source_id = 'wsj';
 my $start_url
     = q{http://online.wsj.com/public/page/letters.html};    #CFG
 
-my $program = $0;
-$program =~ s{\A.*/}{};    # strip leading path, if any
+my $program = 'Scraper';
 my %current_letter = ();
 my $daily_dir;
 my $dt;
@@ -183,7 +182,7 @@ sub run { #------------------------------------------------------
   }
   else {
     carp $date_parser->error;
-    DEBUG $date_parser->error;
+    DEBUG "Error parsing date: ", $date_parser->error;
   }
 
   my ($raw_dir) = init_dir( $rootdir . '/out/wsj/raw' );
@@ -519,7 +518,7 @@ TBDsubdescription.
 sub usage { #----------------------------------------------------
   print <<"END_USAGE";
 Usage:
-  perl Scraper.pm [options]
+  perl Local/Scraper.pm [options]
 
   Options:
     --directory <outpath>: Specify the parent path for o/p data,
