@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 01:32:44 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 01:40:16 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -449,19 +449,11 @@ author block.
 
 =head1 FUNCTIONS
 
-=over 4
-
-=item run()
+=head2 run
 
 The main routine for the program.
 
-=back
-
-=cut
-
-=over 4
-
-=item new()
+=head2 new
 
 Make an object.
 
@@ -475,7 +467,7 @@ sub new { #------------------------------------------------------
   $application;
 }
 
-=item init()
+=head2 init
 
 Initialize the object.
 
@@ -490,7 +482,7 @@ sub init { #-----------------------------------------------------
   return;
 }
 
-=item output_fh()
+=head2 output_fh
 
 Use application object and set output filehandle as an
 attribute,
@@ -507,9 +499,9 @@ sub output_fh { #------------------------------------------------
   $application->{output_fh};
 }
 
-=item usage()
+=head2 usage
 
-TBDsubdescription.
+Show a usage message on screen.
 
 =cut
 
@@ -555,7 +547,7 @@ letters were published in the printed newspaper.
 END_USAGE
 }
 
-=item init_dir()
+=head2 init_dir
 
 TBDsubdescription.
 
@@ -571,7 +563,7 @@ sub init_dir {  #------------------------------------------------
 }
 
 
-=item C<get_web_page( $mech )>
+=head2 get_web_page
 
 This sub includes a try+catch block
 around the request to the web server for the desired page.
@@ -579,12 +571,6 @@ A failure is caught and logged,
 so the program does not crash or die silently.
 
 The $mech parameter is a WWW::Mechanize object.
-
-=cut
-
-=item get_web_page()
-
-TBDsubdescription.
 
 =cut
 
@@ -610,7 +596,7 @@ sub get_web_page {   #-------------------------------------------
   return $mech->content();
 }
 
-=item save_letter_to_file()
+=head2 save_letter_to_file
 
 TBDsubdescription.
 
@@ -638,7 +624,7 @@ sub save_letter_to_file { #--------------------------------------
   return;
 }
 
-=item save_raw_data()
+=head2 save_raw_data
 
 TBDsubdescription.
 
@@ -678,7 +664,7 @@ sub save_raw_data { #--------------------------------------------
   return;
 }
 
-=item TBD Description of sub C<extract_topics()>
+=head2 extract_topics
 
 A headline, or topic,
 can have one or more letters below it.
@@ -702,7 +688,7 @@ sub extract_topics { #-------------------------------------------
   return @topics;
 }
 
-=item initialize_output_dir()
+=head2 initialize_output_dir
 
 TBDsubdescription.
 
@@ -728,7 +714,7 @@ sub initialize_output_dir {
   return $daily_dir;
 }
 
-=item parse_cmd_line()
+=head2 parse_cmd_line
 
 Use C<GetOptions> to specify command line arguments
 and what to do with them.
@@ -759,7 +745,6 @@ sub parse_cmd_line {
 
 __END__
 
-=back
 
 =head2 ASSUMPTIONS
 
