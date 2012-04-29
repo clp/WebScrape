@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 10:52:18 AMAM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 11:24:15 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -165,8 +165,6 @@ sub run { #------------------------------------------------------
 
   ##TBD Verify page title: </script><title>Letters - WSJ.com</title>
 
-  ## TBF b.9. serverTime may be different from the date when
-  ## the letters are printed in the newspaper.
   ## Format of serverTime = new Date("April 06, 2012 00:45:28");
   my ($pub_date_raw) = $tree->as_HTML =~ qr{
         serverTime \s+ = \s+ new \s+ Date
@@ -474,8 +472,7 @@ sub new { #------------------------------------------------------
   my $application = bless {}, $class;
   $application->init;
 
-  #TBD Include return for PBP?
-  return $application;
+  $application;
 }
 
 =item init()
@@ -505,8 +502,7 @@ sub output_fh { #------------------------------------------------
     $application->{output_fh} = $fh;
   }
 
-  #TBD Include return for PBP?
-  return $application->{output_fh};
+  $application->{output_fh};
 }
 
 =item usage()
