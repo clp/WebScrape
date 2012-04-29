@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 01:06:51 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 01:32:44 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -903,9 +903,39 @@ in a hard-copy edition.
 
 =head1 EXAMPLES
 
-Provide a /demo dir w/ well-commented examples.
-Add examples in the documentation, because the demos might
-not always be avbl.
+Some ways to run the code as a program are shown below.
+
+B<perl Local/Scraper.pm --test>
+
+Run the program using a static local data file for input.
+Do not query the web site for its current data.
+Using local data is the default behavior.
+
+B<perl Local/Scraper.pm --getwebpage>
+
+Get the current web page from the hard-coded URL in the
+source code.
+This option is required to get current data.
+
+B<perl Local/Scraper.pm -g --directory /tmp/Scraper>
+
+Get the current web page from the hard-coded URL in the
+source code and save the result.
+
+Save the retrieved data into one file per letter at
+/tmp/Scraper/out/wsj/YYYY/MMDD/ltte_NN.json.
+The year, month, and date are from the date found in the
+web page.  A unique number is assigned to each saved
+file, as NN.
+
+Each time you run this command, any files in the dir will
+be overwritten.  When the date in the web page changes, a new
+directory will be made to store its data.
+
+
+You can also use this code as a module.
+
+TBD.
 
 
 =head1 FAQ: FREQUENTLY ASKED QUESTIONS
