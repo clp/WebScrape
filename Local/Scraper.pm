@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 11:59:42 AMAM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 01:06:51 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -838,22 +838,67 @@ modules that use source code filters are mutually
 incompatible).
 
 
-=head1 BUGS AND LIMITATIONS
+=head1 LIMITATIONS
 
-A list of known problems, together w/ some indication of
-whether they are likely to be fixed in an upcoming release.
+This program is an experiment in web site scraping.
+It is hard-coded to use wsj.com,
+the web site of the Wall Street Journal newspaper.
 
-Also a list of restrictions on the features the module does
-provide: data types that cannot be handled, performance
-issues and the circumstances in which they may arise,
-practical limitations on the size of data sets, special
-cases that are not (yet) handled, etc.
+It gets the web page with letters to the editor.
 
-There are no known bugs in this program.
+Future work may include other data sources,
+and various content from those sources.
+
+The project should evolve to comprise
+a set of components that provide
+core functions,
+and customized configuration code and data,
+to retrieve and to organize
+content from many different web sites.
+
+
+
+=head1 BUGS
+
 Please report problems to the maintainer,
 C. Poda, at
 clp78 at poda dot net
 Patches are welcome.
+
+
+
+=head2 Unsigned text can cause parsing to fail.
+
+Some items do not have an author,
+eg, Clarifications or Corrections.
+
+The current parsing scheme relies on an author's name
+inside <b> tags.
+Without such a marker,
+the text in these items may or may not be included in the
+output stream.
+
+A different parsing technique might be used in a future
+version,
+and this is one of the cases that it will attempt
+to fix.
+
+
+=head2 Date mismatch between web page and printed text.
+
+The date on the web page for a set of data
+may be different from the date when that data appeared
+in the hard-copy published source.
+
+The program gets the date from the web page
+and saves it with the data retrieved from that page.
+
+There are no current plans to modify the date that is stored
+with the data,
+to make it the same as the date when it was published
+in a hard-copy edition.
+
+
 
 
 =head1 EXAMPLES
