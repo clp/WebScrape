@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 10:40:54 AMAM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 10:52:18 AMAM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -135,7 +135,7 @@ sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime;
 
-  DEBUG("$0: Started run() at $start_time");
+  DEBUG("$program: Started run() at $start_time");
 
   ## Initialize -------------------------------------------------
   my $authors_count = 0;
@@ -218,7 +218,7 @@ TOPIC:
     }
     else {
       DEBUG
-          "\$topic_start not found for number: ,$topic_number,";
+          "\$topic_start not found for topic_number: ,$topic_number,";
       $topic_number++;
       next TOPIC;
     }
@@ -427,7 +427,7 @@ author block.
   my $done_time = localtime;
   my ($end_msg1);
   $end_msg1
-      = "\nSummary of $0:\n"
+      = "\nSummary of $program:\n"
       . "  Using data src ,$data_src, for letters to the editor"
       . " in $source_id.\n"
       . "  Found $authors_count authors for"
