@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 11:28:54 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 11:46:19 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -502,7 +502,7 @@ sub output_fh { #------------------------------------------------
 
 =head2 usage
 
-Show a usage message on screen.
+Show a brief help message on screen.
 
 =cut
 
@@ -599,7 +599,7 @@ sub get_web_page {   #-------------------------------------------
 
 =head2 save_letter_to_file
 
-Write each letter to a separate file.
+Write each letter to the editor to a separate file.
 
 =cut
 
@@ -628,12 +628,21 @@ sub save_letter_to_file { #--------------------------------------
 
 Save several formats of the raw data to files for debugging
 purposes,
-including the original web page;
-a dump of the HTML::TreeBuilder tree in HTML form;
-a dump of the tree in text form
-(only letter text and no HTML);
-and an abridged tree dump showing the tree structure but not
-all the content of the page.
+including:
+
+the original web page;
+
+a dump of the HTML::TreeBuilder tree in HTML form
+($raw_dir/wsj.ltte.dump.html);
+
+a dump of that tree in text form
+(contains only letter-to-the-editor text with no HTML)
+($raw_dir/wsj.ltte.dump.txt);
+
+and an abridged tree dump showing the tree structure
+in an outline form,
+but without all the content of the page
+($raw_dir/wsj.ltte.treedump).
 
 The above files are overwritten every time the program runs.
 
@@ -794,9 +803,9 @@ This file is needed for test mode:
 
 Test mode is entered by specifying the --test command-line
 option.
-The tests are not required for the program to fetch a page
+This mode is not required for the program to fetch a page
 from a web server,
-and they can help to ensure that the s/w has been installed
+but it can help to ensure that the software has been installed
 properly and is working in your environment.
 
 The default value of C<$input_dir> is the current dir
@@ -831,24 +840,24 @@ distribution,
 and you can download them from CPAN if they are not already
 installed on your system.
 
-use autodie;
-use charnames qw( :full );
-use feature qw( say );
+  use autodie;
+  use charnames qw( :full );
+  use feature qw( say );
 
-use Carp;
-use Data::Dumper;
-use DateTime::Format::Natural;
-use File::Path qw(remove_tree make_path);
-use File::Slurp;
-use Getopt::Long;
-use HTML::Element::Library;
-use HTML::TreeBuilder;
-use JSON;
-use Log::Log4perl qw(:easy);
-use Try::Tiny;
-use WWW::Mechanize;
+  use Carp;
+  use Data::Dumper;
+  use DateTime::Format::Natural;
+  use File::Path qw(remove_tree make_path);
+  use File::Slurp;
+  use Getopt::Long;
+  use HTML::Element::Library;
+  use HTML::TreeBuilder;
+  use JSON;
+  use Log::Log4perl qw(:easy);
+  use Try::Tiny;
+  use WWW::Mechanize;
 
-use Text::Wrap qw(wrap);
+  use Text::Wrap qw(wrap);
 
 Also, you might find that Test::XML is required
 by one of these modules,
@@ -885,7 +894,8 @@ content from many different web sites.
 
 Please report problems to the maintainer,
 C. Poda, at
-clp78 at poda dot net
+  clp78 at poda dot net
+
 Patches are welcome.
 
 
@@ -958,22 +968,29 @@ directory will be made to store its data.
 
 You can also use this code as a module.
 
-TBD.
+  use lib qw ( Local );
+  use Local::Scraper;
+
+  my $scraper = Local::Scraper->new();
+
+  $scraper->run();
+
 
 
 =head1 FAQ: FREQUENTLY ASKED QUESTIONS
 
-Correct answers to common questions.
+TBD Correct answers to common questions.
 
 
 =head1 COMMON USAGE MISTAKES
 
-List of common misunderstandings, misconceptions, & correct
+TBD List of common misunderstandings, misconceptions, & correct
 alternatives.  Eg, perltrap manpage.
 
 
 =head1 TODO
 
+TBD 
 Notes on bugs to be fixed, 
 features to be added,
 design issues to be considered.
@@ -984,6 +1001,7 @@ the bug data base.
 
 =head1 HISTORY
 
+TBD 
 Some notes on changes made to the program design or code
 over time, before it was committed to the version control
 system, eg, CVS.
@@ -991,6 +1009,7 @@ system, eg, CVS.
 
 =head1 SEE ALSO
 
+TBD 
 Other modules and apps to this program.
 Other documentation that can help users, including books,
 articles, web pages.
@@ -1006,6 +1025,7 @@ http://TBD
 
 =head1 (DISCLAIMER OF) WARRANTY
 
+TBD 
 Provide real, legal notice for any s/w that might be used
 outside the organization.
 Maybe start w/ GPL clauses 11 & 12 at
