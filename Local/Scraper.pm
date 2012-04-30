@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 01:40:16 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 02:11:15 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -31,8 +31,7 @@ scraper - Get a web page, select data, show & save the results.
 =head1 DESCRIPTION
 
 This program is part of a project to test concepts and
-Perl code
-for web scraping, parsing, and analysis.
+Perl code for web scraping, parsing, and analysis.
 
 It uses WWW::Mechanize to get the web page;
 HTML::TreeBuilder, HTML::Element::Library, and regular expressions
@@ -43,7 +42,8 @@ and each letter can be saved to disk
 in a JSON file
 for more detailed analysis.
 
-This version is hard-coded to use The Wall Street Journal
+This experimental version is hard-coded to use
+The Wall Street Journal
 newspaper's web page that contains
 the letters to the editor.
 Those letters are extracted,
@@ -53,10 +53,11 @@ Some of this documentation is specific to the WSJ web site
 and its pages.
 Future versions might get other data from the WSJ,
 and might get data from other sites.
-At that point,
-the code might be divided into a core component
+Also,
+the code might be divided into core components
 holding the main functionality,
-that is used by modules customized for the various
+and separate modules
+that are customized for the various
 data sources.
 
 For casual use,
@@ -72,7 +73,7 @@ use warnings;
 
 use autodie;
 use charnames qw( :full );
-use feature qw( switch say );
+use feature qw( say );
 
 use Carp;
 use Data::Dumper;
