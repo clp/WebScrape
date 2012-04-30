@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 11:46:19 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 11:47:58 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -91,7 +91,7 @@ use WWW::Mechanize;
 my $DEBUGMODE = 1
     ;   # 1: don't print everything; 2: print more; 5: print most
 my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Initialize
 my $source_id = 'wsj';
