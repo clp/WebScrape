@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 02:11:15 PMPM clpoda>
+# Time-stamp: <Sun 2012 Apr 29 11:28:54 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -550,7 +550,9 @@ END_USAGE
 
 =head2 init_dir
 
-TBDsubdescription.
+Remove any existing directory (and its entire subtree) with the
+given name;
+then make a new empty directory with that same name.
 
 =cut
 
@@ -566,12 +568,10 @@ sub init_dir {  #------------------------------------------------
 
 =head2 get_web_page
 
-This sub includes a try+catch block
-around the request to the web server for the desired page.
+Use a WWW::Mechanize object to request the desired web page,
+inside a try+catch block.
 A failure is caught and logged,
-so the program does not crash or die silently.
-
-The $mech parameter is a WWW::Mechanize object.
+so that the program does not crash or die silently.
 
 =cut
 
@@ -599,11 +599,10 @@ sub get_web_page {   #-------------------------------------------
 
 =head2 save_letter_to_file
 
-TBDsubdescription.
+Write each letter to a separate file.
 
 =cut
 
-## Write each letter to a separate file.
 sub save_letter_to_file { #--------------------------------------
   my $ref_current_letter = shift;
   my $count              = $letters_count;
@@ -627,22 +626,32 @@ sub save_letter_to_file { #--------------------------------------
 
 =head2 save_raw_data
 
-TBDsubdescription.
+Save several formats of the raw data to files for debugging
+purposes,
+including the original web page;
+a dump of the HTML::TreeBuilder tree in HTML form;
+a dump of the tree in text form
+(only letter text and no HTML);
+and an abridged tree dump showing the tree structure but not
+all the content of the page.
+
+The above files are overwritten every time the program runs.
+
+The original web page is also saved in a permanent directory
+based on the web page date,
+for future use.
 
 =cut
 
 sub save_raw_data { #--------------------------------------------
   my ( $raw_dir, $start_page, $tree ) = @_;
 
-  ## Save structured view of web page.
+  ## Save structured tree view of web page.
   open my $treeout, '>', "$raw_dir/wsj.ltte.treedump";
   binmode $treeout, ':utf8';
   $tree->dump($treeout);
   close $treeout;
 
-  ## Save temporary copy of raw downloaded page & decoded
-  ## content for debugging.  Overwrite these files each
-  ## time the program runs.
   my $page_file = "$source_id.ltte.raw";
   write_file( "$raw_dir/$page_file", { binmode => ':utf8' },
     $start_page )
@@ -656,7 +665,7 @@ sub save_raw_data { #--------------------------------------------
     $tree->as_text )
       or DEBUG("ERR save_raw_data(): $!");
 
-  ## Save a permanent copy while debugging.
+  ## Also save original web page in the permanent dir.
   if ($DEBUGMODE) {
     write_file( "$daily_dir/$page_file", { binmode => ':utf8' },
       $start_page )
@@ -672,7 +681,7 @@ can have one or more letters below it.
 Each topic is inside a set of h1 tags,
 with the specified attribute.
 
-All topics are gathered into an array and returned
+All topics on the page are gathered into an array and returned
 to the caller.
 
 The letters under a topic are examined as a group
@@ -691,7 +700,21 @@ sub extract_topics { #-------------------------------------------
 
 =head2 initialize_output_dir
 
-TBDsubdescription.
+Create a unique name for each directory that stores
+permanent output data files,
+remove the dir if it exists (erasing any prior data),
+and make the directory.
+
+The path will be:
+  <outpath>/out/wsj/YYYY/MMDD/
+
+  where <outpath> is specified by the --directory command-line
+  option;
+
+  out/wsj/ are hard-coded dir names;
+
+  YYYY and MM and DD are year, month, and date based on the date
+  string on the web page.
 
 =cut
 
@@ -719,9 +742,6 @@ sub initialize_output_dir {
 
 Use C<GetOptions> to specify command line arguments
 and what to do with them.
-
-You can specify the minimal unique text to specify any
-argument to invoke it.
 
 =cut
 
@@ -762,27 +782,29 @@ TBD Document any major assumptions not already listed.
 
 
 
-=head2 TBD Description of configuration settings required.
+=head1 CONFIGURATION
 
-TBD
+There are no configuration settings required.
 
-=head2 TBD Description of inputs required.
 
-This i/p file is needed for certain tests to run:
-  C<$rootdir/data/wsj/wsj.ltte.full.2012_0408.raw>
+=head1 INPUTS
 
-The tests are not required for the program to operate,
-and they can help to ensure it has been installed
+This file is needed for test mode:
+  C<$input_dir/test/in/wsj/wsj.ltte.full.2012_0408.raw>
+
+Test mode is entered by specifying the --test command-line
+option.
+The tests are not required for the program to fetch a page
+from a web server,
+and they can help to ensure that the s/w has been installed
 properly and is working in your environment.
 
-The default value of C<$rootdir> is the current dir
+The default value of C<$input_dir> is the current dir
 in which the program is run.
 
-If you specify a directory on the cmd line,
-that is assigned to C<$rootdir>,
+If you specify a directory on the command line,
+that path is assigned to C<$input_dir>,
 which will affect where the program looks for this file.
-
-TBD: Maybe don't use CLI -d arg for $rootdir?
 
 
 
@@ -795,33 +817,48 @@ any suggested remedies.  If the app generates exit status
 codes (eg, under Unix), then list the exit status associated
 w/ each error.
 
+See the log/*.debug.log files for messages about the program's
+operation.
 
-=head1 CONFIGURATION AND ENVIRONMENT
+TBD.
 
-A full explanation of any config systems used by the app,
-including names & locations of any config files, & the
-meaning of any env vars or properties that can be set.
-These descriptions must also include details of any config
-language used.
 
 
 =head1 DEPENDENCIES
 
-A list of all the other programs & modules that this one
-relies on, including any restrictions on versions, & an
-indication of whether these required modules are part of the
-standard Perl distribution, part of the program's
-distribution, or must be installed separately.
+Several modules listed below are not part of the standard Perl
+distribution,
+and you can download them from CPAN if they are not already
+installed on your system.
+
+use autodie;
+use charnames qw( :full );
+use feature qw( say );
+
+use Carp;
+use Data::Dumper;
+use DateTime::Format::Natural;
+use File::Path qw(remove_tree make_path);
+use File::Slurp;
+use Getopt::Long;
+use HTML::Element::Library;
+use HTML::TreeBuilder;
+use JSON;
+use Log::Log4perl qw(:easy);
+use Try::Tiny;
+use WWW::Mechanize;
+
+use Text::Wrap qw(wrap);
+
+Also, you might find that Test::XML is required
+by one of these modules,
+but is not a 'formal' dependency.
+You may have to install it manually.
 
 
 =head1 INCOMPATIBILITIES
 
-A list of any programs or modules that this program cannot
-be used in conjunction with.  This may be due to name
-conflicts in the i/f, or competition for system or program
-resources, or due to internal limitations of Perl (eg, many
-modules that use source code filters are mutually
-incompatible).
+No known incompatibilities.
 
 
 =head1 LIMITATIONS
