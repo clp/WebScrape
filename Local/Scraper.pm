@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Sun 2012 Apr 29 11:47:58 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 30 05:31:32 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -872,6 +872,8 @@ No known incompatibilities.
 
 =head1 LIMITATIONS
 
+=head2 Hard-Coded URL
+
 This program is an experiment in web site scraping.
 It is hard-coded to use wsj.com,
 the web site of the Wall Street Journal newspaper.
@@ -888,6 +890,12 @@ and customized configuration code and data,
 to retrieve and to organize
 content from many different web sites.
 
+
+=head2 Log Files Stored in ./log.
+
+The program makes the ./log/ directory to store log data.
+The user must have the authority to make this directory under
+the dir where the program was run.
 
 
 =head1 BUGS
