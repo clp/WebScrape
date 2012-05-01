@@ -1,3 +1,11 @@
+Update 2012_0430
+=================================
+
+The experimental code was moved from bin/scraper to
+Local/Scraper.pm.
+
+
+
 WebScrape version 0.10
 =================================
 
@@ -69,7 +77,8 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 C. Poda
+Copyright (C) 2011-2012 C. Poda
 
-This program is released under the following license: artistic
+This program is released under the following license: the same
+license as Perl.
 
