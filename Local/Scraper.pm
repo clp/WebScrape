@@ -1,28 +1,5 @@
 #! /usr/bin/env perl
 
-# scraper  clpoda  2012_0323
-# PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 30 09:07:27 PMPM clpoda>
-# Scrape the wsj.com site for letters to the editor
-#
-# Plan
-# Build a release from this experimental code.
-# Divide this code into a back-end web scraping module,
-# and a program w/ site-specific code & data for wsj.com
-# Status
-# Fri2012_0323_12:51  Scraper works; now parse the data.
-# Thu2012_0329_09:24  Parsing topics OK; get author data OK.
-# Fri2012_0330_14:41  Extract each letter & save for analysis.
-#   Extract is OK; but no metadata fields are stored for simple
-#   retrieval & analysis.
-# Wed2012_0404_21:07  Save letter text & metadata into a structure.
-# Thu2012_0412_22:07  Fix parse bugs-not separating letters into files properly.
-# Fri2012_0413_12:09  Handle letter w/ >1 author correctly.
-#
-# ---------------------------------------------------------------
-
-# For format of the web page: see codenotes.otl file.
-
 =head1 scraper
 
 scraper - Get a web page, select data, show & save the results.
@@ -33,14 +10,9 @@ scraper - Get a web page, select data, show & save the results.
 This program is part of a project to test concepts and
 Perl code for web scraping, parsing, and analysis.
 
-It uses WWW::Mechanize to get the web page;
-HTML::TreeBuilder, HTML::Element::Library, and regular expressions
-to organize, navigate, and extract desired content.
-A formatted copy of the content is saved and
-shown on screen;
-and each letter can be saved to disk
-in a JSON file
-for more detailed analysis.
+It uses CPAN modules such as WWW::Mechanize to get the web page;
+HTML::TreeBuilder, HTML::Element::Library, and regular
+expressions to organize, navigate, and extract desired content.
 
 This experimental version is hard-coded to use
 The Wall Street Journal
@@ -48,17 +20,15 @@ newspaper's web page that contains
 the letters to the editor.
 Those letters are extracted,
 along with author name(s) and data.
-The headline for each letter is stored as its topic.
+
+A formatted copy of the content is both saved and
+shown on screen;
+and each letter can be saved to disk
+in a JSON file
+for more detailed analysis.
+
 Some of this documentation is specific to the WSJ web site
 and its pages.
-Future versions might get other data from the WSJ,
-and might get data from other sites.
-Also,
-the code might be divided into core components
-holding the main functionality,
-and separate modules
-that are customized for the various
-data sources.
 
 For casual use,
 the program can simply show the retrieved content
