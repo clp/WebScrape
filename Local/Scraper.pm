@@ -775,10 +775,6 @@ properly and is working in your environment.
 The default value of C<$input_dir> is the current dir
 in which the program is run.
 
-If you specify a directory on the command line,
-that path is assigned to C<$input_dir>,
-which will affect where the program looks for this file.
-
 
 
 =head1 DIAGNOSTICS
