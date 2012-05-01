@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 30 09:07:06 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 30 09:07:27 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -98,7 +98,7 @@ my $source_id = 'wsj';
 my $start_url
     = q{http://online.wsj.com/public/page/letters.html};    #CFG
 
-my $program = 'Scraper';
+my $program        = 'Scraper';
 my %current_letter = ();
 my $daily_dir;
 my $dt;
@@ -242,7 +242,6 @@ LINE:
       else {
         next LINE;
       }
-
 
 =head2 Letter-to-the-Editor Structure
 
@@ -565,7 +564,6 @@ sub init_dir {  #------------------------------------------------
   return $dir;
 }
 
-
 =head2 get_web_page
 
 Use a WWW::Mechanize object to request the desired web page,
@@ -740,8 +738,7 @@ sub initialize_output_dir {
     $_ = "0" . $_ if $_ <= 9;
   }
 
-  $daily_dir
-      = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
+  $daily_dir = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
   ## TBD Check for success of init_dir here & in init_dir?:
   init_dir($daily_dir);
   return $daily_dir;
