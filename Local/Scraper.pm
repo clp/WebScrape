@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 30 08:56:34 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 30 09:07:06 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -741,7 +741,6 @@ sub initialize_output_dir {
   }
 
   $daily_dir
-      ##DBG = "$rootdir/out/wsj/" . $dt->year . "/$m$d" . "_$hh$mm";
       = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
   ## TBD Check for success of init_dir here & in init_dir?:
   init_dir($daily_dir);
