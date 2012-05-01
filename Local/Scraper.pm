@@ -2,7 +2,7 @@
 
 # scraper  clpoda  2012_0323
 # PC-batbug:/home/clpoda/p/WebScrape/bin
-# Time-stamp: <Mon 2012 Apr 30 05:31:32 PMPM clpoda>
+# Time-stamp: <Mon 2012 Apr 30 08:51:12 PMPM clpoda>
 # Scrape the wsj.com site for letters to the editor
 #
 # Plan
@@ -785,9 +785,6 @@ The site can change and make these assumptions false.
 At that point,
 the code might need to be modified to handle the new data format.
 
-TBD Document any major assumptions not already listed.
-
-
 
 
 
@@ -819,14 +816,7 @@ which will affect where the program looks for this file.
 
 =head1 DIAGNOSTICS
 
-A list of every error & warning msg that the app can
-generate (even the ones that will "never happen"), w/ a full
-explanation of each problem, one or more likely causes, and
-any suggested remedies.  If the app generates exit status
-codes (eg, under Unix), then list the exit status associated
-w/ each error.
-
-See the log/*.debug.log files for messages about the program's
+See the ./log/*.log files for messages about the program's
 operation.
 
 TBD.
@@ -836,8 +826,8 @@ TBD.
 =head1 DEPENDENCIES
 
 Several modules listed below are not part of the standard Perl
-distribution,
-and you can download them from CPAN if they are not already
+distribution;
+download them from CPAN if they are not already
 installed on your system.
 
   use autodie;
@@ -865,9 +855,11 @@ but is not a 'formal' dependency.
 You may have to install it manually.
 
 
+
 =head1 INCOMPATIBILITIES
 
 No known incompatibilities.
+
 
 
 =head1 LIMITATIONS
@@ -875,10 +867,9 @@ No known incompatibilities.
 =head2 Hard-Coded URL
 
 This program is an experiment in web site scraping.
-It is hard-coded to use wsj.com,
+It is hard-coded to request the page with
+letters to the editor at wsj.com,
 the web site of the Wall Street Journal newspaper.
-
-It gets the web page with letters to the editor.
 
 Future work may include other data sources,
 and various content from those sources.
@@ -890,12 +881,6 @@ and customized configuration code and data,
 to retrieve and to organize
 content from many different web sites.
 
-
-=head2 Log Files Stored in ./log.
-
-The program makes the ./log/ directory to store log data.
-The user must have the authority to make this directory under
-the dir where the program was run.
 
 
 =head1 BUGS
@@ -980,89 +965,66 @@ You can also use this code as a module.
   use Local::Scraper;
 
   my $scraper = Local::Scraper->new();
-
   $scraper->run();
 
 
 
 =head1 FAQ: FREQUENTLY ASKED QUESTIONS
 
-TBD Correct answers to common questions.
+TBD
 
 
 =head1 COMMON USAGE MISTAKES
 
-TBD List of common misunderstandings, misconceptions, & correct
-alternatives.  Eg, perltrap manpage.
+By default,
+the program uses a local data file instead of requesting a
+web page from a server on the Internet.
+Use the '--getwebpage' command-line option to fetch the current
+web page at the specified URL.
 
 
 =head1 TODO
 
-TBD 
-Notes on bugs to be fixed, 
-features to be added,
-design issues to be considered.
+Scrape more data sources.
 
-Bugs and features can be officially entered and tracked in
-the bug data base.
+Scrape more categories of data from each source.
+
+Divide the code into a core component with common functionality
+used by scrapers for different sources and categories of data.
 
 
-=head1 HISTORY
-
-TBD 
-Some notes on changes made to the program design or code
-over time, before it was committed to the version control
-system, eg, CVS.
 
 
 =head1 SEE ALSO
 
-TBD 
-Other modules and apps to this program.
-Other documentation that can help users, including books,
-articles, web pages.
+CPAN modules:
+  WebFetch
+  Web::Scrape.
 
-Engineering Wiki at TBD.
-Search for TBD.
-
-Documents for the project at TBD server:
-http://TBD
-
-
-
-
-=head1 (DISCLAIMER OF) WARRANTY
-
-TBD 
-Provide real, legal notice for any s/w that might be used
-outside the organization.
-Maybe start w/ GPL clauses 11 & 12 at
-http://www.gnu.org/copyleft/gpl.html.
 
 
 =head1 ACKNOWLEDGEMENTS
 
-Identify contributors, bug fixers, to encourage others.
+Thanks to all contributors to CPAN, Perl, and open source
+software in general.
 
 
 
 =head1 AUTHOR
 
-C. Poda  clp78 at poda dot net
+C. Poda,  clp78 at poda dot net
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) C. Poda
+Copyright 2012 (c) C. Poda
 clp78 at poda dot net.  All rights reserved.
 
 This program is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.  See
-L<Perl Artistic License|perlartistic>.
+and/or modify it under the same terms as Perl itself.
 
 This program is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.
-
 
