@@ -6,14 +6,13 @@ use Test::More tests => 1;
 # for this test to pass, eg, the install dir.
 # TBD: Erase ./tmp/test/out before running this test, to avoid using stale data.
 use File::Path qw(remove_tree make_path);
-use autodie qw(remove_tree);
+use autodie;
 my $d = "./tmp/test/out";
 if ( -d $d ) {
   remove_tree($d);
 }
 make_path($d);
 
-#ORG.OK my $program_under_test = "perl " . "./lib/Scraper.pm --test --directory ./tmp/test";
 my $program_under_test = "perl ./Local/Scraper.pm --test --directory ./tmp/test";
 system $program_under_test;
 
