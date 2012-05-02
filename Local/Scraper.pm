@@ -58,9 +58,7 @@ use Log::Log4perl qw(:easy);
 use Try::Tiny;
 use WWW::Mechanize;
 
-my $DEBUGMODE = 1
-    ;   # 1: don't print everything; 2: print more; 5: print most
-my $USE_LOCAL_DATA = 1;    # 0=Query the web site.
+my $use_local_data = 1;    # 0=Query the web site.
 our $VERSION = '0.11';
 
 # Initialize
@@ -95,9 +93,15 @@ if ( !$start_url ) {
   exit;
 }
 
+my $debugmode;
 my $directory;
 my $quiet;
 parse_cmd_line();
+
+#TBD if ( ! $debugmode ) {
+#TBD my $debugmode = 0;
+#TBD ;   # 0: print nothing; 1: print least; 2: print more; 5: print most
+#TBD }
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 __PACKAGE__->new->run if !caller;
@@ -120,7 +124,7 @@ sub run { #------------------------------------------------------
   $mech->agent_alias('Linux Mozilla');
   my $start_page;
   my $tree;
-  if ($USE_LOCAL_DATA) {
+  if ($use_local_data) {
     ## Read the local file into $start_page for correct handling
     ## of raw data by TreeBuilder.
     ##
@@ -481,6 +485,8 @@ Usage:
   perl Local/Scraper.pm [options]
 
   Options:
+    --debugmode N: Set a debug level.
+        Default is 0, to disable it.
     --directory <outpath>: Specify the parent path for o/p data,
         and write o/p data to disk files.
         Default is 'no directory'.
@@ -514,6 +520,10 @@ in JSON formatted files at
 The path depends on year, month, and day specified in the
 web page.  That date can be different from the date that those
 letters were published in the printed newspaper.
+
+Enable debugmode by setting it to an integer value, eg 1-5.
+More debug data is shown when the value is higher.
+Set it to 0 to disable all debugmode output.
 END_USAGE
 }
 
@@ -643,11 +653,9 @@ sub save_raw_data { #--------------------------------------------
       or DEBUG("ERR save_raw_data(): $!");
 
   ## Also save original web page in the permanent dir.
-  if ($DEBUGMODE) {
-    write_file( "$daily_dir/$page_file", { binmode => ':utf8' },
-      $start_page )
-        or DEBUG("ERR save_raw_data(): $!");
-  }
+  write_file( "$daily_dir/$page_file", { binmode => ':utf8' },
+    $start_page )
+      or DEBUG("ERR save_raw_data(): $!");
   return;
 }
 
@@ -709,6 +717,12 @@ sub initialize_output_dir {
   }
 
   $daily_dir = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
+
+  if ( $debugmode > 4 ) {
+    ## Add suffix to filename for hour & minute.
+    $daily_dir .= "_$hh$mm";
+  }
+
   ## TBD Check for success of init_dir here & in init_dir?:
   init_dir($daily_dir);
   return $daily_dir;
@@ -721,23 +735,28 @@ and what to do with them.
 
 =cut
 
+#TBD Document CLI options in more detail here, or elsewhere in pod?
+
 sub parse_cmd_line {
 
   my $getwebpage;
   my $help;
   my $test;
   my $result = GetOptions(
-    'help'        => \$help,
+    'debugmode=i' => \$debugmode,
     'directory=s' => \$directory,
+    'help'        => \$help,
     'getwebpage'  => \$getwebpage,
     'quiet'       => \$quiet,
     'test'        => \$test,
   );
 
-  if ($help) { usage; exit; }
+  if ($help)       { usage; exit; }
+
+  if (!$debugmode) { $debugmode = 0; }
+  if ($getwebpage) { $use_local_data = 0; }
   if ($quiet)      { $quiet          = 1; }
-  if ($test)       { $USE_LOCAL_DATA = 1; }
-  if ($getwebpage) { $USE_LOCAL_DATA = 0; }
+  if ($test)       { $use_local_data = 1; }
 }
 
 __END__
@@ -960,7 +979,7 @@ used by scrapers for different sources and categories of data.
 
 =head1 SEE ALSO
 
-CPAN modules:
+CPAN modules at cpan.org:
   WebFetch
   Web::Scrape.
 
