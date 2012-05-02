@@ -94,9 +94,9 @@ if ( !$start_url ) {
 }
 
 my $debuglevel = 0;
-my $directory = q{.};
-my $quiet = 0;
-if ( ! parse_cmd_line() ) {
+my $directory  = q{.};
+my $quiet      = 0;
+if ( !parse_cmd_line() ) {
   usage();
   exit;
 }
@@ -748,20 +748,20 @@ sub parse_cmd_line {
   my $help;
   my $test;
   my $result = GetOptions(
-    'debuglevel=i'=> \$debuglevel,
-    'directory=s' => \$directory,
-    'help|?'      => \$help,
-    'getwebpage'  => \$getwebpage,
-    'quiet'       => \$quiet,
-    'test'        => \$test,
+    'debuglevel=i' => \$debuglevel,
+    'directory=s'  => \$directory,
+    'help|?'       => \$help,
+    'getwebpage'   => \$getwebpage,
+    'quiet'        => \$quiet,
+    'test'         => \$test,
   );
 
-  if ($help)       { usage; exit; }
+  if ($help) { usage; exit; }
 
-  if (!$debuglevel) { $debuglevel = 0; }
-  if ($getwebpage)  { $use_local_data = 0; }
-  if ($quiet)       { $quiet          = 1; }
-  if ($test)        { $use_local_data = 1; }
+  if ( !$debuglevel ) { $debuglevel     = 0; }
+  if ($getwebpage)    { $use_local_data = 0; }
+  if ($quiet)         { $quiet          = 1; }
+  if ($test)          { $use_local_data = 1; }
   return $result;
 }
 
