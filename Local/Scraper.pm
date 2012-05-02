@@ -93,7 +93,7 @@ if ( !$start_url ) {
   exit;
 }
 
-my $debugmode = 0;
+my $debuglevel = 0;
 my $directory = q{.};
 my $quiet = 0;
 if ( ! parse_cmd_line() ) {
@@ -488,7 +488,7 @@ Usage:
   perl Local/Scraper.pm [options]
 
   Options:
-    --debugmode N: Set a debug level.
+    --debuglevel N: Set a debug level.
         Default is 0, to disable it.
     --directory <outpath>: Specify the parent path for o/p data,
         and write o/p data to disk files.
@@ -524,9 +524,9 @@ The path depends on year, month, and day specified in the
 web page.  That date can be different from the date that those
 letters were published in the printed newspaper.
 
-Enable debugmode by setting it to an integer value, eg 1-5.
+Enable debuglevel by setting it to an integer value, eg 1-5.
 More debug data is shown when the value is higher.
-Set it to 0 to disable all debugmode output.
+Set it to 0 to disable all debuglevel output.
 END_USAGE
 }
 
@@ -721,7 +721,7 @@ sub initialize_output_dir {
 
   $daily_dir = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
 
-  if ( $debugmode > 4 ) {
+  if ( $debuglevel > 4 ) {
     ## Add suffix to filename for hour & minute.
     $daily_dir .= "_$hh$mm";
   }
@@ -748,7 +748,7 @@ sub parse_cmd_line {
   my $help;
   my $test;
   my $result = GetOptions(
-    'debugmode=i' => \$debugmode,
+    'debuglevel=i'=> \$debuglevel,
     'directory=s' => \$directory,
     'help|?'      => \$help,
     'getwebpage'  => \$getwebpage,
@@ -758,10 +758,10 @@ sub parse_cmd_line {
 
   if ($help)       { usage; exit; }
 
-  if (!$debugmode) { $debugmode = 0; }
-  if ($getwebpage) { $use_local_data = 0; }
-  if ($quiet)      { $quiet          = 1; }
-  if ($test)       { $use_local_data = 1; }
+  if (!$debuglevel) { $debuglevel = 0; }
+  if ($getwebpage)  { $use_local_data = 0; }
+  if ($quiet)       { $quiet          = 1; }
+  if ($test)        { $use_local_data = 1; }
   return $result;
 }
 
