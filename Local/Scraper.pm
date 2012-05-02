@@ -93,10 +93,13 @@ if ( !$start_url ) {
   exit;
 }
 
-my $debugmode;
-my $directory;
-my $quiet;
-parse_cmd_line();
+my $debugmode = 0;
+my $directory = q{.};
+my $quiet = 0;
+if ( ! parse_cmd_line() ) {
+  usage();
+  exit;
+}
 
 #TBD if ( ! $debugmode ) {
 #TBD my $debugmode = 0;
@@ -737,6 +740,8 @@ and what to do with them.
 
 #TBD Document CLI options in more detail here, or elsewhere in pod?
 
+#TBD Replace $use_local_data w/ $getwebpage?
+
 sub parse_cmd_line {
 
   my $getwebpage;
@@ -745,7 +750,7 @@ sub parse_cmd_line {
   my $result = GetOptions(
     'debugmode=i' => \$debugmode,
     'directory=s' => \$directory,
-    'help'        => \$help,
+    'help|?'      => \$help,
     'getwebpage'  => \$getwebpage,
     'quiet'       => \$quiet,
     'test'        => \$test,
@@ -757,6 +762,7 @@ sub parse_cmd_line {
   if ($getwebpage) { $use_local_data = 0; }
   if ($quiet)      { $quiet          = 1; }
   if ($test)       { $use_local_data = 1; }
+  return $result;
 }
 
 __END__
