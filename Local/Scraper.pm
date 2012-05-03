@@ -702,9 +702,10 @@ but without all the content of the page
 
 The above files are overwritten every time the program runs.
 
-The original web page is also saved in a permanent directory
+The original web page is also saved in a different directory,
 based on the web page date,
-for future use.
+where it is not overwritten
+(unless the new page has the same date as the old page).
 
 =cut
 
@@ -730,7 +731,7 @@ sub save_raw_data { #--------------------------------------------
     $tree->as_text )
       or DEBUG("ERR save_raw_data(): $!");
 
-  ## Also save original web page in the permanent dir.
+  ## Also save original web page in another dir.
   write_file( "$daily_dir/$page_file", { binmode => ':utf8' },
     $start_page )
       or DEBUG("ERR save_raw_data(): $!");
@@ -764,7 +765,7 @@ sub extract_topics { #-------------------------------------------
 =head2 initialize_output_dir
 
 Create a unique name for each directory that stores
-permanent output data files,
+individual output data files,
 remove the dir if it exists (erasing any prior data),
 and make the directory.
 
