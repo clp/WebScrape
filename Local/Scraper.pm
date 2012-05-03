@@ -59,6 +59,7 @@ use Try::Tiny;
 use WWW::Mechanize;
 
 my $use_local_data = 1;    # 0=Query the web site.
+my $getwebpage = 0;    # 1=Query the web site.
 our $VERSION = '0.11';
 
 # Initialize
@@ -123,17 +124,17 @@ sub run { #------------------------------------------------------
   $mech->agent_alias('Linux Mozilla');
   my $start_page;
   my $tree;
-  if ($use_local_data) {
+  if ( $getwebpage ) {
+    $start_page = get_web_page( $mech, $start_url );
+    $data_src = 'web';
+  }
+  else {
     ## Read the local file into $start_page for correct handling
     ## of raw data by TreeBuilder.
     ##
     $start_page = read_file(
       "$input_dir/test/in/wsj/wsj.ltte.full.2012_0408.raw");
     $data_src = 'local copy of web page';
-  }
-  else {
-    $start_page = get_web_page( $mech, $start_url );
-    $data_src = 'web';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
 
@@ -739,7 +740,7 @@ and what to do with them.
 
 sub parse_cmd_line {
 
-  my $getwebpage;
+  #TBR? my $getwebpage;
   my $help;
   my $test;
   my $result = GetOptions(
@@ -754,9 +755,9 @@ sub parse_cmd_line {
   if ($help) { usage; exit; }
 
   if ( !$debuglevel ) { $debuglevel     = 0; }
-  if ($getwebpage)    { $use_local_data = 0; }
+  #TBR if ($getwebpage)    { $use_local_data = 0; }
   if ($quiet)         { $quiet          = 1; }
-  if ($test)          { $use_local_data = 1; }
+  if ($test)          { $getwebpage     = 0; }
   return $result;
 }
 
