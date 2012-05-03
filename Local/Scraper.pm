@@ -115,7 +115,7 @@ only show summary data.
 Default is 'quiet OFF',
 and show the fetched data.
 
-=back 4
+=back
 
 =cut
 
