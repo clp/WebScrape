@@ -62,38 +62,40 @@ Either one or two hyphens can be used to prefix an option name.
 
 Set a level for debugging data written to the screen;
 used during development.
-A convention is to use
-1 to show only the most critical data,
-5 for all data.
 
-Default is 0, to disable it.
+Enable debuglevel by setting it to an integer value, eg 1-5.
+More debug data is shown when the value is higher.
+
+Default is 0, to disable all debuglevel output.
 
 =item B<--directory I<outpath>>
 
 Specify the parent path for storing output data,
-and write the processed output data to a set of disk files
+and write the processed output data to a set of files
 in this tree:
-  I<outpath>/out/I<source>/YYYY/MMDD/
+  I<outpath>/out/I<source>/YYYY/MMDD/ltte_NN.json.
 
-where I<source> is hard-coded in the program; and
-the year, month, and day are extracted from the web page.
-These data will be overwritten whenever a page is fetched and
+where I<source> is hard-coded in the program;
+the year, month, and day are extracted from the web page;
+and NN is a unique sequence number for each file.
+The web page's date can be different from the date when
+this material appeared in the printed newspaper.
+
+These data are intended for later examination and analysis,
+but will be overwritten whenever a page is fetched and
 processed that has the same date stamp.
 
-Some output data that can help with debugging is stored here,
+Some data that can help with debugging are stored here,
 and overwritten on each run:
-  <outpath>/out/raw/
+  I<outpath>/out/raw/
 
-If not specified,
-the default is to use the current directory as the parent
-for any output data.
+Default I<outpath> is the current directory.
 
 =item B<--getwebpage>
 
 Query web server for the desired input data.
 
-By default no web query is made,
-and a local file is used for input data to test the code.
+Default is do not query a web server.
 
 =item B<--help|?>
 
@@ -104,7 +106,7 @@ Show a brief usage message, then exit.
 Read input data from a local data file,
 instead of querying a web server.
 
-By default this mode is ON and no web query is made
+By default test mode is ON and no web query is made
 unless the --getwebpage option is specified.
 
 =item B<--quiet>
@@ -582,13 +584,13 @@ specified content, saves it, and displays it.
 This version is hard-coded to get letters to the editor, ltte,
 from the Wall Street Journal newspaper web site.
 
-Temporary output files are stored under the raw dir,
-<outpath>/out/wsj/raw/.  The program overwrites all files
+Some output files for debugging are stored under the raw dir,
+I<outpath>/out/wsj/raw/.  The program overwrites all files
 in this dir every time it runs.
 
-Permanent output files are stored under the <outpath>/out/ dir
-tree, but only when the --directory option is specified, eg,
-  perl ./lib/Scraper.pm --directory /tmp/Scraper
+Output files intended for later examination and analysis
+are stored under the I<outpath>/out/ dir tree , eg,
+  perl ./Local/Scraper.pm --directory /tmp/Scraper
 
 See the content collected each day that the program was run
 in JSON formatted files at
