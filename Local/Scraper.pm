@@ -101,10 +101,6 @@ if ( !parse_cmd_line() ) {
   exit;
 }
 
-#TBD if ( ! $debugmode ) {
-#TBD my $debugmode = 0;
-#TBD ;   # 0: print nothing; 1: print least; 2: print more; 5: print most
-#TBD }
 
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 __PACKAGE__->new->run if !caller;
@@ -455,7 +451,6 @@ sub init { #-----------------------------------------------------
   my ($application) = @_;
   $application->{output_fh} = \*STDOUT;
 
-  #TBD Include return for PBP?
   return;
 }
 
