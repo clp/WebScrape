@@ -1,8 +1,22 @@
 #! /usr/bin/env perl
 
-=head1 scraper
+=head1 NAME
 
-scraper - Get a web page, select data, show & save the results.
+Local::Scraper - Get a web page, select data, show & save the results.
+
+
+=head1 SYNOPSIS
+
+As a module.
+
+  use Local::Scraper;
+  use lib qw ( Local );
+  my $scraper = Local::Scraper->new();
+  $scraper->run();
+
+As a program.
+
+  Local/Scraper.pm [options]
 
 
 =head1 DESCRIPTION
@@ -33,6 +47,75 @@ and its pages.
 For casual use,
 the program can simply show the retrieved content
 without using a web browser.
+
+
+=head1 OPTIONS
+
+All options can be shortened to the smallest set of unique
+characters.
+
+Either one or two hyphens can be used to prefix an option name.
+
+=over 4
+
+=item B<--debuglevel I<NUM>>
+
+Set a level for debugging data written to the screen;
+used during development.
+A convention is to use
+1 to show only the most critical data,
+5 for all data.
+
+Default is 0, to disable it.
+
+=item B<--directory I<outpath>>
+
+Specify the parent path for storing output data,
+and write the processed output data to a set of disk files
+in this tree:
+  I<outpath>/out/I<source>/YYYY/MMDD/
+
+where I<source> is hard-coded in the program; and
+the year, month, and day are extracted from the web page.
+These data will be overwritten whenever a page is fetched and
+processed that has the same date stamp.
+
+Some output data that can help with debugging is stored here,
+and overwritten on each run:
+  <outpath>/out/raw/
+
+If not specified,
+the default is to use the current directory as the parent
+for any output data.
+
+=item B<--getwebpage>
+
+Query web server for the desired input data.
+
+By default no web query is made,
+and a local file is used for input data to test the code.
+
+=item B<--help|?>
+
+Show a brief usage message, then exit.
+
+=item B<--test>
+
+Read input data from a local data file,
+instead of querying a web server.
+
+By default this mode is ON and no web query is made
+unless the --getwebpage option is specified.
+
+=item B<--quiet>
+
+Do not show the fetched data on the screen;
+only show summary data.
+
+Default is 'quiet OFF',
+and show the fetched data.
+
+=back 4
 
 =cut
 
@@ -485,19 +568,13 @@ Usage:
 
   Options:
     --debuglevel N: Set a debug level.
-        Default is 0, to disable it.
-    --directory <outpath>: Specify the parent path for o/p data,
-        and write o/p data to disk files.
-        Default is 'no directory'.
+    --directory <outpath>: Specify parent path for o/p data,
+        and write o/p to disk.
     --getwebpage: Query web server for i/p data.
-        Default is 'no getwebpage'.
-    --help: Show the brief usage message, then exit.
-    --test: Read i/p data from a file, instead of querying a web
-        server.
-        Default is 'test'.
-    --quiet: Do not show the fetched data on the screen;
+    --help: Show a brief usage message, then exit.
+    --test: Read i/p data from a file.
+    --quiet: Do not show fetched data on screen;
         only show summary data.
-        Default is 'no quiet'.
 
 The program requests a page from a web site, extracts the
 specified content, saves it, and displays it.
