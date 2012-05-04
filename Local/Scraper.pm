@@ -30,23 +30,21 @@ expressions to organize, navigate, and extract desired content.
 
 This experimental version is hard-coded to use
 The Wall Street Journal
-newspaper's web page that contains
-the letters to the editor.
+newspaper's web page that contains the letters to the editor.
 Those letters are extracted,
 along with author name(s) and data.
 
 A formatted copy of the content is both saved and
 shown on screen;
-and each letter can be saved to disk
-in a JSON file
+and each letter can be saved to disk in a JSON file
 for more detailed analysis.
 
 Some of this documentation is specific to the WSJ web site
 and its pages.
 
 For casual use,
-the program can simply show the retrieved content
-without using a web browser.
+the program can simply show the retrieved content without using a
+web browser.
 
 
 =head1 OPTIONS
@@ -327,8 +325,7 @@ A topic is marked by <h1> tags.
 The first line of text after a topic is the start of a letter's
 body text.
 
-The first line with a <b> tag
-marks the end of the body text,
+The first line with a <b> tag marks the end of the body text,
 and the start of the first author's name.
 
 The following lines with <i> tags are data about the first
@@ -502,7 +499,7 @@ author block.
 
 #
 #
-# Other Subroutines ---------------------------------------------------
+# Other Functions -----------------------------------------------
 #
 #
 
@@ -542,8 +539,7 @@ sub init { #-----------------------------------------------------
 
 =head2 output_fh
 
-Use application object and set output filehandle as an
-attribute,
+Use application object and set output filehandle as an attribute,
 for easier module testing.
 
 =cut
@@ -585,23 +581,12 @@ This version is hard-coded to get letters to the editor, ltte,
 from the Wall Street Journal newspaper web site.
 
 Some output files for debugging are stored under the raw dir,
-I<outpath>/out/wsj/raw/.  The program overwrites all files
+I<outpath>/out/wsj/raw/.  The program overwrites files
 in this dir every time it runs.
 
 Output files intended for later examination and analysis
-are stored under the I<outpath>/out/ dir tree , eg,
-  perl ./Local/Scraper.pm --directory /tmp/Scraper
+are stored under the I<outpath>/out/wsj/ dir tree.
 
-See the content collected each day that the program was run
-in JSON formatted files at
-<outpath>/out/wsj/YYYY/MMDD/ltte_NN.json.
-The path depends on year, month, and day specified in the
-web page.  That date can be different from the date that those
-letters were published in the printed newspaper.
-
-Enable debuglevel by setting it to an integer value, eg 1-5.
-More debug data is shown when the value is higher.
-Set it to 0 to disable all debuglevel output.
 END_USAGE
 }
 
@@ -777,7 +762,7 @@ The path will be:
 
   out/wsj/ are hard-coded dir names;
 
-  YYYY and MM and DD are year, month, and date based on the date
+  YYYY, MM, and DD are year, month, and date based on the date
   string on the web page.
 
 =cut
@@ -1016,18 +1001,19 @@ Save the retrieved data into one file per letter at
 /tmp/Scraper/out/wsj/YYYY/MMDD/ltte_NN.json.
 The year, month, and date are from the date found in the
 web page.  A unique number is assigned to each saved
-file, as NN.
+file in a directory, as NN.
 
-Each time you run this command, any files in the dir will
-be overwritten.  When the date in the web page changes, a new
-directory will be made to store its data.
+When you run this command and the web page has the same date
+as stored data,
+the files in that directory will be overwritten.
+When the date in the web page changes,
+a new directory will be made to store its data.
 
 
 You can also use this code as a module.
 
   use lib qw ( Local );
   use Local::Scraper;
-
   my $scraper = Local::Scraper->new();
   $scraper->run();
 
