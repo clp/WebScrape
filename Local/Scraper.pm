@@ -142,7 +142,7 @@ use Try::Tiny;
 use WWW::Mechanize;
 
 my $use_local_data = 1;    # 0=Query the web site.
-my $getwebpage = 0;    # 1=Query the web site.
+my $getwebpage     = 0;    # 1=Query the web site.
 our $VERSION = '0.11';
 
 # Initialize
@@ -185,7 +185,6 @@ if ( !parse_cmd_line() ) {
   exit;
 }
 
-
 # Modulino: use as a module if a caller exists; otherwise run as a program.
 __PACKAGE__->new->run if !caller;
 
@@ -207,7 +206,7 @@ sub run { #------------------------------------------------------
   $mech->agent_alias('Linux Mozilla');
   my $start_page;
   my $tree;
-  if ( $getwebpage ) {
+  if ($getwebpage) {
     $start_page = get_web_page( $mech, $start_url );
     $data_src = 'web';
   }
@@ -819,10 +818,11 @@ sub parse_cmd_line {
 
   if ($help) { usage; exit; }
 
-  if ( !$debuglevel ) { $debuglevel     = 0; }
+  if ( !$debuglevel ) { $debuglevel = 0; }
+
   #TBR if ($getwebpage)    { $use_local_data = 0; }
-  if ($quiet)         { $quiet          = 1; }
-  if ($test)          { $getwebpage     = 0; }
+  if ($quiet) { $quiet      = 1; }
+  if ($test)  { $getwebpage = 0; }
   return $result;
 }
 
