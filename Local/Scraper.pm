@@ -141,7 +141,7 @@ use Log::Log4perl qw(:easy);
 use Try::Tiny;
 use WWW::Mechanize;
 
-my $getwebpage     = 0;    # 1=Query the web site.
+my $getwebpage = 0;    # 1=Query the web site.
 our $VERSION = '0.11';
 
 # Initialize
@@ -163,8 +163,8 @@ if ( !parse_cmd_line() ) {
   exit;
 }
 
-my $log_dir = './log';
-$log_dir = '/var/local/data/Scraper/log' if $debuglevel > 4;
+my $log_dir = './log';    #CFG
+$log_dir = '/var/local/data/Scraper/log' if $debuglevel > 4; #CFG
 if ( !-d $log_dir ) {
   make_path("$log_dir");
 }
@@ -816,8 +816,8 @@ sub parse_cmd_line {
   if ($help) { usage; exit; }
 
   if ( !$debuglevel ) { $debuglevel = 0; }
-  if ($quiet) { $quiet      = 1; }
-  if ($test)  { $getwebpage = 0; }
+  if ($quiet)         { $quiet      = 1; }
+  if ($test)          { $getwebpage = 0; }
   return $result;
 }
 
