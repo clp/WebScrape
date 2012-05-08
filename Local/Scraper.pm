@@ -216,7 +216,7 @@ sub run { #------------------------------------------------------
     ##
     $start_page = read_file(
       "$input_dir/test/in/wsj/wsj.ltte.full.2012_0408.raw");
-    $data_src = 'local copy of web page';
+    $data_src = 'local_file';
   }
   $tree = HTML::TreeBuilder->new_from_content($start_page);
 
@@ -487,7 +487,8 @@ author block.
       . " $letters_count letters to the editor\n"
       . "  in $source_id, for web site content dated $pub_date_raw.\n";
 
-  DEBUG($end_msg1);
+  DEBUG("Run: $program|$source_id|$data_src|$pub_date_raw"
+      . "|$authors_count|$letters_count");
 
   print { $application->{output_fh} } $end_msg1 . "\n";
   return;
