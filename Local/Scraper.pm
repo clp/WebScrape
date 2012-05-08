@@ -141,7 +141,6 @@ use Log::Log4perl qw(:easy);
 use Try::Tiny;
 use WWW::Mechanize;
 
-my $use_local_data = 1;    # 0=Query the web site.
 my $getwebpage     = 0;    # 1=Query the web site.
 our $VERSION = '0.11';
 
@@ -156,7 +155,16 @@ my $daily_dir;
 my $dt;
 my $letters_count;
 
+my $debuglevel = 0;
+my $directory  = q{.};
+my $quiet      = 0;
+if ( !parse_cmd_line() ) {
+  usage();
+  exit;
+}
+
 my $log_dir = './log';
+$log_dir = '/var/local/data/Scraper/log' if $debuglevel > 4;
 if ( !-d $log_dir ) {
   make_path("$log_dir");
 }
@@ -173,14 +181,6 @@ Log::Log4perl->easy_init(
 
 if ( !$start_url ) {
   carp "Die: No URL found in file or on command line.";
-  usage();
-  exit;
-}
-
-my $debuglevel = 0;
-my $directory  = q{.};
-my $quiet      = 0;
-if ( !parse_cmd_line() ) {
   usage();
   exit;
 }
@@ -782,8 +782,8 @@ sub initialize_output_dir {
   $daily_dir = "$rootdir/out/wsj/" . $dt->year . "/$m$d";
 
   if ( $debuglevel > 4 ) {
-    ## Add suffix to filename for hour & minute.
-    $daily_dir .= "_$hh$mm";
+    ## Add suffix to dir name for hour & minute & pid.
+    $daily_dir .= "_$hh$mm" . "_$$";
   }
 
   ## TBD Check for success of init_dir here & in init_dir?:
@@ -800,11 +800,8 @@ and what to do with them.
 
 #TBD Document CLI options in more detail here, or elsewhere in pod?
 
-#TBD Replace $use_local_data w/ $getwebpage?
-
 sub parse_cmd_line {
 
-  #TBR? my $getwebpage;
   my $help;
   my $test;
   my $result = GetOptions(
@@ -819,8 +816,6 @@ sub parse_cmd_line {
   if ($help) { usage; exit; }
 
   if ( !$debuglevel ) { $debuglevel = 0; }
-
-  #TBR if ($getwebpage)    { $use_local_data = 0; }
   if ($quiet) { $quiet      = 1; }
   if ($test)  { $getwebpage = 0; }
   return $result;
