@@ -192,8 +192,6 @@ sub run { #------------------------------------------------------
   my ($application) = @_;
   my $start_time = localtime;
 
-  DEBUG("$program: Started run() at $start_time") if ($debuglevel > 4);
-
   ## Initialize -------------------------------------------------
   my $authors_count = 0;
   my $data_src      = 'unknown, maybe __DATA__';
